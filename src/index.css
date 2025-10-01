@@ -53,6 +53,17 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Betting platform colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --profit: 142 76% 36%;
+    --loss: 0 84.2% 60.2%;
+    --chart-1: 221 83% 53%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 32 95% 44%;
+    --chart-5: 340 82% 52%;
   }
 
   .dark {
@@ -91,6 +102,17 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Betting platform colors - dark mode */
+    --success: 142 70% 45%;
+    --success-foreground: 0 0% 100%;
+    --profit: 142 70% 45%;
+    --loss: 0 62.8% 30.6%;
+    --chart-1: 221 83% 53%;
+    --chart-2: 142 70% 45%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 32 95% 44%;
+    --chart-5: 340 82% 52%;
   }
 }
 
