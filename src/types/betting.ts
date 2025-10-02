@@ -24,8 +24,48 @@ export interface Bet {
   isLive?: boolean;
   teams?: string[];
   competition?: string;
+  sourceType?: 'manual' | 'tip' | 'import';
+  sourceTipId?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Tip {
+  id: string;
+  tipster: string;
+  date: string;
+  match: string;
+  market: string;
+  odds: number;
+  confidence: 'low' | 'medium' | 'high';
+  status: 'pending' | 'converted' | 'archived';
+  notes?: string;
+  convertedBetId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  competition?: string;
+  notes?: string;
+  isWatched: boolean;
+  createdAt: string;
+}
+
+export interface GlossaryEntry {
+  id: string;
+  term: string;
+  definition: string;
+  category: string;
+  language: 'en' | 'pt-br';
+}
+
+export interface UserSettings {
+  language: 'en' | 'pt-br';
+  alertsEnabled: boolean;
+  exposureThreshold: number;
 }
 
 export interface BankrollSettings {
@@ -37,6 +77,8 @@ export interface BankrollSettings {
   stopGainWeekly: number;
   stopLossMonthly: number;
   stopGainMonthly: number;
+  language?: 'en' | 'pt-br';
+  alertsEnabled?: boolean;
   updatedAt: string;
 }
 

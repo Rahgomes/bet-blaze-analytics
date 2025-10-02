@@ -1,0 +1,127 @@
+{
+  "app": {
+    "title": "Gestor de Apostas"
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "bets": "Apostas",
+    "addBet": "Adicionar Aposta",
+    "analytics": "Análises",
+    "tips": "Dicas",
+    "watchlist": "Monitoramento",
+    "import": "Importar",
+    "faq": "FAQ",
+    "settings": "Configurações"
+  },
+  "dashboard": {
+    "title": "Painel",
+    "currentBankroll": "Banca Atual",
+    "totalBets": "Total de Apostas",
+    "totalProfit": "Lucro Total",
+    "roi": "ROI",
+    "recentBets": "Apostas Recentes"
+  },
+  "bets": {
+    "title": "Histórico de Apostas",
+    "addNew": "Adicionar Aposta",
+    "filters": "Filtros",
+    "operation": "Op #",
+    "date": "Data",
+    "bookmaker": "Casa",
+    "type": "Tipo",
+    "amount": "Valor",
+    "odds": "Odd",
+    "return": "Retorno",
+    "profit": "Lucro",
+    "status": "Status",
+    "actions": "Ações"
+  },
+  "addBet": {
+    "title": "Adicionar Nova Aposta",
+    "editTitle": "Editar Aposta",
+    "bookmaker": "Casa de Apostas",
+    "date": "Data",
+    "betType": "Tipo de Aposta",
+    "amount": "Valor",
+    "odds": "Odd",
+    "status": "Status",
+    "description": "Descrição",
+    "stakeLogic": "Lógica da Stake",
+    "protected": "Aposta Protegida",
+    "live": "Aposta Ao Vivo",
+    "submit": "Salvar Aposta",
+    "cancel": "Cancelar"
+  },
+  "tips": {
+    "title": "Dicas & Sinais",
+    "addTip": "Adicionar Dica",
+    "tipster": "Tipster",
+    "match": "Jogo",
+    "market": "Mercado",
+    "odds": "Odd",
+    "confidence": "Confiança",
+    "status": "Status",
+    "convertToBet": "Converter em Aposta",
+    "low": "Baixa",
+    "medium": "Média",
+    "high": "Alta",
+    "pending": "Pendente",
+    "converted": "Convertida",
+    "archived": "Arquivada"
+  },
+  "watchlist": {
+    "title": "Monitoramento & Exposição",
+    "addTeam": "Adicionar Time",
+    "team": "Time",
+    "competition": "Competição",
+    "exposure": "Exposição",
+    "totalStake": "Stake Total",
+    "activeBets": "Apostas Ativas",
+    "alerts": "Alertas"
+  },
+  "import": {
+    "title": "Importação em Massa",
+    "uploadFile": "Enviar Arquivo",
+    "mapColumns": "Mapear Colunas",
+    "preview": "Visualizar",
+    "import": "Importar",
+    "selectFile": "Selecione arquivo CSV ou Excel",
+    "dragDrop": "ou arraste e solte aqui",
+    "columnMapping": "Mapeamento de Colunas",
+    "importSuccess": "{count} apostas importadas com sucesso"
+  },
+  "faq": {
+    "title": "FAQ & Glossário",
+    "search": "Buscar termos...",
+    "category": "Categoria",
+    "general": "Geral",
+    "betTypes": "Tipos de Aposta",
+    "markets": "Mercados",
+    "strategies": "Estratégias"
+  },
+  "settings": {
+    "title": "Configurações da Banca",
+    "initialBankroll": "Banca Inicial",
+    "targetPercentage": "Percentual Alvo",
+    "stopLossWeekly": "Stop Loss Semanal",
+    "stopGainWeekly": "Stop Gain Semanal",
+    "stopLossMonthly": "Stop Loss Mensal",
+    "stopGainMonthly": "Stop Gain Mensal",
+    "language": "Idioma",
+    "alerts": "Ativar Alertas",
+    "save": "Salvar Configurações"
+  },
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "close": "Fechar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "loading": "Carregando...",
+    "noData": "Nenhum dado disponível",
+    "success": "Sucesso",
+    "error": "Erro"
+  }
+}
