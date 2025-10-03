@@ -30,15 +30,29 @@ export interface Bet {
   updatedAt: string;
 }
 
+export interface Tipster {
+  id: string;
+  name: string;
+  bio?: string;
+  rating?: number;
+  totalTips?: number;
+  successRate?: number;
+  createdAt: string;
+}
+
 export interface Tip {
   id: string;
-  tipster: string;
-  date: string;
+  tipsterId: string;
+  title: string;
+  description: string;
   match: string;
   market: string;
-  odds: number;
+  suggestedStake?: number;
+  suggestedOdds: number;
+  betType: BetType;
   confidence: 'low' | 'medium' | 'high';
   status: 'pending' | 'converted' | 'archived';
+  date: string;
   notes?: string;
   convertedBetId?: string;
   createdAt: string;

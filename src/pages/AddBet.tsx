@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useBettingData } from '@/hooks/useBettingData';
+import { useExtendedData } from '@/hooks/useExtendedData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,8 +14,21 @@ import { BetType, BetStatus } from '@/types/betting';
 
 export default function AddBet() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { addBet, bookmakers } = useBettingData();
+  const { updateTip } = useExtendedData();
   const { toast } = useToast();
+
+  const locationState = location.state as { 
+    prefill?: {
+      description?: string;
+      odds?: string;
+      amount?: string;
+      betType?: BetType;
+      stakeLogic?: string;
+    };
+    sourceTipId?: string;
+  } | null;
 
   const [formData, setFormData] = useState({
     bookmaker: '',
@@ -28,6 +42,15 @@ export default function AddBet() {
     isProtected: false,
     isLive: false,
   });
+
+  useEffect(() => {
+    if (locationState?.prefill) {
+      setFormData(prev => ({
+        ...prev,
+        ...locationState.prefill,
+      }));
+    }
+  }, [locationState]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +70,7 @@ export default function AddBet() {
     const return_ = formData.status === 'won' ? amount * odds : 0;
     const profit = return_ - amount;
 
-    addBet({
+    const betData = {
       bookmaker: formData.bookmaker,
       date: formData.date,
       betType: formData.betType,
@@ -60,7 +83,19 @@ export default function AddBet() {
       stakeLogic: formData.stakeLogic,
       isProtected: formData.isProtected,
       isLive: formData.isLive,
-    });
+      sourceType: locationState?.sourceTipId ? 'tip' as const : 'manual' as const,
+      sourceTipId: locationState?.sourceTipId,
+    };
+
+    addBet(betData);
+
+    // If this bet was created from a tip, mark the tip as converted
+    if (locationState?.sourceTipId) {
+      updateTip(locationState.sourceTipId, { 
+        status: 'converted',
+        convertedBetId: betData.description, // We'll use a proper ID after bet is created
+      });
+    }
 
     toast({
       title: 'Success',

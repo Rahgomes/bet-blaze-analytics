@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Tip, Team, GlossaryEntry } from '@/types/betting';
+import { Tip, Team, GlossaryEntry, Tipster } from '@/types/betting';
 
 const STORAGE_KEYS = {
   TIPS: 'betting_tips',
   TEAMS: 'betting_teams',
   GLOSSARY: 'betting_glossary',
+  TIPSTERS: 'betting_tipsters',
 };
 
 const DEFAULT_GLOSSARY: GlossaryEntry[] = [
@@ -18,10 +19,16 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '8', term: 'BTTS', definition: 'Ambos Marcam', category: 'markets', language: 'pt-br' },
 ];
 
+const DEFAULT_TIPSTERS: Tipster[] = [
+  { id: '1', name: 'ProTipster', bio: 'Professional sports analyst', rating: 4.5, totalTips: 120, successRate: 68, createdAt: new Date().toISOString() },
+  { id: '2', name: 'BetGuru', bio: 'Expert in football betting', rating: 4.2, totalTips: 95, successRate: 65, createdAt: new Date().toISOString() },
+];
+
 export function useExtendedData() {
   const [tips, setTips] = useState<Tip[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [glossary, setGlossary] = useState<GlossaryEntry[]>(DEFAULT_GLOSSARY);
+  const [tipsters, setTipsters] = useState<Tipster[]>(DEFAULT_TIPSTERS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,10 +36,12 @@ export function useExtendedData() {
       const storedTips = localStorage.getItem(STORAGE_KEYS.TIPS);
       const storedTeams = localStorage.getItem(STORAGE_KEYS.TEAMS);
       const storedGlossary = localStorage.getItem(STORAGE_KEYS.GLOSSARY);
+      const storedTipsters = localStorage.getItem(STORAGE_KEYS.TIPSTERS);
 
       if (storedTips) setTips(JSON.parse(storedTips));
       if (storedTeams) setTeams(JSON.parse(storedTeams));
       if (storedGlossary) setGlossary(JSON.parse(storedGlossary));
+      if (storedTipsters) setTipsters(JSON.parse(storedTipsters));
     } catch (error) {
       console.error('Error loading extended data:', error);
     } finally {
@@ -91,10 +100,25 @@ export function useExtendedData() {
     saveTeams(teams.filter(t => t.id !== id));
   }, [teams, saveTeams]);
 
+  const saveTipsters = useCallback((newTipsters: Tipster[]) => {
+    setTipsters(newTipsters);
+    localStorage.setItem(STORAGE_KEYS.TIPSTERS, JSON.stringify(newTipsters));
+  }, []);
+
+  const addTipster = useCallback((tipster: Omit<Tipster, 'id' | 'createdAt'>) => {
+    const newTipster: Tipster = {
+      ...tipster,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+    };
+    saveTipsters([...tipsters, newTipster]);
+  }, [tipsters, saveTipsters]);
+
   return {
     tips,
     teams,
     glossary,
+    tipsters,
     loading,
     addTip,
     updateTip,
@@ -102,5 +126,6 @@ export function useExtendedData() {
     addTeam,
     updateTeam,
     deleteTeam,
+    addTipster,
   };
 }
