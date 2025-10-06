@@ -14,6 +14,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
 
+
   const periodBets = useMemo(() => filterBetsByPeriod(bets, selectedPeriod), [bets, selectedPeriod]);
   const periodStats = useMemo(() => calculateStats(periodBets), [periodBets]);
   const overallStats = useMemo(() => calculateStats(bets), [bets]);
