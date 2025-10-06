@@ -11,11 +11,12 @@ interface StatCardProps {
     isPositive: boolean;
   };
   className?: string;
+  onClick?: () => void;
 }
 
-export function StatCard({ title, value, icon, trend, className }: StatCardProps) {
+export function StatCard({ title, value, icon, trend, className, onClick }: StatCardProps) {
   return (
-    <Card className={className}>
+    <Card className={className} onClick={onClick}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {icon}

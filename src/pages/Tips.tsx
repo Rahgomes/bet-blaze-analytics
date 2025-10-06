@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useExtendedData } from '@/hooks/useExtendedData';
+import { generateMockTips } from '@/utils/mockData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,7 +19,14 @@ import { Tip } from '@/types/betting';
 export default function Tips() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { tips, tipsters, addTip, updateTip, deleteTip } = useExtendedData();
+  const { tips: realTips, tipsters, addTip, updateTip, deleteTip } = useExtendedData();
+  
+  // Merge real tips with mock tips for demonstration
+  const allTips = useMemo(() => {
+    const mockTips = realTips.length === 0 ? generateMockTips() : [];
+    return [...realTips, ...mockTips];
+  }, [realTips]);
+  
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTip, setSelectedTip] = useState<Tip | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -77,7 +85,22 @@ export default function Tips() {
     toast.success(t('common.success'));
   };
 
+  const handleDelete = (id: string) => {
+    if (id.startsWith('mock-tip-')) {
+      toast.error('Cannot delete mock data. Add real tips to manage them.');
+      return;
+    }
+    if (window.confirm(t('common.confirmDelete'))) {
+      deleteTip(id);
+      toast.success(t('common.success'));
+    }
+  };
+
   const handleConvertToBet = (tip: Tip) => {
+    if (tip.id.startsWith('mock-tip-')) {
+      toast.error('Cannot convert mock tips. Add real tips to convert them to bets.');
+      return;
+    }
     navigate('/add-bet', {
       state: {
         prefill: {
@@ -93,21 +116,23 @@ export default function Tips() {
   };
 
   const getTipsterName = (tipsterId: string) => {
-    return tipsters.find(t => t.id === tipsterId)?.name || 'Unknown';
+    return tipsters.find(t => t.id === tipsterId)?.name || 'Unknown Tipster';
   };
 
   const getTipsterRating = (tipsterId: string) => {
     return tipsters.find(t => t.id === tipsterId)?.rating || 0;
   };
 
-  const filteredTips = tips.filter(tip => {
-    const matchesSearch = tip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         tip.match.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         tip.market.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTipster = filterTipster === 'all' || tip.tipsterId === filterTipster;
-    const matchesStatus = filterStatus === 'all' || tip.status === filterStatus;
-    return matchesSearch && matchesTipster && matchesStatus;
-  });
+  const filteredTips = useMemo(() => {
+    return allTips.filter(tip => {
+      const matchesSearch = tip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           tip.match.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           tip.market.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesTipster = filterTipster === 'all' || tip.tipsterId === filterTipster;
+      const matchesStatus = filterStatus === 'all' || tip.status === filterStatus;
+      return matchesSearch && matchesTipster && matchesStatus;
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [allTips, searchQuery, filterTipster, filterStatus]);
 
   const getConfidenceBadge = (confidence: string) => {
     const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {

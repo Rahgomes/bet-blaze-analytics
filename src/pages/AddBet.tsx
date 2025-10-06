@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { BetType, BetStatus } from '@/types/betting';
 
@@ -30,6 +31,8 @@ export default function AddBet() {
     sourceTipId?: string;
   } | null;
 
+  const protectionTypes = ['DC (Double Chance)', 'DNB (Draw No Bet)', 'Asian Handicap', 'European Handicap', 'Cash Out Available'];
+  
   const [formData, setFormData] = useState({
     bookmaker: '',
     date: new Date().toISOString().split('T')[0],
@@ -39,7 +42,7 @@ export default function AddBet() {
     status: 'pending' as BetStatus,
     description: '',
     stakeLogic: '',
-    isProtected: false,
+    protectionTypes: [] as string[],
     isLive: false,
   });
 
@@ -81,7 +84,7 @@ export default function AddBet() {
       status: formData.status,
       description: formData.description,
       stakeLogic: formData.stakeLogic,
-      isProtected: formData.isProtected,
+      isProtected: formData.protectionTypes.length > 0,
       isLive: formData.isLive,
       sourceType: locationState?.sourceTipId ? 'tip' as const : 'manual' as const,
       sourceTipId: locationState?.sourceTipId,
@@ -224,16 +227,27 @@ export default function AddBet() {
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="isProtected">Protected Bet</Label>
-                  <p className="text-sm text-muted-foreground">DC, DNB, Asian Handicap, etc.</p>
+              <div className="space-y-3">
+                <Label>Protection Types</Label>
+                <p className="text-sm text-muted-foreground">Select all that apply to this bet</p>
+                <div className="space-y-2">
+                  {protectionTypes.map((type) => (
+                    <div key={type} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={type}
+                        checked={formData.protectionTypes.includes(type)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setFormData({ ...formData, protectionTypes: [...formData.protectionTypes, type] });
+                          } else {
+                            setFormData({ ...formData, protectionTypes: formData.protectionTypes.filter(t => t !== type) });
+                          }
+                        }}
+                      />
+                      <Label htmlFor={type} className="text-sm font-normal cursor-pointer">{type}</Label>
+                    </div>
+                  ))}
                 </div>
-                <Switch
-                  id="isProtected"
-                  checked={formData.isProtected}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isProtected: checked })}
-                />
               </div>
 
               <div className="flex items-center justify-between">
