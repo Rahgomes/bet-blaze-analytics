@@ -10,12 +10,16 @@ const STORAGE_KEYS = {
 const DEFAULT_BANKROLL: BankrollSettings = {
   initialBankroll: 1000,
   currentBankroll: 1000,
+  targetMode: 'percentage',
   targetPercentage: 20,
   targetAmount: 1200,
   stopLossWeekly: 100,
   stopGainWeekly: 200,
   stopLossMonthly: 300,
   stopGainMonthly: 500,
+  leagues: ['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Champions League'],
+  markets: ['Match Winner', 'Over/Under 2.5', 'BTTS', 'Asian Handicap', 'Double Chance', 'Draw No Bet'],
+  strategies: ['DC', 'DNB', 'Asian Handicap', 'Kelly Criterion', 'Martingale', 'Fixed Stake'],
   updatedAt: new Date().toISOString(),
 };
 

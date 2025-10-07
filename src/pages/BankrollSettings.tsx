@@ -10,9 +10,20 @@ export default function BankrollSettings() {
   const { bankroll, updateBankrollSettings } = useBettingData();
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    initialBankroll: string;
+    targetMode: 'percentage' | 'fixed';
+    targetPercentage: string;
+    targetAmount: string;
+    stopLossWeekly: string;
+    stopGainWeekly: string;
+    stopLossMonthly: string;
+    stopGainMonthly: string;
+  }>({
     initialBankroll: bankroll.initialBankroll.toString(),
+    targetMode: bankroll.targetMode || 'percentage',
     targetPercentage: bankroll.targetPercentage.toString(),
+    targetAmount: bankroll.targetAmount.toString(),
     stopLossWeekly: bankroll.stopLossWeekly.toString(),
     stopGainWeekly: bankroll.stopGainWeekly.toString(),
     stopLossMonthly: bankroll.stopLossMonthly.toString(),
@@ -24,15 +35,17 @@ export default function BankrollSettings() {
 
     const initialBankroll = parseFloat(formData.initialBankroll);
     const targetPercentage = parseFloat(formData.targetPercentage);
+    const targetAmount = formData.targetMode === 'fixed' 
+      ? parseFloat(formData.targetAmount)
+      : initialBankroll * (1 + targetPercentage / 100);
     const stopLossWeekly = parseFloat(formData.stopLossWeekly);
     const stopGainWeekly = parseFloat(formData.stopGainWeekly);
     const stopLossMonthly = parseFloat(formData.stopLossMonthly);
     const stopGainMonthly = parseFloat(formData.stopGainMonthly);
 
-    const targetAmount = initialBankroll * (1 + targetPercentage / 100);
-
     updateBankrollSettings({
       initialBankroll,
+      targetMode: formData.targetMode as 'percentage' | 'fixed',
       targetPercentage,
       targetAmount,
       stopLossWeekly,
@@ -76,19 +89,59 @@ export default function BankrollSettings() {
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="targetPercentage">Target Percentage (%)</Label>
-              <Input
-                id="targetPercentage"
-                type="number"
-                step="0.1"
-                min="0"
-                value={formData.targetPercentage}
-                onChange={(e) => setFormData({ ...formData, targetPercentage: e.target.value })}
-              />
-              <p className="text-sm text-muted-foreground">
-                Target amount: €{(parseFloat(formData.initialBankroll || '0') * (1 + parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2)}
-              </p>
+            <div className="space-y-4">
+              <div>
+                <Label>Target Mode</Label>
+                <div className="flex gap-4 mt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="percentage"
+                      checked={formData.targetMode === 'percentage'}
+                      onChange={(e) => setFormData({ ...formData, targetMode: e.target.value as 'percentage' | 'fixed' })}
+                    />
+                    <span>Percentage Target</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="fixed"
+                      checked={formData.targetMode === 'fixed'}
+                      onChange={(e) => setFormData({ ...formData, targetMode: e.target.value as 'percentage' | 'fixed' })}
+                    />
+                    <span>Fixed Amount Target</span>
+                  </label>
+                </div>
+              </div>
+
+              {formData.targetMode === 'percentage' ? (
+                <div className="space-y-2">
+                  <Label htmlFor="targetPercentage">Target Percentage (%)</Label>
+                  <Input
+                    id="targetPercentage"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={formData.targetPercentage}
+                    onChange={(e) => setFormData({ ...formData, targetPercentage: e.target.value })}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Target amount: €{(parseFloat(formData.initialBankroll || '0') * (1 + parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2)}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="targetAmount">Target Amount (€)</Label>
+                  <Input
+                    id="targetAmount"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.targetAmount}
+                    onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

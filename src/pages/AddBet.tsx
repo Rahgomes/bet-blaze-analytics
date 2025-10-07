@@ -44,6 +44,9 @@ export default function AddBet() {
     stakeLogic: '',
     protectionTypes: [] as string[],
     isLive: false,
+    league: '',
+    market: '',
+    matchTime: new Date().toISOString().slice(0, 16),
   });
 
   useEffect(() => {
@@ -86,6 +89,10 @@ export default function AddBet() {
       stakeLogic: formData.stakeLogic,
       isProtected: formData.protectionTypes.length > 0,
       isLive: formData.isLive,
+      league: formData.league || undefined,
+      market: formData.market || undefined,
+      strategies: formData.protectionTypes.length > 0 ? formData.protectionTypes : undefined,
+      matchTime: formData.matchTime || undefined,
       sourceType: locationState?.sourceTipId ? 'tip' as const : 'manual' as const,
       sourceTipId: locationState?.sourceTipId,
     };
@@ -202,6 +209,38 @@ export default function AddBet() {
                   placeholder="1.50"
                 />
               </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="league">League / Competition</Label>
+                <Input
+                  id="league"
+                  value={formData.league}
+                  onChange={(e) => setFormData({ ...formData, league: e.target.value })}
+                  placeholder="e.g., Premier League"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="market">Market</Label>
+                <Input
+                  id="market"
+                  value={formData.market}
+                  onChange={(e) => setFormData({ ...formData, market: e.target.value })}
+                  placeholder="e.g., Match Winner"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="matchTime">Match Date & Time</Label>
+              <Input
+                id="matchTime"
+                type="datetime-local"
+                value={formData.matchTime}
+                onChange={(e) => setFormData({ ...formData, matchTime: e.target.value })}
+              />
             </div>
 
             <div className="space-y-2">

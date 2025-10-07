@@ -24,6 +24,10 @@ export interface Bet {
   isLive?: boolean;
   teams?: string[];
   competition?: string;
+  league?: string;
+  market?: string;
+  strategies?: string[];
+  matchTime?: string;
   sourceType?: 'manual' | 'tip' | 'import';
   sourceTipId?: string;
   createdAt: string;
@@ -85,12 +89,16 @@ export interface UserSettings {
 export interface BankrollSettings {
   initialBankroll: number;
   currentBankroll: number;
+  targetMode: 'percentage' | 'fixed';
   targetPercentage: number;
   targetAmount: number;
   stopLossWeekly: number;
   stopGainWeekly: number;
   stopLossMonthly: number;
   stopGainMonthly: number;
+  leagues?: string[];
+  markets?: string[];
+  strategies?: string[];
   language?: 'en' | 'pt-br';
   alertsEnabled?: boolean;
   updatedAt: string;

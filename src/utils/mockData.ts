@@ -1,58 +1,91 @@
-import { Bet, Tip, BetType, BetStatus } from '@/types/betting';
+import { Bet, Tip } from '@/types/betting';
 
-export const generateMockBets = (): Bet[] => {
-  const bookmakers = ['Bet365', 'Betano', '1xBet', 'Betway', 'Bwin'];
-  const betTypes: BetType[] = ['simple', 'multiple', 'live', 'system'];
-  const statuses: BetStatus[] = ['won', 'lost', 'pending', 'void'];
+export function generateMockBets(): Bet[] {
+  const mockBets: Bet[] = [];
+  const bookmakers = ['Bet365', '1xBet', 'Betfair', 'Betano'];
+  const betTypes = ['simple', 'multiple', 'live', 'system'];
+  const statuses = ['won', 'lost', 'pending', 'void'];
+  const leagues = ['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Champions League'];
+  const markets = ['Match Winner', 'Over/Under 2.5', 'BTTS', 'Asian Handicap', 'Double Chance'];
+  const strategiesList = ['DC', 'DNB', 'Asian Handicap', 'Kelly Criterion', 'Martingale'];
   const descriptions = [
-    'Manchester United vs Chelsea - Home Win',
-    'Real Madrid vs Barcelona - Over 2.5 Goals',
-    'Liverpool vs Arsenal - Both Teams to Score',
-    'Bayern Munich vs Dortmund - Asian Handicap -1',
-    'PSG vs Lyon - Draw No Bet',
-    'Inter Milan vs AC Milan - Double Chance',
-    'Atletico Madrid vs Valencia - Under 3.5',
-    'Juventus vs Napoli - Match Result',
-    'Sevilla vs Real Betis - BTTS Yes',
-    'Tottenham vs West Ham - Over 1.5 Goals',
+    'Arsenal vs Chelsea - Over 2.5 goals',
+    'Manchester United Win',
+    'Liverpool vs City - BTTS',
+    'Real Madrid -1.5 Handicap',
+    'PSG Win & Over 1.5'
   ];
 
-  const bets: Bet[] = [];
-  const today = new Date();
-
-  for (let i = 0; i < 10; i++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - Math.floor(Math.random() * 60)); // Random date within last 60 days
+  for (let i = 0; i < 15; i++) {
+    const bookmaker = bookmakers[Math.floor(Math.random() * bookmakers.length)];
+    const betType = betTypes[Math.floor(Math.random() * betTypes.length)] as any;
+    const status = statuses[Math.floor(Math.random() * statuses.length)] as any;
+    const amount = 10 + Math.random() * 90;
+    const odds = 1.5 + Math.random() * 3.5;
+    const description = descriptions[Math.floor(Math.random() * descriptions.length)];
+    const league = leagues[Math.floor(Math.random() * leagues.length)];
+    const market = markets[Math.floor(Math.random() * markets.length)];
     
-    const amount = Math.round((Math.random() * 50 + 10) * 100) / 100;
-    const odds = Math.round((Math.random() * 3 + 1.5) * 100) / 100;
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const return_ = status === 'won' ? amount * odds : 0;
-    const profit = return_ - amount;
+    // Random strategies (0-3 strategies per bet)
+    const numStrategies = Math.floor(Math.random() * 4);
+    const strategies = Array.from({ length: numStrategies }, () => 
+      strategiesList[Math.floor(Math.random() * strategiesList.length)]
+    );
+    
+    const daysAgo = Math.floor(Math.random() * 60);
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+    
+    // Some bets are today with specific match times
+    const isToday = Math.random() > 0.7;
+    if (isToday) {
+      date.setDate(new Date().getDate());
+    }
+    
+    const hours = Math.floor(Math.random() * 24);
+    const minutes = Math.floor(Math.random() * 60);
+    const matchTime = `${date.toISOString().split('T')[0]}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+    
+    let return_ = 0;
+    let profit = -amount;
+    
+    if (status === 'won') {
+      return_ = amount * odds;
+      profit = return_ - amount;
+    } else if (status === 'void') {
+      return_ = amount;
+      profit = 0;
+    }
 
-    bets.push({
-      id: `mock-${i + 1}`,
-      operationNumber: i + 1,
-      bookmaker: bookmakers[Math.floor(Math.random() * bookmakers.length)],
-      date: date.toISOString(),
-      betType: betTypes[Math.floor(Math.random() * betTypes.length)],
+    mockBets.push({
+      id: `mock-bet-${i}`,
+      operationNumber: 1000 + i,
+      bookmaker,
+      date: date.toISOString().split('T')[0],
+      betType,
       amount,
       odds,
       return: return_,
       profit,
       status,
-      description: descriptions[i],
-      stakeLogic: i % 3 === 0 ? 'Kelly Criterion - 2% bankroll' : undefined,
-      isProtected: i % 4 === 0,
-      isLive: i % 5 === 0,
+      description,
+      league,
+      market,
+      strategies: strategies.length > 0 ? strategies : undefined,
+      matchTime,
+      stakeLogic: Math.random() > 0.5 ? 'Kelly Criterion' : 'Fixed',
+      isProtected: Math.random() > 0.5,
+      isLive: isToday && status === 'pending' && Math.random() > 0.5,
       sourceType: 'manual',
       createdAt: date.toISOString(),
       updatedAt: date.toISOString(),
     });
   }
 
-  return bets.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-};
+  return mockBets.sort((a, b) => 
+    new Date(b.matchTime || b.date).getTime() - new Date(a.matchTime || a.date).getTime()
+  );
+}
 
 export const generateMockTips = (): Tip[] => {
   const tipsters = ['John ProTips', 'BetMaster', 'SoccerGuru', 'ValueBets', 'SharpLine'];
@@ -74,7 +107,7 @@ export const generateMockTips = (): Tip[] => {
     market: markets[i],
     suggestedStake: 20 + (i * 5),
     suggestedOdds: 1.8 + (i * 0.2),
-    betType: ['simple', 'simple', 'multiple', 'simple', 'live'][i] as BetType,
+    betType: ['simple', 'simple', 'multiple', 'simple', 'live'][i] as any,
     confidence: ['high', 'medium', 'high', 'medium', 'low'][i] as 'low' | 'medium' | 'high',
     status: ['pending', 'pending', 'converted', 'pending', 'archived'][i] as 'pending' | 'converted' | 'archived',
     date: new Date(Date.now() + i * 86400000).toISOString(),

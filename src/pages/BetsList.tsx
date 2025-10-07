@@ -46,14 +46,23 @@ export default function BetsList() {
   const filteredBets = useMemo(() => {
     return bets.filter(bet => {
       const matchesSearch = bet.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          bet.bookmaker.toLowerCase().includes(searchTerm.toLowerCase());
+                          bet.bookmaker.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          bet.league?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          bet.market?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesBookmaker = filterBookmaker === 'all' || bet.bookmaker === filterBookmaker;
       const matchesType = filterType === 'all' || bet.betType === filterType;
       const matchesStatus = filterStatus === 'all' || bet.status === filterStatus;
       
       return matchesSearch && matchesBookmaker && matchesType && matchesStatus;
-    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }).sort((a, b) => new Date(b.matchTime || b.date).getTime() - new Date(a.matchTime || a.date).getTime());
   }, [bets, searchTerm, filterBookmaker, filterType, filterStatus]);
+
+  const isLiveBet = (bet: Bet) => {
+    if (!bet.matchTime || !bet.isLive || bet.status !== 'pending') return false;
+    const matchDate = new Date(bet.matchTime).toDateString();
+    const today = new Date().toDateString();
+    return matchDate === today;
+  };
 
   const handleDelete = (id: string) => {
     if (id.startsWith('mock-')) {
@@ -185,9 +194,13 @@ export default function BetsList() {
                   <TableRow>
                     <TableHead>#</TableHead>
                     <TableHead>Date</TableHead>
+                    <TableHead>Match Time</TableHead>
+                    <TableHead>League</TableHead>
+                    <TableHead>Market</TableHead>
                     <TableHead>Bookmaker</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Description</TableHead>
+                    <TableHead>Strategies</TableHead>
                     <TableHead className="text-right">Stake</TableHead>
                     <TableHead className="text-right">Odds</TableHead>
                     <TableHead className="text-right">Return</TableHead>
@@ -198,12 +211,37 @@ export default function BetsList() {
                 </TableHeader>
                 <TableBody>
                   {filteredBets.map((bet) => (
-                    <TableRow key={bet.id}>
+                    <TableRow 
+                      key={bet.id}
+                      className={isLiveBet(bet) ? 'bg-orange-500/10 border-l-4 border-l-orange-500' : ''}
+                    >
                       <TableCell className="font-medium">{bet.operationNumber}</TableCell>
                       <TableCell>{new Date(bet.date).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {bet.matchTime ? new Date(bet.matchTime).toLocaleString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric', 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        }) : '-'}
+                      </TableCell>
+                      <TableCell>{bet.league || '-'}</TableCell>
+                      <TableCell>{bet.market || '-'}</TableCell>
                       <TableCell>{bet.bookmaker}</TableCell>
                       <TableCell className="capitalize">{bet.betType}</TableCell>
-                      <TableCell className="max-w-xs truncate">{bet.description}</TableCell>
+                      <TableCell className="max-w-xs truncate">
+                        {bet.description}
+                        {isLiveBet(bet) && <Badge className="ml-2 bg-orange-500">LIVE</Badge>}
+                      </TableCell>
+                      <TableCell>
+                        {bet.strategies && bet.strategies.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {bet.strategies.map((s, i) => (
+                              <Badge key={i} variant="secondary" className="text-xs">{s}</Badge>
+                            ))}
+                          </div>
+                        ) : '-'}
+                      </TableCell>
                       <TableCell className="text-right">€{bet.amount.toFixed(2)}</TableCell>
                       <TableCell className="text-right">{bet.odds.toFixed(2)}</TableCell>
                       <TableCell className="text-right">€{bet.return.toFixed(2)}</TableCell>
@@ -269,6 +307,24 @@ export default function BetsList() {
                   <Label className="text-muted-foreground">Date</Label>
                   <p className="font-medium">{new Date(selectedBet.date).toLocaleDateString()}</p>
                 </div>
+                {selectedBet.matchTime && (
+                  <div>
+                    <Label className="text-muted-foreground">Match Time</Label>
+                    <p className="font-medium">{new Date(selectedBet.matchTime).toLocaleString()}</p>
+                  </div>
+                )}
+                {selectedBet.league && (
+                  <div>
+                    <Label className="text-muted-foreground">League</Label>
+                    <p className="font-medium">{selectedBet.league}</p>
+                  </div>
+                )}
+                {selectedBet.market && (
+                  <div>
+                    <Label className="text-muted-foreground">Market</Label>
+                    <p className="font-medium">{selectedBet.market}</p>
+                  </div>
+                )}
                 <div>
                   <Label className="text-muted-foreground">Bookmaker</Label>
                   <p className="font-medium">{selectedBet.bookmaker}</p>
@@ -312,6 +368,16 @@ export default function BetsList() {
                   </Badge>
                 </div>
               </div>
+              {selectedBet.strategies && selectedBet.strategies.length > 0 && (
+                <div>
+                  <Label className="text-muted-foreground">Strategies/Protection</Label>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {selectedBet.strategies.map((s, i) => (
+                      <Badge key={i} variant="secondary">{s}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
               {selectedBet.description && (
                 <div>
                   <Label className="text-muted-foreground">Description</Label>
@@ -327,6 +393,7 @@ export default function BetsList() {
               <div className="flex gap-4">
                 {selectedBet.isProtected && <Badge>Protected</Badge>}
                 {selectedBet.isLive && <Badge variant="secondary">Live</Badge>}
+                {isLiveBet(selectedBet) && <Badge className="bg-orange-500">LIVE NOW</Badge>}
               </div>
             </div>
           )}
