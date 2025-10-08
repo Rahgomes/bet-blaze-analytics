@@ -72,6 +72,17 @@ export interface Team {
   createdAt: string;
 }
 
+export interface Transaction {
+  id: string;
+  type: 'deposit' | 'withdrawal';
+  amount: number;
+  dateTime: string;
+  description: string;
+  balanceAfter: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface GlossaryEntry {
   id: string;
   term: string;

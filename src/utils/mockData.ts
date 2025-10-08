@@ -1,4 +1,4 @@
-import { Bet, Tip } from '@/types/betting';
+import { Bet, Tip, Transaction } from '@/types/betting';
 
 export function generateMockBets(): Bet[] {
   const mockBets: Bet[] = [];
@@ -115,4 +115,39 @@ export const generateMockTips = (): Tip[] => {
     createdAt: new Date(Date.now() - i * 86400000).toISOString(),
     updatedAt: new Date(Date.now() - i * 86400000).toISOString(),
   }));
+};
+
+export const generateMockTransactions = (): Transaction[] => {
+  const transactions: Transaction[] = [];
+  let balance = 1000;
+
+  const transactionData = [
+    { type: 'deposit' as const, amount: 1000, description: 'Initial deposit', daysAgo: 60 },
+    { type: 'deposit' as const, amount: 500, description: 'Monthly top-up', daysAgo: 30 },
+    { type: 'withdrawal' as const, amount: 200, description: 'Partial withdrawal', daysAgo: 20 },
+    { type: 'deposit' as const, amount: 300, description: 'Bonus deposit', daysAgo: 10 },
+    { type: 'withdrawal' as const, amount: 150, description: 'Profit withdrawal', daysAgo: 5 },
+  ];
+
+  transactionData.forEach((data, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - data.daysAgo);
+    
+    balance += data.type === 'deposit' ? data.amount : -data.amount;
+
+    transactions.push({
+      id: `mock-transaction-${i + 1}`,
+      type: data.type,
+      amount: data.amount,
+      dateTime: date.toISOString(),
+      description: data.description,
+      balanceAfter: balance,
+      createdAt: date.toISOString(),
+      updatedAt: date.toISOString(),
+    });
+  });
+
+  return transactions.sort((a, b) => 
+    new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
+  );
 };

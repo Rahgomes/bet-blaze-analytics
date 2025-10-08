@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bet, BankrollSettings, Bookmaker } from '@/types/betting';
+import { Bet, BankrollSettings, Bookmaker, Transaction } from '@/types/betting';
 
 const STORAGE_KEYS = {
   BETS: 'betting_bets',
   BANKROLL: 'betting_bankroll',
   BOOKMAKERS: 'betting_bookmakers',
+  TRANSACTIONS: 'betting_transactions',
 };
 
 const DEFAULT_BANKROLL: BankrollSettings = {
@@ -32,6 +33,7 @@ export function useBettingData() {
   const [bets, setBets] = useState<Bet[]>([]);
   const [bankroll, setBankroll] = useState<BankrollSettings>(DEFAULT_BANKROLL);
   const [bookmakers, setBookmakers] = useState<Bookmaker[]>(DEFAULT_BOOKMAKERS);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load data from localStorage on mount
@@ -40,10 +42,12 @@ export function useBettingData() {
       const storedBets = localStorage.getItem(STORAGE_KEYS.BETS);
       const storedBankroll = localStorage.getItem(STORAGE_KEYS.BANKROLL);
       const storedBookmakers = localStorage.getItem(STORAGE_KEYS.BOOKMAKERS);
+      const storedTransactions = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
 
       if (storedBets) setBets(JSON.parse(storedBets));
       if (storedBankroll) setBankroll(JSON.parse(storedBankroll));
       if (storedBookmakers) setBookmakers(JSON.parse(storedBookmakers));
+      if (storedTransactions) setTransactions(JSON.parse(storedTransactions));
     } catch (error) {
       console.error('Error loading data from localStorage:', error);
     } finally {
@@ -148,15 +152,75 @@ export function useBettingData() {
     saveBookmakers([...bookmakers, newBookmaker]);
   }, [bookmakers, saveBookmakers]);
 
+  // Save transactions to localStorage
+  const saveTransactions = useCallback((newTransactions: Transaction[]) => {
+    setTransactions(newTransactions);
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(newTransactions));
+  }, []);
+
+  // Add transaction
+  const addTransaction = useCallback((transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt' | 'balanceAfter'>) => {
+    const newBalanceAfter = bankroll.currentBankroll + (transaction.type === 'deposit' ? transaction.amount : -transaction.amount);
+    
+    const newTransaction: Transaction = {
+      ...transaction,
+      id: crypto.randomUUID(),
+      balanceAfter: newBalanceAfter,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    saveTransactions([...transactions, newTransaction]);
+    
+    // Update bankroll
+    const newBankroll = {
+      ...bankroll,
+      currentBankroll: newBalanceAfter,
+      updatedAt: new Date().toISOString(),
+    };
+    saveBankroll(newBankroll);
+  }, [transactions, bankroll, saveTransactions, saveBankroll]);
+
+  // Update transaction
+  const updateTransaction = useCallback((id: string, updates: Partial<Transaction>) => {
+    const updatedTransactions = transactions.map(transaction =>
+      transaction.id === id
+        ? { ...transaction, ...updates, updatedAt: new Date().toISOString() }
+        : transaction
+    );
+    saveTransactions(updatedTransactions);
+  }, [transactions, saveTransactions]);
+
+  // Delete transaction
+  const deleteTransaction = useCallback((id: string) => {
+    const transaction = transactions.find(t => t.id === id);
+    if (!transaction) return;
+
+    saveTransactions(transactions.filter(t => t.id !== id));
+    
+    // Recalculate bankroll
+    const amountChange = transaction.type === 'deposit' ? -transaction.amount : transaction.amount;
+    const newBankroll = {
+      ...bankroll,
+      currentBankroll: bankroll.currentBankroll + amountChange,
+      updatedAt: new Date().toISOString(),
+    };
+    saveBankroll(newBankroll);
+  }, [transactions, bankroll, saveTransactions, saveBankroll]);
+
   return {
     bets,
     bankroll,
     bookmakers,
+    transactions,
     loading,
     addBet,
     updateBet,
     deleteBet,
     updateBankrollSettings,
     addBookmaker,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
   };
 }
