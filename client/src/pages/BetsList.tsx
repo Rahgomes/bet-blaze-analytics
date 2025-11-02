@@ -11,14 +11,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pencil, Trash2, Search, Eye } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
 import { BetType, BetStatus, Bet } from '@/types/betting';
 import { TimePeriod, filterBetsByPeriod } from '@/utils/dateFilters';
 import { generateMockBets } from '@/utils/mockData';
 
 export default function BetsList() {
   const { bets: realBets, bookmakers, deleteBet, updateBet } = useBettingData();
-  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBookmaker, setFilterBookmaker] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
@@ -36,12 +34,6 @@ export default function BetsList() {
   }, [realBets]);
 
   const bets = useMemo(() => filterBetsByPeriod(allBets, selectedPeriod), [allBets, selectedPeriod]);
-
-  useEffect(() => {
-    if (location.state?.period) {
-      setSelectedPeriod(location.state.period as TimePeriod);
-    }
-  }, [location.state]);
 
   const filteredBets = useMemo(() => {
     return bets.filter(bet => {

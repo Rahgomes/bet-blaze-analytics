@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useExtendedData } from '@/hooks/useExtendedData';
 import { generateMockTips } from '@/utils/mockData';
@@ -18,7 +18,7 @@ import { Tip } from '@/types/betting';
 
 export default function Tips() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { tips: realTips, tipsters, addTip, updateTip, deleteTip } = useExtendedData();
   
   // Merge real tips with mock tips for demonstration
@@ -101,18 +101,7 @@ export default function Tips() {
       toast.error('Cannot convert mock tips. Add real tips to convert them to bets.');
       return;
     }
-    navigate('/add-bet', {
-      state: {
-        prefill: {
-          description: `${tip.title} - ${tip.match} - ${tip.market}`,
-          odds: tip.suggestedOdds.toString(),
-          amount: tip.suggestedStake?.toString() || '',
-          betType: tip.betType,
-          stakeLogic: tip.description,
-        },
-        sourceTipId: tip.id,
-      }
-    });
+    setLocation('/add-bet');
   };
 
   const getTipsterName = (tipsterId: string) => {

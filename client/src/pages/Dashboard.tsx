@@ -6,12 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, TrendingDown, Wallet, Target, Activity } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { filterBetsByPeriod, calculateStats, TimePeriod } from '@/utils/dateFilters';
 
 export default function Dashboard() {
   const { bets, bankroll, loading } = useBettingData();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
 
 
@@ -74,21 +74,21 @@ export default function Dashboard() {
             <TrendingUp className="h-4 w-4 text-[hsl(var(--profit))]" /> : 
             <TrendingDown className="h-4 w-4 text-[hsl(var(--loss))]" />
           }
-          onClick={() => navigate('/bets', { state: { period: selectedPeriod } })}
+          onClick={() => setLocation('/bets')}
           className="cursor-pointer hover:bg-accent/50 transition-colors"
         />
         <StatCard
           title={`ROI (${selectedPeriod === 'all' ? 'Overall' : selectedPeriod})`}
           value={`${periodStats.roi.toFixed(2)}%`}
           icon={<Activity className="h-4 w-4 text-muted-foreground" />}
-          onClick={() => navigate('/bets', { state: { period: selectedPeriod } })}
+          onClick={() => setLocation('/bets')}
           className="cursor-pointer hover:bg-accent/50 transition-colors"
         />
         <StatCard
           title={`Win Rate (${selectedPeriod === 'all' ? 'Overall' : selectedPeriod})`}
           value={`${periodStats.winRate.toFixed(1)}%`}
           icon={<Target className="h-4 w-4 text-muted-foreground" />}
-          onClick={() => navigate('/bets', { state: { period: selectedPeriod } })}
+          onClick={() => setLocation('/bets')}
           className="cursor-pointer hover:bg-accent/50 transition-colors"
         />
       </div>

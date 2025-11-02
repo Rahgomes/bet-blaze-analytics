@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { BarChart3, PlusCircle, Settings, TrendingUp, Wallet, Lightbulb, Eye, Upload, HelpCircle } from 'lucide-react';
 import { LanguageToggle } from './LanguageToggle';
@@ -22,7 +22,7 @@ const getNavItems = (t: (key: string) => string) => [
 ];
 
 export function BettingLayout({ children }: BettingLayoutProps) {
-  const location = useLocation();
+  const [location] = useLocation();
   const { t } = useTranslation();
   const navItems = getNavItems(t);
 
@@ -36,11 +36,11 @@ export function BettingLayout({ children }: BettingLayoutProps) {
         <nav className="space-y-1 p-4">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = location === item.path;
             return (
               <Link
                 key={item.path}
-                to={item.path}
+                href={item.path}
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   isActive

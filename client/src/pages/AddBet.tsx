@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { useBettingData } from '@/hooks/useBettingData';
 import { useExtendedData } from '@/hooks/useExtendedData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,13 +14,12 @@ import { useToast } from '@/hooks/use-toast';
 import { BetType, BetStatus } from '@/types/betting';
 
 export default function AddBet() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [, setLocation] = useLocation();
   const { addBet, bookmakers } = useBettingData();
   const { updateTip } = useExtendedData();
   const { toast } = useToast();
 
-  const locationState = location.state as { 
+  const locationState = null as { 
     prefill?: {
       description?: string;
       odds?: string;
@@ -112,7 +111,7 @@ export default function AddBet() {
       description: 'Bet added successfully',
     });
 
-    navigate('/bets');
+    setLocation('/bets');
   };
 
   return (
@@ -304,7 +303,7 @@ export default function AddBet() {
 
             <div className="flex gap-4">
               <Button type="submit" className="flex-1">Add Bet</Button>
-              <Button type="button" variant="outline" onClick={() => navigate('/bets')}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setLocation('/bets')}>Cancel</Button>
             </div>
           </CardContent>
         </Card>
