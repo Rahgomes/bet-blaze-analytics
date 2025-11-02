@@ -4,6 +4,11 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    allowedHosts: [
+      "258acb6e-5f91-4376-94a7-e68d0c11bde3-00-2kvqiwijvsnsf.riker.replit.dev",
+    ],
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./client/src"),
