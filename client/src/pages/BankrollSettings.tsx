@@ -35,7 +35,7 @@ export default function BankrollSettings() {
 
     const initialBankroll = parseFloat(formData.initialBankroll);
     const targetPercentage = parseFloat(formData.targetPercentage);
-    const targetAmount = formData.targetMode === 'fixed' 
+    const targetAmount = formData.targetMode === 'fixed'
       ? parseFloat(formData.targetAmount)
       : initialBankroll * (1 + targetPercentage / 100);
     const stopLossWeekly = parseFloat(formData.stopLossWeekly);
@@ -55,27 +55,27 @@ export default function BankrollSettings() {
     });
 
     toast({
-      title: 'Success',
-      description: 'Bankroll settings updated successfully',
+      title: 'Sucesso',
+      description: 'Configurações da banca atualizadas com sucesso',
     });
   };
 
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">Configure your bankroll and risk management</p>
+        <h1 className="text-3xl font-bold tracking-tight">Configurações</h1>
+        <p className="text-muted-foreground">Configure sua banca e gerenciamento de risco</p>
       </div>
 
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
-            <CardTitle>Bankroll Configuration</CardTitle>
-            <CardDescription>Set your initial bankroll and targets</CardDescription>
+            <CardTitle>Configuração da Banca</CardTitle>
+            <CardDescription>Defina sua banca inicial e metas</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="initialBankroll">Initial Bankroll (€)</Label>
+              <Label htmlFor="initialBankroll">Banca Inicial (R$)</Label>
               <Input
                 id="initialBankroll"
                 type="number"
@@ -85,13 +85,13 @@ export default function BankrollSettings() {
                 onChange={(e) => setFormData({ ...formData, initialBankroll: e.target.value })}
               />
               <p className="text-sm text-muted-foreground">
-                Current bankroll: €{bankroll.currentBankroll.toFixed(2)}
+                Banca atual: R$ {bankroll.currentBankroll.toFixed(2)}
               </p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <Label>Target Mode</Label>
+                <Label>Modo de Meta</Label>
                 <div className="flex gap-4 mt-2">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -100,7 +100,7 @@ export default function BankrollSettings() {
                       checked={formData.targetMode === 'percentage'}
                       onChange={(e) => setFormData({ ...formData, targetMode: e.target.value as 'percentage' | 'fixed' })}
                     />
-                    <span>Percentage Target</span>
+                    <span>Meta Percentual</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -109,14 +109,14 @@ export default function BankrollSettings() {
                       checked={formData.targetMode === 'fixed'}
                       onChange={(e) => setFormData({ ...formData, targetMode: e.target.value as 'percentage' | 'fixed' })}
                     />
-                    <span>Fixed Amount Target</span>
+                    <span>Meta em Valor Fixo</span>
                   </label>
                 </div>
               </div>
 
               {formData.targetMode === 'percentage' ? (
                 <div className="space-y-2">
-                  <Label htmlFor="targetPercentage">Target Percentage (%)</Label>
+                  <Label htmlFor="targetPercentage">Percentual de Meta (%)</Label>
                   <Input
                     id="targetPercentage"
                     type="number"
@@ -126,12 +126,12 @@ export default function BankrollSettings() {
                     onChange={(e) => setFormData({ ...formData, targetPercentage: e.target.value })}
                   />
                   <p className="text-sm text-muted-foreground">
-                    Target amount: €{(parseFloat(formData.initialBankroll || '0') * (1 + parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2)}
+                    Valor da meta: R$ {(parseFloat(formData.initialBankroll || '0') * (1 + parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2)}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Label htmlFor="targetAmount">Target Amount (€)</Label>
+                  <Label htmlFor="targetAmount">Valor da Meta (R$)</Label>
                   <Input
                     id="targetAmount"
                     type="number"
@@ -148,13 +148,13 @@ export default function BankrollSettings() {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Risk Management</CardTitle>
-            <CardDescription>Set stop loss and stop gain limits</CardDescription>
+            <CardTitle>Gerenciamento de Risco</CardTitle>
+            <CardDescription>Defina limites de stop loss e stop gain</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="stopLossWeekly">Weekly Stop Loss (€)</Label>
+                <Label htmlFor="stopLossWeekly">Stop Loss Semanal (R$)</Label>
                 <Input
                   id="stopLossWeekly"
                   type="number"
@@ -166,7 +166,7 @@ export default function BankrollSettings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stopGainWeekly">Weekly Stop Gain (€)</Label>
+                <Label htmlFor="stopGainWeekly">Stop Gain Semanal (R$)</Label>
                 <Input
                   id="stopGainWeekly"
                   type="number"
@@ -178,7 +178,7 @@ export default function BankrollSettings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stopLossMonthly">Monthly Stop Loss (€)</Label>
+                <Label htmlFor="stopLossMonthly">Stop Loss Mensal (R$)</Label>
                 <Input
                   id="stopLossMonthly"
                   type="number"
@@ -190,7 +190,7 @@ export default function BankrollSettings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stopGainMonthly">Monthly Stop Gain (€)</Label>
+                <Label htmlFor="stopGainMonthly">Stop Gain Mensal (R$)</Label>
                 <Input
                   id="stopGainMonthly"
                   type="number"
@@ -204,7 +204,7 @@ export default function BankrollSettings() {
           </CardContent>
         </Card>
 
-        <Button type="submit" className="mt-6 w-full">Save Settings</Button>
+        <Button type="submit" className="mt-6 w-full">Salvar Configurações</Button>
       </form>
     </div>
   );

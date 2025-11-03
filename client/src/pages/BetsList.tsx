@@ -38,13 +38,13 @@ export default function BetsList() {
   const filteredBets = useMemo(() => {
     return bets.filter(bet => {
       const matchesSearch = bet.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          bet.bookmaker.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          bet.league?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          bet.market?.toLowerCase().includes(searchTerm.toLowerCase());
+        bet.bookmaker.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bet.league?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bet.market?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesBookmaker = filterBookmaker === 'all' || bet.bookmaker === filterBookmaker;
       const matchesType = filterType === 'all' || bet.betType === filterType;
       const matchesStatus = filterStatus === 'all' || bet.status === filterStatus;
-      
+
       return matchesSearch && matchesBookmaker && matchesType && matchesStatus;
     }).sort((a, b) => new Date(b.matchTime || b.date).getTime() - new Date(a.matchTime || a.date).getTime());
   }, [bets, searchTerm, filterBookmaker, filterType, filterStatus]);
@@ -58,10 +58,10 @@ export default function BetsList() {
 
   const handleDelete = (id: string) => {
     if (id.startsWith('mock-')) {
-      alert('Cannot delete mock data. Add real bets to manage them.');
+      alert('Não é possível excluir dados de demonstração. Adicione apostas reais para gerenciá-las.');
       return;
     }
-    if (window.confirm('Are you sure you want to delete this bet?')) {
+    if (window.confirm('Tem certeza que deseja excluir esta aposta?')) {
       deleteBet(id);
     }
   };
@@ -73,7 +73,7 @@ export default function BetsList() {
 
   const handleEdit = (bet: Bet) => {
     if (bet.id.startsWith('mock-')) {
-      alert('Cannot edit mock data. Add real bets to manage them.');
+      alert('Não é possível editar dados de demonstração. Adicione apostas reais para gerenciá-las.');
       return;
     }
     setEditForm(bet);
@@ -82,7 +82,7 @@ export default function BetsList() {
 
   const handleSaveEdit = () => {
     if (!editForm) return;
-    
+
     const amount = editForm.amount;
     const odds = editForm.odds;
     const return_ = editForm.status === 'won' ? amount * odds : 0;
@@ -102,31 +102,31 @@ export default function BetsList() {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Bets</h1>
-          <p className="text-muted-foreground">Manage and view all your bets</p>
+          <h1 className="text-3xl font-bold tracking-tight">Apostas</h1>
+          <p className="text-muted-foreground">Gerencie e visualize todas as suas apostas</p>
         </div>
         <Tabs value={selectedPeriod} onValueChange={(v) => setSelectedPeriod(v as TimePeriod)}>
           <TabsList>
-            <TabsTrigger value="today">Today</TabsTrigger>
-            <TabsTrigger value="week">Week</TabsTrigger>
-            <TabsTrigger value="month">Month</TabsTrigger>
-            <TabsTrigger value="year">Year</TabsTrigger>
-            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="today">Hoje</TabsTrigger>
+            <TabsTrigger value="week">Semana</TabsTrigger>
+            <TabsTrigger value="month">Mês</TabsTrigger>
+            <TabsTrigger value="year">Ano</TabsTrigger>
+            <TabsTrigger value="all">Tudo</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Filters</CardTitle>
-          <CardDescription>Filter your bets by various criteria</CardDescription>
+          <CardTitle>Filtros</CardTitle>
+          <CardDescription>Filtre suas apostas por diversos critérios</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-4">
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search..."
+                placeholder="Buscar..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-8"
@@ -134,10 +134,10 @@ export default function BetsList() {
             </div>
             <Select value={filterBookmaker} onValueChange={setFilterBookmaker}>
               <SelectTrigger>
-                <SelectValue placeholder="All Bookmakers" />
+                <SelectValue placeholder="Todas as Casas" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Bookmakers</SelectItem>
+                <SelectItem value="all">Todas as Casas</SelectItem>
                 {bookmakers.map((bm) => (
                   <SelectItem key={bm.id} value={bm.name}>{bm.name}</SelectItem>
                 ))}
@@ -145,26 +145,26 @@ export default function BetsList() {
             </Select>
             <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger>
-                <SelectValue placeholder="All Types" />
+                <SelectValue placeholder="Todos os Tipos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="simple">Simple</SelectItem>
-                <SelectItem value="multiple">Multiple</SelectItem>
-                <SelectItem value="live">Live</SelectItem>
-                <SelectItem value="system">System</SelectItem>
+                <SelectItem value="all">Todos os Tipos</SelectItem>
+                <SelectItem value="simple">Simples</SelectItem>
+                <SelectItem value="multiple">Múltipla</SelectItem>
+                <SelectItem value="live">Ao Vivo</SelectItem>
+                <SelectItem value="system">Sistema</SelectItem>
               </SelectContent>
             </Select>
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger>
-                <SelectValue placeholder="All Statuses" />
+                <SelectValue placeholder="Todos os Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="won">Won</SelectItem>
-                <SelectItem value="lost">Lost</SelectItem>
-                <SelectItem value="void">Void</SelectItem>
+                <SelectItem value="all">Todos os Status</SelectItem>
+                <SelectItem value="pending">Pendente</SelectItem>
+                <SelectItem value="won">Ganha</SelectItem>
+                <SelectItem value="lost">Perdida</SelectItem>
+                <SelectItem value="void">Anulada</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -173,54 +173,53 @@ export default function BetsList() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All Bets ({filteredBets.length})</CardTitle>
-          <CardDescription>Complete history of your bets</CardDescription>
+          <CardTitle>Todas as Apostas ({filteredBets.length})</CardTitle>
+          <CardDescription>Histórico completo das suas apostas</CardDescription>
         </CardHeader>
         <CardContent>
           {filteredBets.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">No bets found matching your criteria</p>
+            <p className="text-center text-muted-foreground py-8">Nenhuma aposta encontrada com esses critérios</p>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>#</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Match Time</TableHead>
-                    <TableHead>League</TableHead>
-                    <TableHead>Market</TableHead>
-                    <TableHead>Bookmaker</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Strategies</TableHead>
-                    <TableHead className="text-right">Stake</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Hora do Jogo</TableHead>
+                    <TableHead>Liga</TableHead>
+                    <TableHead>Mercado</TableHead>
+                    <TableHead>Casa</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead>Estratégias</TableHead>
+                    <TableHead className="text-right">Valor</TableHead>
                     <TableHead className="text-right">Odds</TableHead>
-                    <TableHead className="text-right">Return</TableHead>
-                    <TableHead className="text-right">Profit</TableHead>
+                    <TableHead className="text-right">Retorno</TableHead>
+                    <TableHead className="text-right">Lucro</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredBets.map((bet) => (
-                    <TableRow 
+                    <TableRow
                       key={bet.id}
                       className={isLiveBet(bet) ? 'bg-orange-500/10 border-l-4 border-l-orange-500' : ''}
                     >
-                      <TableCell className="font-medium">{bet.operationNumber}</TableCell>
+                      <TableCell>{bet.operationNumber}</TableCell>
                       <TableCell>{new Date(bet.date).toLocaleDateString()}</TableCell>
                       <TableCell>
-                        {bet.matchTime ? new Date(bet.matchTime).toLocaleString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric', 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
+                        {bet.matchTime ? new Date(bet.matchTime).toLocaleTimeString('pt-BR', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false
                         }) : '-'}
                       </TableCell>
                       <TableCell>{bet.league || '-'}</TableCell>
                       <TableCell>{bet.market || '-'}</TableCell>
                       <TableCell>{bet.bookmaker}</TableCell>
-                      <TableCell className="capitalize">{bet.betType}</TableCell>
+                      <TableCell className="capitalize">{bet.betType === 'simple' ? 'simples' : bet.betType === 'multiple' ? 'múltipla' : bet.betType === 'live' ? 'ao vivo' : bet.betType === 'system' ? 'sistema' : bet.betType}</TableCell>
                       <TableCell className="max-w-xs truncate">
                         {bet.description}
                         {isLiveBet(bet) && <Badge className="ml-2 bg-orange-500">LIVE</Badge>}
@@ -234,11 +233,11 @@ export default function BetsList() {
                           </div>
                         ) : '-'}
                       </TableCell>
-                      <TableCell className="text-right">€{bet.amount.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">R$ {bet.amount.toFixed(2)}</TableCell>
                       <TableCell className="text-right">{bet.odds.toFixed(2)}</TableCell>
-                      <TableCell className="text-right">€{bet.return.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">R$ {bet.return.toFixed(2)}</TableCell>
                       <TableCell className={`text-right font-medium ${bet.profit >= 0 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
-                        {bet.profit >= 0 ? '+' : ''}€{bet.profit.toFixed(2)}
+                        {bet.profit >= 0 ? '+' : ''}R$ {bet.profit.toFixed(2)}
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -247,11 +246,11 @@ export default function BetsList() {
                             bet.status === 'won'
                               ? 'bg-[hsl(var(--profit)/0.1)] text-[hsl(var(--profit))] border-[hsl(var(--profit)/0.3)]'
                               : bet.status === 'lost'
-                              ? 'bg-[hsl(var(--loss)/0.1)] text-[hsl(var(--loss))] border-[hsl(var(--loss)/0.3)]'
-                              : ''
+                                ? 'bg-[hsl(var(--loss)/0.1)] text-[hsl(var(--loss))] border-[hsl(var(--loss)/0.3)]'
+                                : ''
                           }
                         >
-                          {bet.status}
+                          {bet.status === 'won' ? 'ganha' : bet.status === 'lost' ? 'perdida' : bet.status === 'pending' ? 'pendente' : bet.status === 'void' ? 'anulada' : bet.status}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -285,62 +284,62 @@ export default function BetsList() {
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Bet Details</DialogTitle>
-            <DialogDescription>Complete information about this bet</DialogDescription>
+            <DialogTitle>Detalhes da Aposta</DialogTitle>
+            <DialogDescription>Informações completas sobre esta aposta</DialogDescription>
           </DialogHeader>
           {selectedBet && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-muted-foreground">Operation #</Label>
+                  <Label className="text-muted-foreground">Operação #</Label>
                   <p className="font-medium">{selectedBet.operationNumber}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Date</Label>
+                  <Label className="text-muted-foreground">Data</Label>
                   <p className="font-medium">{new Date(selectedBet.date).toLocaleDateString()}</p>
                 </div>
                 {selectedBet.matchTime && (
                   <div>
-                    <Label className="text-muted-foreground">Match Time</Label>
+                    <Label className="text-muted-foreground">Hora do Jogo</Label>
                     <p className="font-medium">{new Date(selectedBet.matchTime).toLocaleString()}</p>
                   </div>
                 )}
                 {selectedBet.league && (
                   <div>
-                    <Label className="text-muted-foreground">League</Label>
+                    <Label className="text-muted-foreground">Liga</Label>
                     <p className="font-medium">{selectedBet.league}</p>
                   </div>
                 )}
                 {selectedBet.market && (
                   <div>
-                    <Label className="text-muted-foreground">Market</Label>
+                    <Label className="text-muted-foreground">Mercado</Label>
                     <p className="font-medium">{selectedBet.market}</p>
                   </div>
                 )}
                 <div>
-                  <Label className="text-muted-foreground">Bookmaker</Label>
+                  <Label className="text-muted-foreground">Casa</Label>
                   <p className="font-medium">{selectedBet.bookmaker}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Type</Label>
-                  <p className="font-medium capitalize">{selectedBet.betType}</p>
+                  <Label className="text-muted-foreground">Tipo</Label>
+                  <p className="font-medium capitalize">{selectedBet.betType === 'simple' ? 'simples' : selectedBet.betType === 'multiple' ? 'múltipla' : selectedBet.betType === 'live' ? 'ao vivo' : selectedBet.betType === 'system' ? 'sistema' : selectedBet.betType}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Stake</Label>
-                  <p className="font-medium">€{selectedBet.amount.toFixed(2)}</p>
+                  <Label className="text-muted-foreground">Valor</Label>
+                  <p className="font-medium">R$ {selectedBet.amount.toFixed(2)}</p>
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Odds</Label>
                   <p className="font-medium">{selectedBet.odds.toFixed(2)}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Return</Label>
-                  <p className="font-medium">€{selectedBet.return.toFixed(2)}</p>
+                  <Label className="text-muted-foreground">Retorno</Label>
+                  <p className="font-medium">R$ {selectedBet.return.toFixed(2)}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Profit/Loss</Label>
+                  <Label className="text-muted-foreground">Lucro/Prejuízo</Label>
                   <p className={`font-medium ${selectedBet.profit >= 0 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
-                    {selectedBet.profit >= 0 ? '+' : ''}€{selectedBet.profit.toFixed(2)}
+                    {selectedBet.profit >= 0 ? '+' : ''}R$ {selectedBet.profit.toFixed(2)}
                   </p>
                 </div>
                 <div>
@@ -353,16 +352,16 @@ export default function BetsList() {
                     selectedBet.status === 'won'
                       ? 'bg-[hsl(var(--profit)/0.1)] text-[hsl(var(--profit))] border-[hsl(var(--profit)/0.3)]'
                       : selectedBet.status === 'lost'
-                      ? 'bg-[hsl(var(--loss)/0.1)] text-[hsl(var(--loss))] border-[hsl(var(--loss)/0.3)]'
-                      : ''
+                        ? 'bg-[hsl(var(--loss)/0.1)] text-[hsl(var(--loss))] border-[hsl(var(--loss)/0.3)]'
+                        : ''
                   }>
-                    {selectedBet.status}
+                    {selectedBet.status === 'won' ? 'ganha' : selectedBet.status === 'lost' ? 'perdida' : selectedBet.status === 'pending' ? 'pendente' : selectedBet.status === 'void' ? 'anulada' : selectedBet.status}
                   </Badge>
                 </div>
               </div>
               {selectedBet.strategies && selectedBet.strategies.length > 0 && (
                 <div>
-                  <Label className="text-muted-foreground">Strategies/Protection</Label>
+                  <Label className="text-muted-foreground">Estratégias/Proteção</Label>
                   <div className="flex flex-wrap gap-2 mt-1">
                     {selectedBet.strategies.map((s, i) => (
                       <Badge key={i} variant="secondary">{s}</Badge>
@@ -372,20 +371,20 @@ export default function BetsList() {
               )}
               {selectedBet.description && (
                 <div>
-                  <Label className="text-muted-foreground">Description</Label>
+                  <Label className="text-muted-foreground">Descrição</Label>
                   <p className="mt-1">{selectedBet.description}</p>
                 </div>
               )}
               {selectedBet.stakeLogic && (
                 <div>
-                  <Label className="text-muted-foreground">Stake Logic</Label>
+                  <Label className="text-muted-foreground">Lógica do Valor</Label>
                   <p className="mt-1">{selectedBet.stakeLogic}</p>
                 </div>
               )}
               <div className="flex gap-4">
-                {selectedBet.isProtected && <Badge>Protected</Badge>}
-                {selectedBet.isLive && <Badge variant="secondary">Live</Badge>}
-                {isLiveBet(selectedBet) && <Badge className="bg-orange-500">LIVE NOW</Badge>}
+                {selectedBet.isProtected && <Badge>Protegida</Badge>}
+                {selectedBet.isLive && <Badge variant="secondary">Ao Vivo</Badge>}
+                {isLiveBet(selectedBet) && <Badge className="bg-orange-500">AO VIVO AGORA</Badge>}
               </div>
             </div>
           )}
@@ -396,14 +395,14 @@ export default function BetsList() {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Bet</DialogTitle>
-            <DialogDescription>Update bet information</DialogDescription>
+            <DialogTitle>Editar Aposta</DialogTitle>
+            <DialogDescription>Atualizar informações da aposta</DialogDescription>
           </DialogHeader>
           {editForm && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="edit-stake">Stake (€)</Label>
+                  <Label htmlFor="edit-stake">Valor (R$)</Label>
                   <Input
                     id="edit-stake"
                     type="number"
@@ -429,30 +428,30 @@ export default function BetsList() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="won">Won</SelectItem>
-                      <SelectItem value="lost">Lost</SelectItem>
-                      <SelectItem value="void">Void</SelectItem>
+                      <SelectItem value="pending">Pendente</SelectItem>
+                      <SelectItem value="won">Ganha</SelectItem>
+                      <SelectItem value="lost">Perdida</SelectItem>
+                      <SelectItem value="void">Anulada</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="edit-type">Bet Type</Label>
+                  <Label htmlFor="edit-type">Tipo de Aposta</Label>
                   <Select value={editForm.betType} onValueChange={(v) => setEditForm({ ...editForm, betType: v as BetType })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="simple">Simple</SelectItem>
-                      <SelectItem value="multiple">Multiple</SelectItem>
-                      <SelectItem value="live">Live</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
+                      <SelectItem value="simple">Simples</SelectItem>
+                      <SelectItem value="multiple">Múltipla</SelectItem>
+                      <SelectItem value="live">Ao Vivo</SelectItem>
+                      <SelectItem value="system">Sistema</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div>
-                <Label htmlFor="edit-description">Description</Label>
+                <Label htmlFor="edit-description">Descrição</Label>
                 <Textarea
                   id="edit-description"
                   value={editForm.description}
@@ -461,7 +460,7 @@ export default function BetsList() {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-logic">Stake Logic</Label>
+                <Label htmlFor="edit-logic">Lógica do Valor</Label>
                 <Textarea
                   id="edit-logic"
                   value={editForm.stakeLogic || ''}
@@ -470,8 +469,8 @@ export default function BetsList() {
                 />
               </div>
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-                <Button onClick={handleSaveEdit}>Save Changes</Button>
+                <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancelar</Button>
+                <Button onClick={handleSaveEdit}>Salvar Alterações</Button>
               </div>
             </div>
           )}

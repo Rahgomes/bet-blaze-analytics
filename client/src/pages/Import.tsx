@@ -24,7 +24,7 @@ export default function Import() {
   const parseCSV = (text: string): any[] => {
     const lines = text.split('\n').filter(line => line.trim());
     const headers = lines[0].split(',').map(h => h.trim());
-    
+
     return lines.slice(1).map(line => {
       const values = line.split(',');
       const obj: any = {};
@@ -37,7 +37,7 @@ export default function Import() {
 
   const handleImport = async () => {
     if (!file) {
-      toast.error('Please select a file');
+      toast.error('Por favor, selecione um arquivo');
       return;
     }
 
@@ -45,7 +45,7 @@ export default function Import() {
     try {
       const text = await file.text();
       const rows = parseCSV(text);
-      
+
       let imported = 0;
       for (const row of rows) {
         // Map CSV columns to bet structure
@@ -54,7 +54,7 @@ export default function Import() {
           const amount = parseFloat(row.amount);
           const odds = parseFloat(row.odds);
           const returnAmount = row.status === 'won' ? amount * odds : 0;
-          
+
           addBet({
             bookmaker: row.bookmaker || 'Manual',
             date: row.date || new Date().toISOString().split('T')[0],
@@ -70,7 +70,7 @@ export default function Import() {
           imported++;
         }
       }
-      
+
       toast.success(t('import.importSuccess').replace('{count}', imported.toString()));
       setFile(null);
     } catch (error) {
@@ -88,6 +88,9 @@ export default function Import() {
       <Card>
         <CardHeader>
           <CardTitle>{t('import.uploadFile')}</CardTitle>
+          <p className="text-sm text-muted-foreground mt-2">
+            Importe suas apostas em formato CSV ou Excel. Os valores monetários devem estar em Real brasileiro (R$).
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="border-2 border-dashed border-border rounded-lg p-12 text-center">
@@ -111,7 +114,7 @@ export default function Import() {
             </div>
             {file && (
               <div className="mt-4 text-sm text-foreground">
-                Selected: {file.name}
+                Selecionado: {file.name}
               </div>
             )}
           </div>
@@ -119,18 +122,28 @@ export default function Import() {
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('import.columnMapping')}</h3>
             <div className="bg-muted p-4 rounded-lg space-y-2 text-sm">
-              <p><strong>bookmaker</strong> - Bookmaker name</p>
-              <p><strong>date</strong> - Bet date (YYYY-MM-DD)</p>
-              <p><strong>betType</strong> - simple, multiple, live, or system</p>
-              <p><strong>amount</strong> - Stake amount</p>
-              <p><strong>odds</strong> - Odds value</p>
-              <p><strong>status</strong> - pending, won, lost, or void</p>
-              <p><strong>description</strong> - Bet description</p>
+              <p><strong>bookmaker</strong> - Nome da casa de apostas</p>
+              <p><strong>date</strong> - Data da aposta (AAAA-MM-DD)</p>
+              <p><strong>betType</strong> - simples, múltipla, ao vivo ou sistema</p>
+              <p><strong>amount</strong> - Valor apostado (em R$)</p>
+              <p><strong>odds</strong> - Valor das odds</p>
+              <p><strong>status</strong> - pendente, ganha, perdida ou anulada</p>
+              <p><strong>description</strong> - Descrição da aposta</p>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-medium text-foreground">Exemplo de arquivo CSV:</h4>
+              <div className="bg-gray-900 p-3 rounded-lg text-xs font-mono text-green-400 overflow-x-auto">
+                <div>bookmaker,date,betType,amount,odds,status,description</div>
+                <div>Bet365,2024-11-01,simples,50.00,1.85,ganha,Flamengo vs Palmeiras - Vitória Flamengo</div>
+                <div>Betfair,2024-11-02,múltipla,25.00,3.20,perdida,Arsenal + Liverpool Vitórias</div>
+                <div>Betano,2024-11-03,simples,30.00,2.10,pendente,Real Madrid vs Barcelona - Mais de 2.5 gols</div>
+              </div>
             </div>
           </div>
 
-          <Button 
-            onClick={handleImport} 
+          <Button
+            onClick={handleImport}
             disabled={!file || importing}
             className="w-full"
           >

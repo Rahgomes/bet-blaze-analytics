@@ -135,6 +135,7 @@
     "loading": "Carregando...",
     "noData": "Nenhum dado disponível",
     "success": "Sucesso",
-    "error": "Erro"
+    "error": "Erro",
+    "confirmDelete": "Tem certeza que deseja excluir este item?"
   }
 }

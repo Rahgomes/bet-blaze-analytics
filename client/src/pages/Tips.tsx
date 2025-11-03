@@ -20,19 +20,19 @@ export default function Tips() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { tips: realTips, tipsters, addTip, updateTip, deleteTip } = useExtendedData();
-  
+
   // Merge real tips with mock tips for demonstration
   const allTips = useMemo(() => {
     const mockTips = realTips.length === 0 ? generateMockTips() : [];
     return [...realTips, ...mockTips];
   }, [realTips]);
-  
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTip, setSelectedTip] = useState<Tip | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTipster, setFilterTipster] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  
+
   const [formData, setFormData] = useState({
     tipsterId: '',
     title: '',
@@ -48,7 +48,7 @@ export default function Tips() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.tipsterId || !formData.title || !formData.match || !formData.suggestedOdds) {
       toast.error(t('common.error'));
       return;
@@ -68,18 +68,18 @@ export default function Tips() {
       status: 'pending',
       notes: formData.notes,
     });
-    
-    setFormData({ 
-      tipsterId: '', 
-      title: '', 
-      description: '', 
-      match: '', 
-      market: '', 
-      suggestedStake: '', 
-      suggestedOdds: '', 
+
+    setFormData({
+      tipsterId: '',
+      title: '',
+      description: '',
+      match: '',
+      market: '',
+      suggestedStake: '',
+      suggestedOdds: '',
       betType: 'simple',
-      confidence: 'medium', 
-      notes: '' 
+      confidence: 'medium',
+      notes: ''
     });
     setIsAddDialogOpen(false);
     toast.success(t('common.success'));
@@ -87,7 +87,7 @@ export default function Tips() {
 
   const handleDelete = (id: string) => {
     if (id.startsWith('mock-tip-')) {
-      toast.error('Cannot delete mock data. Add real tips to manage them.');
+      toast.error('Não é possível excluir dados de demonstração. Adicione dicas reais para gerenciá-las.');
       return;
     }
     if (window.confirm(t('common.confirmDelete'))) {
@@ -98,14 +98,14 @@ export default function Tips() {
 
   const handleConvertToBet = (tip: Tip) => {
     if (tip.id.startsWith('mock-tip-')) {
-      toast.error('Cannot convert mock tips. Add real tips to convert them to bets.');
+      toast.error('Não é possível converter dicas de demonstração. Adicione dicas reais para convertê-las em apostas.');
       return;
     }
     setLocation('/add-bet');
   };
 
   const getTipsterName = (tipsterId: string) => {
-    return tipsters.find(t => t.id === tipsterId)?.name || 'Unknown Tipster';
+    return tipsters.find(t => t.id === tipsterId)?.name || 'Tipster Desconhecido';
   };
 
   const getTipsterRating = (tipsterId: string) => {
@@ -115,8 +115,8 @@ export default function Tips() {
   const filteredTips = useMemo(() => {
     return allTips.filter(tip => {
       const matchesSearch = tip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           tip.match.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           tip.market.toLowerCase().includes(searchQuery.toLowerCase());
+        tip.match.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tip.market.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesTipster = filterTipster === 'all' || tip.tipsterId === filterTipster;
       const matchesStatus = filterStatus === 'all' || tip.status === filterStatus;
       return matchesSearch && matchesTipster && matchesStatus;
@@ -186,21 +186,21 @@ export default function Tips() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="simple">Simple</SelectItem>
-                      <SelectItem value="multiple">Multiple</SelectItem>
-                      <SelectItem value="live">Live</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
+                      <SelectItem value="simple">Simples</SelectItem>
+                      <SelectItem value="multiple">Múltipla</SelectItem>
+                      <SelectItem value="live">Ao Vivo</SelectItem>
+                      <SelectItem value="system">Sistema</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-              
+
               <div>
                 <Label>{t('tips.title_field')}</Label>
                 <Input
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="e.g., Liverpool ML Value Bet"
+                  placeholder="ex: Flamengo Vitória - Aposta de Valor"
                   required
                 />
               </div>
@@ -210,7 +210,7 @@ export default function Tips() {
                 <Textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Detailed analysis and reasoning..."
+                  placeholder="Análise detalhada e justificativa..."
                   rows={3}
                 />
               </div>
@@ -221,7 +221,7 @@ export default function Tips() {
                   <Input
                     value={formData.match}
                     onChange={(e) => setFormData({ ...formData, match: e.target.value })}
-                    placeholder="Team A vs Team B"
+                    placeholder="Time A vs Time B"
                     required
                   />
                 </div>
@@ -230,7 +230,7 @@ export default function Tips() {
                   <Input
                     value={formData.market}
                     onChange={(e) => setFormData({ ...formData, market: e.target.value })}
-                    placeholder="Match Result, Over 2.5, etc."
+                    placeholder="Resultado Final, Mais de 2.5, etc."
                     required
                   />
                 </div>
@@ -281,7 +281,7 @@ export default function Tips() {
                 <Textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Additional notes..."
+                  placeholder="Observações adicionais..."
                   rows={2}
                 />
               </div>
@@ -311,7 +311,7 @@ export default function Tips() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Tipsters</SelectItem>
+                  <SelectItem value="all">Todos os Tipsters</SelectItem>
                   {tipsters.map((tipster) => (
                     <SelectItem key={tipster.id} value={tipster.id}>
                       {tipster.name}
@@ -327,7 +327,7 @@ export default function Tips() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="all">Todos os Status</SelectItem>
                   <SelectItem value="pending">{t('tips.pending')}</SelectItem>
                   <SelectItem value="converted">{t('tips.converted')}</SelectItem>
                   <SelectItem value="archived">{t('tips.archived')}</SelectItem>
@@ -440,7 +440,7 @@ export default function Tips() {
                 </div>
                 <div>
                   <Label className="text-muted-foreground">{t('tips.betType')}</Label>
-                  <p className="font-medium capitalize">{selectedTip.betType}</p>
+                  <p className="font-medium capitalize">{selectedTip.betType === 'simple' ? 'simples' : selectedTip.betType === 'multiple' ? 'múltipla' : selectedTip.betType === 'live' ? 'ao vivo' : selectedTip.betType === 'system' ? 'sistema' : selectedTip.betType}</p>
                 </div>
                 <div>
                   <Label className="text-muted-foreground">{t('tips.suggestedOdds')}</Label>
@@ -449,7 +449,7 @@ export default function Tips() {
                 {selectedTip.suggestedStake && (
                   <div>
                     <Label className="text-muted-foreground">{t('tips.suggestedStake')}</Label>
-                    <p className="font-medium">€{selectedTip.suggestedStake.toFixed(2)}</p>
+                    <p className="font-medium">R$ {selectedTip.suggestedStake.toFixed(2)}</p>
                   </div>
                 )}
                 <div>

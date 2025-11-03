@@ -12,10 +12,26 @@ import { Badge } from '@/components/ui/badge';
 import { PlusCircle, Trash2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Mock teams data for demonstration
+const generateMockTeams = () => [
+  { id: 'mock-team-1', name: 'Bayern Munich', competition: 'Bundesliga', notes: 'Strong home form', isWatched: true, createdAt: new Date().toISOString() },
+  { id: 'mock-team-2', name: 'Real Madrid', competition: 'La Liga', notes: 'Champions League favorites', isWatched: true, createdAt: new Date().toISOString() },
+  { id: 'mock-team-3', name: 'Paris Saint-Germain', competition: 'Ligue 1', notes: 'High scoring matches', isWatched: true, createdAt: new Date().toISOString() },
+  { id: 'mock-team-4', name: 'Manchester City', competition: 'Premier League', notes: 'Excellent away record', isWatched: true, createdAt: new Date().toISOString() },
+  { id: 'mock-team-5', name: 'Barcelona', competition: 'La Liga', notes: 'Good value in El Clasico', isWatched: true, createdAt: new Date().toISOString() },
+  { id: 'mock-team-6', name: 'Liverpool', competition: 'Premier League', notes: 'Strong at Anfield', isWatched: true, createdAt: new Date().toISOString() },
+];
+
 export default function Watchlist() {
   const { t } = useTranslation();
-  const { teams, addTeam, deleteTeam } = useExtendedData();
+  const { teams: realTeams, addTeam, deleteTeam } = useExtendedData();
   const { bets } = useBettingData();
+
+  // Merge real teams with mock teams for demonstration
+  const allTeams = useMemo(() => {
+    const mockTeams = realTeams.length === 0 ? generateMockTeams() : [];
+    return [...realTeams, ...mockTeams];
+  }, [realTeams]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -24,11 +40,33 @@ export default function Watchlist() {
   });
 
   const teamExposure = useMemo(() => {
-    return teams.filter(t => t.isWatched).map(team => {
-      const teamBets = bets.filter(bet => 
-        bet.status === 'pending' && 
-        bet.teams?.some(t => t.toLowerCase().includes(team.name.toLowerCase()))
+    return allTeams.filter(t => t.isWatched).map(team => {
+      // For mock teams, generate some exposure data
+      let teamBets = bets.filter(bet =>
+        bet.status === 'pending' &&
+        bet.description?.toLowerCase().includes(team.name.toLowerCase())
       );
+
+      // Add mock exposure data for demonstration
+      if (team.id.startsWith('mock-team-') && teamBets.length === 0) {
+        const mockExposure = [
+          { team: 'Bayern Munich', activeBets: 3, totalStake: 150.00 },
+          { team: 'Real Madrid', activeBets: 5, totalStake: 275.50 },
+          { team: 'Paris Saint-Germain', activeBets: 2, totalStake: 85.00 },
+          { team: 'Manchester City', activeBets: 4, totalStake: 200.00 },
+          { team: 'Barcelona', activeBets: 1, totalStake: 50.00 },
+          { team: 'Liverpool', activeBets: 2, totalStake: 120.00 },
+        ];
+        const mockData = mockExposure.find(m => m.team === team.name);
+        if (mockData) {
+          return {
+            ...team,
+            activeBets: mockData.activeBets,
+            totalStake: mockData.totalStake,
+          };
+        }
+      }
+
       const totalStake = teamBets.reduce((sum, bet) => sum + bet.amount, 0);
       return {
         ...team,
@@ -36,7 +74,7 @@ export default function Watchlist() {
         totalStake,
       };
     });
-  }, [teams, bets]);
+  }, [allTeams, bets]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +82,17 @@ export default function Watchlist() {
     setFormData({ name: '', competition: '', notes: '' });
     setIsAddDialogOpen(false);
     toast.success(t('common.success'));
+  };
+
+  const handleDelete = (id: string) => {
+    if (id.startsWith('mock-team-')) {
+      toast.error('Não é possível excluir dados de demonstração. Adicione times reais para gerenciá-los.');
+      return;
+    }
+    if (window.confirm('Tem certeza que deseja remover este time do monitoramento?')) {
+      deleteTeam(id);
+      toast.success('Time removido com sucesso');
+    }
   };
 
   return (
@@ -67,6 +116,7 @@ export default function Watchlist() {
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="ex: Flamengo, Palmeiras"
                   required
                 />
               </div>
@@ -75,6 +125,7 @@ export default function Watchlist() {
                 <Input
                   value={formData.competition}
                   onChange={(e) => setFormData({ ...formData, competition: e.target.value })}
+                  placeholder="ex: Brasileirão, Libertadores"
                 />
               </div>
               <Button type="submit" className="w-full">{t('common.save')}</Button>
@@ -112,12 +163,12 @@ export default function Watchlist() {
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell>{item.competition || '-'}</TableCell>
                     <TableCell>{item.activeBets}</TableCell>
-                    <TableCell>€{item.totalStake.toFixed(2)}</TableCell>
+                    <TableCell>R$ {item.totalStake.toFixed(2)}</TableCell>
                     <TableCell>
                       {item.activeBets > 3 && (
                         <Badge variant="destructive">
                           <AlertTriangle className="mr-1 h-3 w-3" />
-                          High Exposure
+                          Alta Exposição
                         </Badge>
                       )}
                     </TableCell>
@@ -125,7 +176,7 @@ export default function Watchlist() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => deleteTeam(item.id)}
+                        onClick={() => handleDelete(item.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

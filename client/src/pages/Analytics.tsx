@@ -54,7 +54,7 @@ export default function Analytics() {
 
   const leagueStats = useMemo(() => {
     const leagues = new Map<string, { totalBets: number; profit: number; totalStake: number }>();
-    
+
     periodBets.forEach(bet => {
       if (bet.league) {
         const current = leagues.get(bet.league) || { totalBets: 0, profit: 0, totalStake: 0 };
@@ -85,7 +85,7 @@ export default function Analytics() {
 
   const monthlyStats = useMemo(() => {
     const months = new Map<string, { stake: number; return_: number; profit: number; bets: number }>();
-    
+
     periodBets.forEach(bet => {
       const month = bet.date.substring(0, 7); // YYYY-MM
       const current = months.get(month) || { stake: 0, return_: 0, profit: 0, bets: 0 };
@@ -112,16 +112,16 @@ export default function Analytics() {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
-          <p className="text-muted-foreground">Detailed performance analysis</p>
+          <h1 className="text-3xl font-bold tracking-tight">Análise</h1>
+          <p className="text-muted-foreground">Análise detalhada de performance</p>
         </div>
         <Tabs value={selectedPeriod} onValueChange={(v) => setSelectedPeriod(v as TimePeriod)}>
           <TabsList>
-            <TabsTrigger value="today">Today</TabsTrigger>
-            <TabsTrigger value="week">Week</TabsTrigger>
-            <TabsTrigger value="month">Month</TabsTrigger>
-            <TabsTrigger value="year">Year</TabsTrigger>
-            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="today">Hoje</TabsTrigger>
+            <TabsTrigger value="week">Semana</TabsTrigger>
+            <TabsTrigger value="month">Mês</TabsTrigger>
+            <TabsTrigger value="year">Ano</TabsTrigger>
+            <TabsTrigger value="all">Tudo</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -130,11 +130,11 @@ export default function Analytics() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Profit</CardTitle>
+            <CardTitle className="text-sm font-medium">Lucro Total</CardTitle>
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${periodStats.totalProfit >= 0 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
-              {periodStats.totalProfit >= 0 ? '+' : ''}€{periodStats.totalProfit.toFixed(2)}
+              {periodStats.totalProfit >= 0 ? '+' : ''}R$ {periodStats.totalProfit.toFixed(2)}
             </div>
           </CardContent>
         </Card>
@@ -148,7 +148,7 @@ export default function Analytics() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Taxa de Acerto</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{periodStats.winRate.toFixed(1)}%</div>
@@ -156,7 +156,7 @@ export default function Analytics() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Bets</CardTitle>
+            <CardTitle className="text-sm font-medium">Total de Apostas</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{periodBets.length}</div>
@@ -168,8 +168,8 @@ export default function Analytics() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Profit Over Time</CardTitle>
-            <CardDescription>Monthly profit trend</CardDescription>
+            <CardTitle>Lucro ao Longo do Tempo</CardTitle>
+            <CardDescription>Tendência de lucro mensal</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -187,8 +187,8 @@ export default function Analytics() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Profit by League</CardTitle>
-            <CardDescription>Top performing competitions</CardDescription>
+            <CardTitle>Lucro por Liga</CardTitle>
+            <CardDescription>Competições com melhor performance</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -205,8 +205,8 @@ export default function Analytics() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Market Distribution</CardTitle>
-            <CardDescription>Bets by market type</CardDescription>
+            <CardTitle>Distribuição por Mercado</CardTitle>
+            <CardDescription>Apostas por tipo de mercado</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -233,8 +233,8 @@ export default function Analytics() {
 
         <Card>
           <CardHeader>
-            <CardTitle>ROI by Bookmaker</CardTitle>
-            <CardDescription>Return on investment comparison</CardDescription>
+            <CardTitle>ROI por Casa de Apostas</CardTitle>
+            <CardDescription>Comparação de retorno sobre investimento</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -253,23 +253,23 @@ export default function Analytics() {
       {/* Detailed Tables */}
       <Card>
         <CardHeader>
-          <CardTitle>Performance by Bookmaker</CardTitle>
-          <CardDescription>Compare your results across different bookmakers</CardDescription>
+          <CardTitle>Performance por Casa de Apostas</CardTitle>
+          <CardDescription>Compare seus resultados entre diferentes casas de apostas</CardDescription>
         </CardHeader>
         <CardContent>
           {bookmakerStats.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">No data available</p>
+            <p className="text-center text-muted-foreground py-8">Nenhum dado disponível</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Bookmaker</TableHead>
-                  <TableHead className="text-right">Bets</TableHead>
-                  <TableHead className="text-right">Total Stake</TableHead>
-                  <TableHead className="text-right">Total Return</TableHead>
-                  <TableHead className="text-right">Profit</TableHead>
+                  <TableHead>Casa de Apostas</TableHead>
+                  <TableHead className="text-right">Apostas</TableHead>
+                  <TableHead className="text-right">Valor Total</TableHead>
+                  <TableHead className="text-right">Retorno Total</TableHead>
+                  <TableHead className="text-right">Lucro</TableHead>
                   <TableHead className="text-right">ROI</TableHead>
-                  <TableHead className="text-right">Win Rate</TableHead>
+                  <TableHead className="text-right">Taxa de Acerto</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -277,10 +277,10 @@ export default function Analytics() {
                   <TableRow key={stat.bookmaker}>
                     <TableCell className="font-medium">{stat.bookmaker}</TableCell>
                     <TableCell className="text-right">{stat.totalBets}</TableCell>
-                    <TableCell className="text-right">€{stat.totalStake.toFixed(2)}</TableCell>
-                    <TableCell className="text-right">€{stat.totalReturn.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">R$ {stat.totalStake.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">R$ {stat.totalReturn.toFixed(2)}</TableCell>
                     <TableCell className={`text-right font-medium ${stat.profit >= 0 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
-                      {stat.profit >= 0 ? '+' : ''}€{stat.profit.toFixed(2)}
+                      {stat.profit >= 0 ? '+' : ''}R$ {stat.profit.toFixed(2)}
                     </TableCell>
                     <TableCell className={`text-right ${stat.roi >= 0 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
                       {stat.roi >= 0 ? '+' : ''}{stat.roi.toFixed(2)}%
@@ -296,32 +296,32 @@ export default function Analytics() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Performance by Bet Type</CardTitle>
-          <CardDescription>Compare your results across bet types</CardDescription>
+          <CardTitle>Performance por Tipo de Aposta</CardTitle>
+          <CardDescription>Compare seus resultados entre tipos de apostas</CardDescription>
         </CardHeader>
         <CardContent>
           {betTypeStats.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">No data available</p>
+            <p className="text-center text-muted-foreground py-8">Nenhum dado disponível</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Type</TableHead>
-                  <TableHead className="text-right">Bets</TableHead>
-                  <TableHead className="text-right">Total Stake</TableHead>
-                  <TableHead className="text-right">Profit</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead className="text-right">Apostas</TableHead>
+                  <TableHead className="text-right">Valor Total</TableHead>
+                  <TableHead className="text-right">Lucro</TableHead>
                   <TableHead className="text-right">ROI</TableHead>
-                  <TableHead className="text-right">Win Rate</TableHead>
+                  <TableHead className="text-right">Taxa de Acerto</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {betTypeStats.map((stat) => (
                   <TableRow key={stat.type}>
-                    <TableCell className="font-medium capitalize">{stat.type}</TableCell>
+                    <TableCell className="font-medium capitalize">{stat.type === 'simple' ? 'simples' : stat.type === 'multiple' ? 'múltipla' : stat.type === 'live' ? 'ao vivo' : stat.type === 'system' ? 'sistema' : stat.type}</TableCell>
                     <TableCell className="text-right">{stat.totalBets}</TableCell>
-                    <TableCell className="text-right">€{stat.totalStake.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">R$ {stat.totalStake.toFixed(2)}</TableCell>
                     <TableCell className={`text-right font-medium ${stat.profit >= 0 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
-                      {stat.profit >= 0 ? '+' : ''}€{stat.profit.toFixed(2)}
+                      {stat.profit >= 0 ? '+' : ''}R$ {stat.profit.toFixed(2)}
                     </TableCell>
                     <TableCell className={`text-right ${stat.roi >= 0 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
                       {stat.roi >= 0 ? '+' : ''}{stat.roi.toFixed(2)}%

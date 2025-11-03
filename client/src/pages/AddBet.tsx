@@ -19,7 +19,7 @@ export default function AddBet() {
   const { updateTip } = useExtendedData();
   const { toast } = useToast();
 
-  const locationState = null as { 
+  const locationState = null as {
     prefill?: {
       description?: string;
       odds?: string;
@@ -31,7 +31,7 @@ export default function AddBet() {
   } | null;
 
   const protectionTypes = ['DC (Double Chance)', 'DNB (Draw No Bet)', 'Asian Handicap', 'European Handicap', 'Cash Out Available'];
-  
+
   const [formData, setFormData] = useState({
     bookmaker: '',
     date: new Date().toISOString().split('T')[0],
@@ -65,8 +65,8 @@ export default function AddBet() {
 
     if (!formData.bookmaker || !formData.date || !amount || !odds) {
       toast({
-        title: 'Error',
-        description: 'Please fill in all required fields',
+        title: 'Erro',
+        description: 'Por favor, preencha todos os campos obrigatórios',
         variant: 'destructive',
       });
       return;
@@ -100,15 +100,15 @@ export default function AddBet() {
 
     // If this bet was created from a tip, mark the tip as converted
     if (locationState?.sourceTipId) {
-      updateTip(locationState.sourceTipId, { 
+      updateTip(locationState.sourceTipId, {
         status: 'converted',
         convertedBetId: betData.description, // We'll use a proper ID after bet is created
       });
     }
 
     toast({
-      title: 'Success',
-      description: 'Bet added successfully',
+      title: 'Sucesso',
+      description: 'Aposta adicionada com sucesso',
     });
 
     setLocation('/bets');
@@ -117,23 +117,23 @@ export default function AddBet() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Add Bet</h1>
-        <p className="text-muted-foreground">Record a new bet</p>
+        <h1 className="text-3xl font-bold tracking-tight">Adicionar Aposta</h1>
+        <p className="text-muted-foreground">Registrar uma nova aposta</p>
       </div>
 
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
-            <CardTitle>Bet Details</CardTitle>
-            <CardDescription>Enter the details of your bet</CardDescription>
+            <CardTitle>Detalhes da Aposta</CardTitle>
+            <CardDescription>Digite os detalhes da sua aposta</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="bookmaker">Bookmaker *</Label>
+                <Label htmlFor="bookmaker">Casa de Apostas *</Label>
                 <Select value={formData.bookmaker} onValueChange={(value) => setFormData({ ...formData, bookmaker: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select bookmaker" />
+                    <SelectValue placeholder="Selecionar casa de apostas" />
                   </SelectTrigger>
                   <SelectContent>
                     {bookmakers.map((bm) => (
@@ -144,7 +144,7 @@ export default function AddBet() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="date">Date *</Label>
+                <Label htmlFor="date">Data *</Label>
                 <Input
                   id="date"
                   type="date"
@@ -154,16 +154,16 @@ export default function AddBet() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="betType">Bet Type *</Label>
+                <Label htmlFor="betType">Tipo de Aposta *</Label>
                 <Select value={formData.betType} onValueChange={(value) => setFormData({ ...formData, betType: value as BetType })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="simple">Simple</SelectItem>
-                    <SelectItem value="multiple">Multiple</SelectItem>
-                    <SelectItem value="live">Live</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
+                    <SelectItem value="simple">Simples</SelectItem>
+                    <SelectItem value="multiple">Múltipla</SelectItem>
+                    <SelectItem value="live">Ao Vivo</SelectItem>
+                    <SelectItem value="system">Sistema</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -175,16 +175,16 @@ export default function AddBet() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="won">Won</SelectItem>
-                    <SelectItem value="lost">Lost</SelectItem>
-                    <SelectItem value="void">Void</SelectItem>
+                    <SelectItem value="pending">Pendente</SelectItem>
+                    <SelectItem value="won">Ganha</SelectItem>
+                    <SelectItem value="lost">Perdida</SelectItem>
+                    <SelectItem value="void">Anulada</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="amount">Stake Amount (€) *</Label>
+                <Label htmlFor="amount">Valor da Aposta (R$) *</Label>
                 <Input
                   id="amount"
                   type="number"
@@ -192,7 +192,7 @@ export default function AddBet() {
                   min="0"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  placeholder="0.00"
+                  placeholder="0,00"
                 />
               </div>
 
@@ -212,28 +212,28 @@ export default function AddBet() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="league">League / Competition</Label>
+                <Label htmlFor="league">Liga / Competição</Label>
                 <Input
                   id="league"
                   value={formData.league}
                   onChange={(e) => setFormData({ ...formData, league: e.target.value })}
-                  placeholder="e.g., Premier League"
+                  placeholder="ex: Brasileirão, Libertadores"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="market">Market</Label>
+                <Label htmlFor="market">Mercado</Label>
                 <Input
                   id="market"
                   value={formData.market}
                   onChange={(e) => setFormData({ ...formData, market: e.target.value })}
-                  placeholder="e.g., Match Winner"
+                  placeholder="ex: Resultado Final, Ambas Marcam"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="matchTime">Match Date & Time</Label>
+              <Label htmlFor="matchTime">Data e Hora do Jogo</Label>
               <Input
                 id="matchTime"
                 type="datetime-local"
@@ -243,31 +243,31 @@ export default function AddBet() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Descrição</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="e.g., Home Team vs Away Team - Match Result"
+                placeholder="ex: Flamengo vs São Paulo - Resultado Final"
                 rows={3}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="stakeLogic">Stake Logic</Label>
+              <Label htmlFor="stakeLogic">Lógica do Valor</Label>
               <Textarea
                 id="stakeLogic"
                 value={formData.stakeLogic}
                 onChange={(e) => setFormData({ ...formData, stakeLogic: e.target.value })}
-                placeholder="Reasoning behind this bet and stake size"
+                placeholder="Justificativa para esta aposta e valor apostado"
                 rows={3}
               />
             </div>
 
             <div className="space-y-4">
               <div className="space-y-3">
-                <Label>Protection Types</Label>
-                <p className="text-sm text-muted-foreground">Select all that apply to this bet</p>
+                <Label>Tipos de Proteção</Label>
+                <p className="text-sm text-muted-foreground">Selecione todas que se aplicam a esta aposta</p>
                 <div className="space-y-2">
                   {protectionTypes.map((type) => (
                     <div key={type} className="flex items-center space-x-2">
@@ -290,8 +290,8 @@ export default function AddBet() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="isLive">Live/In-Play Bet</Label>
-                  <p className="text-sm text-muted-foreground">Placed during the match</p>
+                  <Label htmlFor="isLive">Aposta Ao Vivo</Label>
+                  <p className="text-sm text-muted-foreground">Feita durante o jogo</p>
                 </div>
                 <Switch
                   id="isLive"
@@ -302,8 +302,8 @@ export default function AddBet() {
             </div>
 
             <div className="flex gap-4">
-              <Button type="submit" className="flex-1">Add Bet</Button>
-              <Button type="button" variant="outline" onClick={() => setLocation('/bets')}>Cancel</Button>
+              <Button type="submit" className="flex-1">Adicionar Aposta</Button>
+              <Button type="button" variant="outline" onClick={() => setLocation('/bets')}>Cancelar</Button>
             </div>
           </CardContent>
         </Card>
