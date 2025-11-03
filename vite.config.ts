@@ -5,9 +5,16 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: "0.0.0.0",
+    port: 5173,
     allowedHosts: [
       "258acb6e-5f91-4376-94a7-e68d0c11bde3-00-2kvqiwijvsnsf.riker.replit.dev",
     ],
+    // Configuração otimizada para Replit
+    watch: {
+      usePolling: true,
+      interval: 1000,
+    },
   },
   resolve: {
     alias: {

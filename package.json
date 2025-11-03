@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server/index.ts",
+    "dev:watch": "NODE_ENV=development tsx --watch server/index.ts",
+    "dev:replit": "node dev-server.js",
     "build": "vite build",
     "start": "NODE_ENV=production tsx server/index.ts",
     "lint": "eslint .",
