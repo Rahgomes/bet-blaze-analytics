@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Route } from "wouter";
+import { Route, Switch } from "wouter";
 import { BettingLayout } from "./components/betting/BettingLayout";
 import { TranslationProvider } from "./hooks/useTranslation";
 import { queryClient } from "@/lib/queryClient";
@@ -24,16 +24,18 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BettingLayout>
-          <Route path="/" component={Dashboard} />
-          <Route path="/bets" component={BetsList} />
-          <Route path="/add-bet" component={AddBet} />
-          <Route path="/analytics" component={Analytics} />
-          <Route path="/tips" component={Tips} />
-          <Route path="/watchlist" component={Watchlist} />
-          <Route path="/import" component={Import} />
-          <Route path="/faq" component={FAQ} />
-          <Route path="/settings" component={BankrollSettings} />
-          <Route component={NotFound} />
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/bets" component={BetsList} />
+            <Route path="/add-bet" component={AddBet} />
+            <Route path="/analytics" component={Analytics} />
+            <Route path="/tips" component={Tips} />
+            <Route path="/watchlist" component={Watchlist} />
+            <Route path="/import" component={Import} />
+            <Route path="/faq" component={FAQ} />
+            <Route path="/settings" component={BankrollSettings} />
+            <Route component={NotFound} />
+          </Switch>
         </BettingLayout>
       </TooltipProvider>
     </TranslationProvider>
