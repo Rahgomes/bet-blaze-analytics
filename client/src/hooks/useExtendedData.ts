@@ -52,6 +52,38 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '34', term: 'Stop Loss', definition: 'Predetermined limit on losses per day/week/month. Once reached, you stop betting to protect bankroll.', category: 'strategies', language: 'en' },
   { id: '35', term: 'Stop Gain', definition: 'Predetermined profit target. Once reached, you stop betting to lock in profits and avoid giving them back.', category: 'strategies', language: 'en' },
   
+  // NEW TERMS - Modern Technologies and Features
+  { id: '116', term: 'Cash Out', definition: 'Feature allowing you to settle bets before event ends, securing partial profit or minimizing losses.', category: 'general', language: 'en' },
+  { id: '117', term: 'Odds Boost', definition: 'Promotion where bookmaker increases odds on specific markets, offering higher potential returns temporarily.', category: 'general', language: 'en' },
+  { id: '118', term: 'Bet Builder', definition: 'Tool to create custom bets combining different markets from the same game.', category: 'betTypes', language: 'en' },
+  { id: '119', term: 'Super Odds', definition: 'Extremely high odds offered as promotion, usually with low stake limits.', category: 'general', language: 'en' },
+  { id: '120', term: 'Live Streaming', definition: 'Free game broadcasts offered by bookmakers to customers with balance or active bets.', category: 'general', language: 'en' },
+  { id: '121', term: 'Free Bet (Freebet)', definition: 'Promotional credit to place bets without using own money. Winnings don\'t include free bet value.', category: 'general', language: 'en' },
+  { id: '122', term: 'Rollover', definition: 'Wagering requirement to fulfill before withdrawing bonus. E.g., 5x rollover means bet 5x the bonus amount.', category: 'general', language: 'en' },
+  { id: '123', term: 'Best Odds Guaranteed', definition: 'Policy where bookmaker pays higher odds if price increases after you bet. Protects against odds drops.', category: 'general', language: 'en' },
+  { id: '124', term: 'Betting Limits', definition: 'Maximum amount bookmaker allows you to bet on specific market. Varies by customer and event.', category: 'general', language: 'en' },
+  { id: '125', term: 'House Edge', definition: 'Percentage built into odds that ensures bookmaker profit. Lower edge means better odds for players.', category: 'general', language: 'en' },
+  
+  // New Markets and Specific Types
+  { id: '126', term: 'Acca Boost', definition: 'Promotion increasing odds on accumulator bets with minimum selections and minimum odds requirements.', category: 'betTypes', language: 'en' },
+  { id: '127', term: 'Both Teams To Score', definition: 'Bet on whether both teams will score at least one goal during the match. Yes or No options.', category: 'markets', language: 'en' },
+  { id: '128', term: 'Corner Betting', definition: 'Betting on total number of corner kicks in match, similar to Over/Under for goals.', category: 'markets', language: 'en' },
+  { id: '129', term: 'First/Last Goal', definition: 'Bet on which team will score first goal or last goal of the match.', category: 'markets', language: 'en' },
+  { id: '130', term: 'Odd/Even Goals', definition: 'Bet on whether total number of goals will be odd or even. Entertainment market.', category: 'markets', language: 'en' },
+  { id: '131', term: 'Half Time/Full Time', definition: 'Combination of half-time result and full-time result (e.g., Draw/Home means draw at HT, home win at FT).', category: 'markets', language: 'en' },
+  
+  // Advanced Strategies and Technical Terms
+  { id: '132', term: 'Closing Line Value', definition: 'Comparison between odds you got and closing odds. Positive CLV indicates long-term skill.', category: 'strategies', language: 'en' },
+  { id: '133', term: 'Implied Probability', definition: 'Probability implied by odds. Calculated as 1/decimal odds. Useful for identifying value bets.', category: 'strategies', language: 'en' },
+  { id: '134', term: 'Unit System', definition: 'System where 1 unit = fixed percentage of bankroll (e.g., 2%). Facilitates tracking regardless of monetary value.', category: 'strategies', language: 'en' },
+  { id: '135', term: 'Variance', definition: 'Natural fluctuation in results even with positive edge. Results in winning/losing streaks.', category: 'strategies', language: 'en' },
+  { id: '136', term: 'Expectancy', definition: 'Average expected value per bet considering probabilities and payouts. Must be positive to profit.', category: 'strategies', language: 'en' },
+  { id: '137', term: 'Soft Book', definition: 'Bookmaker that accepts winners/value bettors. Opposite of sharp book that limits quickly.', category: 'strategies', language: 'en' },
+  { id: '138', term: 'Sharp Money', definition: 'Money from professional bettors/syndicates. Moves lines quickly and indicates where real value lies.', category: 'strategies', language: 'en' },
+  { id: '139', term: 'Steam', definition: 'Rapid, coordinated odds movement caused by sharp money or important information.', category: 'strategies', language: 'en' },
+  { id: '140', term: 'Reverse Line Movement', definition: 'When odds move against public money. Indicates sharp action on opposite side.', category: 'strategies', language: 'en' },
+  { id: '141', term: 'Pinnacle Model', definition: 'Using Pinnacle odds as reference for "fair" odds due to low margin and acceptance of winners.', category: 'strategies', language: 'en' },
+  
   // PORTUGUESE-BR - Geral
   { id: '51', term: 'ROI', definition: 'Retorno sobre Investimento - Porcentagem que mede a lucratividade geral de sua atividade de apostas. Calculado como (Lucro Total / Stake Total) × 100.', category: 'general', language: 'pt-br' },
   { id: '52', term: 'Banca', definition: 'Quantia total de dinheiro dedicada exclusivamente para apostas. Deve ser dinheiro que você pode perder.', category: 'general', language: 'pt-br' },
@@ -93,7 +125,75 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '82', term: 'Hedge', definition: 'Fazer apostas em resultados opostos para garantir lucro ou minimizar perda, frequentemente feito quando primeira aposta está indo bem.', category: 'strategies', language: 'pt-br' },
   { id: '83', term: 'Matched Betting', definition: 'Usar apostas grátis e promoções de casas com apostas lay em exchanges para garantir lucro. Método sem risco.', category: 'strategies', language: 'pt-br' },
   { id: '84', term: 'Stop Loss', definition: 'Limite predeterminado de perdas por dia/semana/mês. Uma vez atingido, você para de apostar para proteger banca.', category: 'strategies', language: 'pt-br' },
-  { id: '85', term: 'Stop Gain', definition: 'Meta de lucro predeterminada. Uma vez atingida, você para de apostar para garantir lucros e evitar devolvê-los.', category: 'strategies', language: 'pt-br' },
+  { id: '85', term: 'Stop Gain', definition: 'Meta de lucro predefinida. Ao atingir, você para de apostar para garantir os ganhos e evitar devolvê-los.', category: 'strategies', language: 'pt-br' },
+  
+  // NOVOS TERMOS - Tecnologias e Recursos Modernos
+  { id: '142', term: 'Cashout', definition: 'Recurso que permite encerrar apostas antes do evento terminar, garantindo lucro parcial ou minimizando perdas.', category: 'general', language: 'pt-br' },
+  { id: '143', term: 'Boost de Odds', definition: 'Promoção onde a casa aumenta as odds de mercados específicos, oferecendo retornos maiores temporariamente.', category: 'general', language: 'pt-br' },
+  { id: '144', term: 'Construtor de Apostas', definition: 'Ferramenta para criar apostas personalizadas combinando diferentes mercados do mesmo jogo.', category: 'betTypes', language: 'pt-br' },
+  { id: '145', term: 'Super Odds', definition: 'Odds extremamente altas oferecidas como promoção, geralmente com limites baixos de stake.', category: 'general', language: 'pt-br' },
+  { id: '146', term: 'Transmissão Ao Vivo', definition: 'Transmissões gratuitas de jogos oferecidas por casas de apostas para clientes com saldo ou apostas ativas.', category: 'general', language: 'pt-br' },
+  { id: '147', term: 'Aposta Grátis (Freebet)', definition: 'Crédito promocional para apostar sem usar dinheiro próprio. Ganhos não incluem o valor da aposta grátis.', category: 'general', language: 'pt-br' },
+  { id: '148', term: 'Rollover', definition: 'Requisito de apostas para cumprir antes de sacar bônus. Ex: rollover 5x significa apostar 5x o valor do bônus.', category: 'general', language: 'pt-br' },
+  { id: '149', term: 'Melhores Odds Garantidas', definition: 'Política onde a casa paga odds maiores se preço subir depois da aposta. Protege contra quedas de odds.', category: 'general', language: 'pt-br' },
+  { id: '150', term: 'Limites de Apostas', definition: 'Valor máximo que a casa permite apostar em mercado específico. Varia por cliente e evento.', category: 'general', language: 'pt-br' },
+  { id: '151', term: 'Margem da Casa', definition: 'Porcentagem incluída nas odds que garante lucro da casa. Margem menor significa odds melhores para jogadores.', category: 'general', language: 'pt-br' },
+  
+  // Novos Mercados e Tipos Específicos
+  { id: '152', term: 'Boost de Múltiplas', definition: 'Promoção que aumenta odds em apostas múltiplas com mínimo de seleções e odds mínimas exigidas.', category: 'betTypes', language: 'pt-br' },
+  { id: '153', term: 'Ambos Marcam', definition: 'Aposta se ambos times marcarão pelo menos um gol durante a partida. Opções Sim ou Não.', category: 'markets', language: 'pt-br' },
+  { id: '154', term: 'Apostas em Escanteios', definition: 'Apostas no total de escanteios da partida, similar ao Over/Under para gols.', category: 'markets', language: 'pt-br' },
+  { id: '155', term: 'Primeiro/Último Gol', definition: 'Aposta em qual time marcará o primeiro gol ou último gol da partida.', category: 'markets', language: 'pt-br' },
+  { id: '156', term: 'Gols Pares/Ímpares', definition: 'Aposta se o total de gols será par ou ímpar. Mercado de entretenimento.', category: 'markets', language: 'pt-br' },
+  { id: '157', term: 'Meio-tempo/Tempo Final', definition: 'Combinação do resultado do primeiro tempo e tempo final (ex: Empate/Casa = empate no 1T, vitória casa no final).', category: 'markets', language: 'pt-br' },
+  
+  // Estratégias Avançadas e Termos Técnicos
+  { id: '158', term: 'Valor da Linha de Fechamento', definition: 'Comparação entre odds que você pegou e odds de fechamento. CLV positivo indica habilidade a longo prazo.', category: 'strategies', language: 'pt-br' },
+  { id: '159', term: 'Probabilidade Implícita', definition: 'Probabilidade implícita pelas odds. Calculada como 1/odds decimal. Útil para identificar apostas de valor.', category: 'strategies', language: 'pt-br' },
+  { id: '160', term: 'Sistema de Unidades', definition: 'Sistema onde 1 unidade = porcentagem fixa da banca (ex: 2%). Facilita tracking independente do valor monetário.', category: 'strategies', language: 'pt-br' },
+  { id: '161', term: 'Variância', definition: 'Flutuação natural nos resultados mesmo com edge positiva. Resulta em sequências de vitórias/derrotas.', category: 'strategies', language: 'pt-br' },
+  { id: '162', term: 'Expectativa', definition: 'Valor esperado médio por aposta considerando probabilidades e pagamentos. Deve ser positiva para lucrar.', category: 'strategies', language: 'pt-br' },
+  { id: '163', term: 'Casa Soft', definition: 'Casa que aceita vencedores/apostadores de valor. Oposto de casa sharp que limita rapidamente.', category: 'strategies', language: 'pt-br' },
+  { id: '164', term: 'Dinheiro Sharp', definition: 'Dinheiro de apostadores profissionais/sindicatos. Move linhas rapidamente e indica onde está o valor real.', category: 'strategies', language: 'pt-br' },
+  { id: '165', term: 'Steam', definition: 'Movimento rápido e coordenado de odds causado por dinheiro sharp ou informação importante.', category: 'strategies', language: 'pt-br' },
+  { id: '166', term: 'Movimento Reverso de Linha', definition: 'Quando odds se movem contra o dinheiro público. Indica ação sharp do lado oposto.', category: 'strategies', language: 'pt-br' },
+  { id: '167', term: 'Modelo Pinnacle', definition: 'Usar odds da Pinnacle como referência para odds "justas" devido à baixa margem e aceitação de vencedores.', category: 'strategies', language: 'pt-br' },
+  
+  // NOVOS TERMOS - Tecnologias e Funcionalidades Modernas
+  { id: '86', term: 'Cashout', definition: 'Funcionalidade que permite encerrar aposta antes do evento terminar, garantindo lucro parcial ou minimizando perdas.', category: 'general', language: 'pt-br' },
+  { id: '87', term: 'Boost de Odds', definition: 'Promoção onde casa aumenta odds de mercados específicos, oferecendo maior retorno potencial temporariamente.', category: 'general', language: 'pt-br' },
+  { id: '88', term: 'Bet Builder', definition: 'Ferramenta para criar apostas personalizadas combinando diferentes mercados de um mesmo jogo.', category: 'betTypes', language: 'pt-br' },
+  { id: '89', term: 'Super Odds', definition: 'Odds extremamente altas oferecidas como promoção, geralmente com limite baixo de stake.', category: 'general', language: 'pt-br' },
+  { id: '90', term: 'Streaming Ao Vivo', definition: 'Transmissão gratuita de jogos oferecida por casas de apostas para clientes com saldo ou apostas ativas.', category: 'general', language: 'pt-br' },
+  { id: '91', term: 'Aposta Grátis (Freebet)', definition: 'Crédito promocional para fazer apostas sem usar dinheiro próprio. Ganhos não incluem valor da aposta grátis.', category: 'general', language: 'pt-br' },
+  { id: '92', term: 'Rollover', definition: 'Requisito de apostas que deve ser cumprido antes de sacar bônus. Ex: rollover 5x significa apostar 5x o valor do bônus.', category: 'general', language: 'pt-br' },
+  { id: '93', term: 'Odds Garantidas', definition: 'Política onde casa paga odds maiores se preço subir após você apostar. Protege contra queda de odds.', category: 'general', language: 'pt-br' },
+  { id: '94', term: 'Limite de Aposta', definition: 'Valor máximo que casa permite apostar em determinado mercado. Varia por cliente e evento.', category: 'general', language: 'pt-br' },
+  { id: '95', term: 'Margem da Casa', definition: 'Percentual embutido nas odds que garante lucro da casa. Quanto menor a margem, melhores as odds.', category: 'general', language: 'pt-br' },
+  
+  // Novos Mercados e Tipos Específicos
+  { id: '96', term: 'Combo Boost', definition: 'Promoção que aumenta odds de apostas múltiplas com número mínimo de seleções e odds mínimas.', category: 'betTypes', language: 'pt-br' },
+  { id: '97', term: 'Draw No Bet (DNB)', definition: 'Aposta em time para vencer. Se empatar, stake retorna. Elimina possibilidade de empate.', category: 'betTypes', language: 'pt-br' },
+  { id: '98', term: 'Dupla Chance (DC)', definition: 'Aposta cobrindo dois dos três resultados possíveis (Casa ou Empate, Fora ou Empate, Casa ou Fora).', category: 'betTypes', language: 'pt-br' },
+  { id: '99', term: 'Handicap Asiático', definition: 'Sistema de handicaps que elimina empate usando handicaps fracionários (0.5, 1.5) ou permite empate parcial (0.25, 0.75).', category: 'markets', language: 'pt-br' },
+  { id: '100', term: 'Handicap Europeu', definition: 'Handicap tradicional com três resultados possíveis. Time recebe vantagem/desvantagem virtual de gols.', category: 'markets', language: 'pt-br' },
+  { id: '101', term: 'Ambos Marcam (BTTS)', definition: 'Aposta se ambos os times marcarão pelo menos um gol durante a partida. Sim ou Não.', category: 'markets', language: 'pt-br' },
+  { id: '102', term: 'Total de Corners', definition: 'Aposta no número total de escanteios na partida, similar ao Over/Under para gols.', category: 'markets', language: 'pt-br' },
+  { id: '103', term: 'Primeiro/Último Gol', definition: 'Aposta em qual time marcará primeiro gol ou último gol da partida.', category: 'markets', language: 'pt-br' },
+  { id: '104', term: 'Gols Pares/Ímpares', definition: 'Aposta se número total de gols será par ou ímpar. Mercado de entretenimento.', category: 'markets', language: 'pt-br' },
+  { id: '105', term: 'Intervalo/Final', definition: 'Combinação do resultado ao intervalo e resultado final (ex: Casa/Empate = casa ganha no 1º tempo, empata no final).', category: 'markets', language: 'pt-br' },
+  
+  // Estratégias Avançadas e Termos Técnicos
+  { id: '106', term: 'Closing Line Value (CLV)', definition: 'Comparação entre odds que você conseguiu e odds de fechamento. CLV positivo indica skill a longo prazo.', category: 'strategies', language: 'pt-br' },
+  { id: '107', term: 'Implied Probability', definition: 'Probabilidade implícita nas odds. Calculada como 1/odds decimal. Useful para identificar value bets.', category: 'strategies', language: 'pt-br' },
+  { id: '108', term: 'Unit System', definition: 'Sistema onde 1 unidade = porcentagem fixa da banca (ex: 2%). Facilita tracking independente do valor monetário.', category: 'strategies', language: 'pt-br' },
+  { id: '109', term: 'Variance', definition: 'Flutuação natural nos resultados mesmo com edge positivo. Resulta em sequências de vitórias/derrotas.', category: 'strategies', language: 'pt-br' },
+  { id: '110', term: 'Expectancy', definition: 'Valor médio esperado por aposta considerando probabilidades e payouts. Deve ser positivo para lucrar.', category: 'strategies', language: 'pt-br' },
+  { id: '111', term: 'Soft Book', definition: 'Casa de apostas que aceita winners/value bettors. Oposto de sharp book que limita rapidamente.', category: 'strategies', language: 'pt-br' },
+  { id: '112', term: 'Sharp Money', definition: 'Dinheiro de apostadores profissionais/sindicatos. Move linhas rapidamente e indica onde está o value real.', category: 'strategies', language: 'pt-br' },
+  { id: '113', term: 'Steam', definition: 'Movimento rápido e coordenado nas odds causado por sharp money ou informações importantes.', category: 'strategies', language: 'pt-br' },
+  { id: '114', term: 'Reverse Line Movement', definition: 'Quando odds movem contra o dinheiro público. Indica ação sharp no lado oposto.', category: 'strategies', language: 'pt-br' },
+  { id: '115', term: 'Pinnacle Model', definition: 'Usar odds da Pinnacle como referência de odds "justas" devido à baixa margem e aceitação de winners.', category: 'strategies', language: 'pt-br' },
 ];
 
 const DEFAULT_TIPSTERS: Tipster[] = [
