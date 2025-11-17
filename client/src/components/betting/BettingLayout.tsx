@@ -1,10 +1,10 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
-import { BarChart3, PlusCircle, Settings, TrendingUp, Wallet, Lightbulb, Eye, Upload, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BarChart3, PlusCircle, Settings, TrendingUp, Wallet, Lightbulb, Eye, Upload, HelpCircle, ChevronLeft, ChevronRight, Bell, User } from 'lucide-react';
 import { LanguageToggle } from './LanguageToggle';
 import { useTranslation } from '@/hooks/useTranslation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -29,6 +29,46 @@ export function BettingLayout({ children }: BettingLayoutProps) {
   const { t } = useTranslation();
   const navItems = getNavItems(t);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isTopbarVisible, setIsTopbarVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!scrollContainerRef.current) return;
+
+      const currentScrollY = scrollContainerRef.current.scrollTop;
+
+      // Se estiver no topo, sempre mostrar
+      if (currentScrollY < 10) {
+        setIsTopbarVisible(true);
+        lastScrollY.current = currentScrollY;
+        return;
+      }
+
+      // Se rolou para baixo, esconder
+      if (currentScrollY > lastScrollY.current && currentScrollY > 64) {
+        setIsTopbarVisible(false);
+      }
+      // Se rolou para cima, mostrar
+      else if (currentScrollY < lastScrollY.current) {
+        setIsTopbarVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -41,7 +81,7 @@ export function BettingLayout({ children }: BettingLayoutProps) {
           duration: 0.3,
           ease: [0.4, 0, 0.2, 1]
         }}
-        className="relative border-r border-border bg-card"
+        className="fixed left-0 top-0 z-40 h-screen border-r border-border bg-card"
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-4">
           <motion.h1
@@ -54,7 +94,7 @@ export function BettingLayout({ children }: BettingLayoutProps) {
           >
             {t('app.title')}
           </motion.h1>
-          
+
           <motion.h1
             animate={{
               opacity: isCollapsed ? 1 : 0,
@@ -65,8 +105,6 @@ export function BettingLayout({ children }: BettingLayoutProps) {
           >
             G.A
           </motion.h1>
-
-          {!isCollapsed && <LanguageToggle />}
         </div>
 
         <Button
@@ -138,16 +176,60 @@ export function BettingLayout({ children }: BettingLayoutProps) {
           })}
         </nav>
       </motion.aside>
-      
-      <motion.main
+
+      {/* Topbar fixa */}
+      <motion.header
         animate={{
-          marginLeft: 0
+          paddingLeft: isCollapsed ? 80 : 256,
+          y: isTopbarVisible ? 0 : -64,
         }}
         transition={{
           duration: 0.3,
           ease: [0.4, 0, 0.2, 1]
         }}
-        className="flex-1 overflow-auto"
+        className="fixed top-0 left-0 right-0 z-30 h-16 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60"
+      >
+        <div className="flex h-full items-center justify-end gap-4 px-6">
+          {/* Ícone de Tradução */}
+          <LanguageToggle />
+
+          {/* Placeholder para futuras funcionalidades */}
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <Bell className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Notificações (em breve)</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <User className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Perfil (em breve)</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+      </motion.header>
+
+      <motion.main
+        ref={scrollContainerRef}
+        animate={{
+          marginLeft: isCollapsed ? 80 : 256
+        }}
+        transition={{
+          duration: 0.3,
+          ease: [0.4, 0, 0.2, 1]
+        }}
+        className="flex-1 overflow-auto pt-16"
       >
         <div className="container mx-auto p-6">
           {children}

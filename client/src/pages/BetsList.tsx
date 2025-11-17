@@ -215,10 +215,6 @@ export default function BetsList() {
   };
 
   const handleEdit = (bet: Bet) => {
-    if (bet.id.startsWith('mock-')) {
-      alert('Não é possível editar dados de demonstração. Adicione apostas reais para gerenciá-las.');
-      return;
-    }
     setEditForm(bet);
     setEditDialogOpen(true);
   };
@@ -231,11 +227,21 @@ export default function BetsList() {
     const return_ = editForm.status === 'won' ? amount * odds : 0;
     const profit = return_ - amount;
 
-    updateBet(editForm.id, {
-      ...editForm,
-      return: return_,
-      profit,
-    });
+    if (editForm.id.startsWith('mock-')) {
+      // Simular edição de dados mock para demonstração
+      console.log('Dados de demonstração editados (simulação):', {
+        ...editForm,
+        return: return_,
+        profit,
+      });
+      alert('✅ Edição salva (simulação)\nEm uma aplicação real, as alterações seriam salvas no banco de dados.\n\nNota: Para dados mockados, as alterações não são persistidas após recarregar a página.');
+    } else {
+      updateBet(editForm.id, {
+        ...editForm,
+        return: return_,
+        profit,
+      });
+    }
 
     setEditDialogOpen(false);
     setEditForm(null);
@@ -645,46 +651,19 @@ export default function BetsList() {
                       <TableCell>{bet.bookmaker}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className="capitalize">
-                            {bet.betType === 'simple' ? 'simples' : bet.betType === 'multiple' ? 'múltipla' : bet.betType === 'live' ? 'ao vivo' : bet.betType === 'system' ? 'sistema' : bet.betType}
-                          </span>
-                          {isLiveBet(bet) && <Badge className="ml-1 bg-orange-500 text-xs px-2 py-0">LIVE</Badge>}
+                          {bet.betType === 'live' ? (
+                            <Badge className="bg-red-500 text-white animate-pulse text-xs px-2 py-1">
+                              AO VIVO
+                            </Badge>
+                          ) : (
+                            <span className="capitalize">
+                              {bet.betType === 'simple' ? 'simples' : bet.betType === 'multiple' ? 'múltipla' : bet.betType === 'system' ? 'sistema' : bet.betType}
+                            </span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="text-right">R$ {bet.amount.toFixed(2)}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <span>{bet.odds.toFixed(2)}</span>
-                          {/* Badges dinâmicos baseados em características */}
-                          {bet.id.includes('1') && (
-                            <Badge 
-                              variant="outline" 
-                              className="text-xs bg-yellow-50 text-yellow-700 px-1" 
-                              title="Odds original: 2.45 → Final: 2.58 (+5.3%)"
-                            >
-                              💰 +5%
-                            </Badge>
-                          )}
-                          {bet.id.includes('2') && (
-                            <Badge 
-                              variant="outline" 
-                              className="text-xs bg-blue-50 text-blue-700 px-1"
-                              title="Aposta encerrada antecipadamente"
-                            >
-                              🏦 Cashout
-                            </Badge>
-                          )}
-                          {bet.id.includes('3') && (
-                            <Badge 
-                              variant="outline" 
-                              className="text-xs bg-purple-50 text-purple-700 px-1"
-                              title="Aposta feita com créditos de aposta"
-                            >
-                              💳 Créditos
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
+                      <TableCell className="text-right">{bet.odds.toFixed(2)}</TableCell>
                       <TableCell>
                         <Badge
                           variant="outline"
@@ -906,18 +885,83 @@ export default function BetsList() {
                   {selectedBet.isProtected && <Badge className="bg-orange-500 text-sm px-3 py-1">🛡️ Protegida</Badge>}
                   {selectedBet.isLive && <Badge variant="secondary" className="text-sm px-3 py-1">📺 Ao Vivo</Badge>}
                   {isLiveBet(selectedBet) && <Badge className="bg-red-500 animate-pulse text-sm px-3 py-1">🔴 AO VIVO AGORA</Badge>}
-                  
-                  {/* Badges baseados na planilha */}
-                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 text-sm px-3 py-1">
-                    💰 BOOST +5%
-                  </Badge>
-                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-sm px-3 py-1">
-                    💳 Créditos
-                  </Badge>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300 text-sm px-3 py-1">
-                    ⚡ Pag. Antecipado
-                  </Badge>
                 </div>
+              </div>
+
+              {/* Características Especiais */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Características Especiais</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Boost */}
+                  {selectedBet.id.includes('1') && (
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800">💰 BOOST</Badge>
+                      </div>
+                      <div className="text-sm space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-yellow-700">Odds Original:</span>
+                          <span className="font-medium">{(selectedBet.odds * 0.95).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-yellow-700">Odds Final:</span>
+                          <span className="font-medium">{selectedBet.odds.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-yellow-700">Aumento:</span>
+                          <span className="font-semibold text-yellow-800">+{((selectedBet.odds / (selectedBet.odds * 0.95) - 1) * 100).toFixed(1)}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Cashout */}
+                  {selectedBet.id.includes('2') && (
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="bg-blue-100 text-blue-800">🏦 CASHOUT</Badge>
+                      </div>
+                      <div className="text-sm space-y-1">
+                        <div className="text-blue-700 mb-1">Aposta encerrada antecipadamente</div>
+                        <div className="flex justify-between">
+                          <span className="text-blue-700">Valor Resgatado:</span>
+                          <span className="font-medium">R$ {(selectedBet.amount * 0.85).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-blue-700">% do Potencial:</span>
+                          <span className="font-medium">85%</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Créditos */}
+                  {selectedBet.id.includes('3') && (
+                    <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="bg-purple-100 text-purple-800">💳 CRÉDITOS</Badge>
+                      </div>
+                      <div className="text-sm space-y-1">
+                        <div className="text-purple-700 mb-1">Aposta feita com créditos promocionais</div>
+                        <div className="flex justify-between">
+                          <span className="text-purple-700">Origem:</span>
+                          <span className="font-medium">Bônus de Depósito</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-purple-700">Rollover:</span>
+                          <span className="font-medium">3x</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Caso não tenha características especiais */}
+                {!selectedBet.id.includes('1') && !selectedBet.id.includes('2') && !selectedBet.id.includes('3') && (
+                  <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
+                    <span className="text-gray-500 text-sm">Nenhuma característica especial aplicada nesta aposta</span>
+                  </div>
+                )}
               </div>
 
               {/* Estratégias e Proteções */}
@@ -961,8 +1005,8 @@ export default function BetsList() {
                     <p className="font-medium">2x1 (simulado)</p>
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">Odds Original</Label>
-                    <p className="font-medium">{(selectedBet.odds * 0.95).toFixed(2)} → {selectedBet.odds.toFixed(2)} <Badge variant="outline" className="ml-1 text-xs">+5%</Badge></p>
+                    <Label className="text-muted-foreground">Tempo do Gol</Label>
+                    <p className="font-medium">23', 67' e 89'</p>
                   </div>
                 </div>
               </div>
