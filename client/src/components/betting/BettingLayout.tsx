@@ -34,28 +34,40 @@ export function BettingLayout({ children }: BettingLayoutProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      if (!scrollContainerRef.current) return;
+      if (!scrollContainerRef.current || ticking) return;
 
-      const currentScrollY = scrollContainerRef.current.scrollTop;
+      ticking = true;
 
-      // Se estiver no topo, sempre mostrar
-      if (currentScrollY < 10) {
-        setIsTopbarVisible(true);
-        lastScrollY.current = currentScrollY;
-        return;
-      }
+      window.requestAnimationFrame(() => {
+        if (!scrollContainerRef.current) {
+          ticking = false;
+          return;
+        }
 
-      // Se rolou para baixo, esconder
-      if (currentScrollY > lastScrollY.current && currentScrollY > 64) {
-        setIsTopbarVisible(false);
-      }
-      // Se rolou para cima, mostrar
-      else if (currentScrollY < lastScrollY.current) {
-        setIsTopbarVisible(true);
-      }
+        const currentScrollY = scrollContainerRef.current.scrollTop;
+        const scrollDifference = currentScrollY - lastScrollY.current;
 
-      lastScrollY.current = currentScrollY;
+        if (currentScrollY < 10) {
+          setIsTopbarVisible(true);
+          lastScrollY.current = currentScrollY;
+          ticking = false;
+          return;
+        }
+
+        if (Math.abs(scrollDifference) > 5) {
+          if (scrollDifference > 0 && currentScrollY > 64) {
+            setIsTopbarVisible(false);
+          } else if (scrollDifference < 0) {
+            setIsTopbarVisible(true);
+          }
+          lastScrollY.current = currentScrollY;
+        }
+
+        ticking = false;
+      });
     };
 
     const scrollContainer = scrollContainerRef.current;
