@@ -72,24 +72,74 @@ export const PreviewCard = ({
           </div>
         )}
 
-        {validations.oddsAlert && (
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-xs text-yellow-800">⚠️ {validations.oddsAlert}</p>
-          </div>
-        )}
-        {validations.amountAlert && (
-          <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-xs text-red-800">🚨 {validations.amountAlert}</p>
-          </div>
-        )}
-        {validations.roiWarning && (
-          <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-            <p className="text-xs text-orange-800">⚡ {validations.roiWarning}</p>
-          </div>
-        )}
+        {/* Alertas de Gestão de Risco */}
+        <div className="mt-4 space-y-2">
+          {validations.amountAlert && (
+            <div className={`p-3 rounded-lg border ${
+              validations.amountAlert.includes('CRÍTICO') 
+                ? 'bg-red-50 border-red-300' 
+                : validations.amountAlert.includes('Alto Risco')
+                ? 'bg-red-50 border-red-200'
+                : validations.amountAlert.includes('Agressivo')
+                ? 'bg-orange-50 border-orange-200'
+                : 'bg-yellow-50 border-yellow-200'
+            }`}>
+              <p className={`text-xs font-medium ${
+                validations.amountAlert.includes('CRÍTICO') 
+                  ? 'text-red-900' 
+                  : validations.amountAlert.includes('Alto Risco')
+                  ? 'text-red-800'
+                  : validations.amountAlert.includes('Agressivo')
+                  ? 'text-orange-800'
+                  : 'text-yellow-800'
+              }`}>
+                {validations.amountAlert}
+              </p>
+            </div>
+          )}
 
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-blue-800">💡 {validations.stakeSuggestion}</p>
+          {validations.oddsAlert && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-xs font-medium text-yellow-800">{validations.oddsAlert}</p>
+            </div>
+          )}
+
+          {validations.roiWarning && (
+            <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+              <p className="text-xs font-medium text-orange-800">{validations.roiWarning}</p>
+            </div>
+          )}
+
+          {/* Sempre mostrar a sugestão de stake */}
+          <div className={`p-3 rounded-lg border ${
+            validations.stakeSuggestion.includes('🚨')
+              ? 'bg-red-50 border-red-200'
+              : validations.stakeSuggestion.includes('⚠️')
+              ? 'bg-orange-50 border-orange-200'
+              : validations.stakeSuggestion.includes('⚡')
+              ? 'bg-yellow-50 border-yellow-200'
+              : validations.stakeSuggestion.includes('⚖️')
+              ? 'bg-blue-50 border-blue-200'
+              : validations.stakeSuggestion.includes('✅')
+              ? 'bg-green-50 border-green-200'
+              : 'bg-gray-50 border-gray-200'
+          }`}>
+            <p className={`text-xs font-medium ${
+              validations.stakeSuggestion.includes('🚨')
+                ? 'text-red-800'
+                : validations.stakeSuggestion.includes('⚠️')
+                ? 'text-orange-800'
+                : validations.stakeSuggestion.includes('⚡')
+                ? 'text-yellow-800'
+                : validations.stakeSuggestion.includes('⚖️')
+                ? 'text-blue-800'
+                : validations.stakeSuggestion.includes('✅')
+                ? 'text-green-800'
+                : 'text-gray-800'
+            }`}>
+              {validations.stakeSuggestion}
+            </p>
+          </div>
         </div>
       </div>
     </CardContent>

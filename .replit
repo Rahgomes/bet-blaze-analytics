@@ -62,13 +62,13 @@ localPort = 24678
 externalPort = 3000
 
 [[ports]]
-localPort = 36813
-externalPort = 6000
-
-[[ports]]
 localPort = 37603
 externalPort = 5000
 exposeLocalhost = true
+
+[[ports]]
+localPort = 44047
+externalPort = 6000
 
 [[ports]]
 localPort = 53932

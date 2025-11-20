@@ -210,13 +210,82 @@ export default function AddBet() {
     const totalAmount = parseFloat(calculations.totalAmount);
     const roi = parseFloat(calculations.roi);
 
+    // Gestão de Risco baseada em percentual da banca (mockado em R$ 1.000)
+    const MOCK_BANKROLL = 1000;
+    const percentage = (totalAmount / MOCK_BANKROLL) * 100;
+
+    // Classificação de risco
+    let riskLevel = '';
+    let riskColor = '';
+    if (percentage <= 0.5) {
+      riskLevel = 'Super Odd';
+      riskColor = 'verde';
+    } else if (percentage <= 1) {
+      riskLevel = 'Conservador';
+      riskColor = 'verde-claro';
+    } else if (percentage <= 2) {
+      riskLevel = 'Moderado';
+      riskColor = 'amarelo';
+    } else if (percentage <= 3) {
+      riskLevel = 'Agressivo';
+      riskColor = 'laranja';
+    } else if (percentage <= 4) {
+      riskLevel = 'Alto Risco';
+      riskColor = 'vermelho';
+    } else if (percentage <= 5) {
+      riskLevel = 'Máximo';
+      riskColor = 'vermelho-escuro';
+    } else {
+      riskLevel = 'CRÍTICO - Acima do limite';
+      riskColor = 'vermelho-crítico';
+    }
+
+    // Alertas contextualizados baseados em gestão de risco
+    let oddsAlert = null;
+    let amountAlert = null;
+    let roiWarning = null;
+    let stakeSuggestion = 'Preencha os valores para ver sugestões';
+
+    if (totalAmount > 0) {
+      // Alerta de odds baseado no risco
+      if (finalOdds < 1.5 && percentage > 2) {
+        oddsAlert = `⚠️ Odds baixa (${finalOdds.toFixed(2)}) com ${percentage.toFixed(1)}% da banca - risco elevado!`;
+      } else if (finalOdds < 1.3) {
+        oddsAlert = '⚠️ Odds muito baixa: considere analisar o risco/retorno';
+      } else if (finalOdds < 1.5) {
+        oddsAlert = '⚠️ Odds baixa: retorno limitado nesta aposta';
+      }
+
+      // Alerta de valor baseado em gestão de risco
+      if (percentage > 5) {
+        amountAlert = `🚨 CRÍTICO: ${percentage.toFixed(1)}% da banca! Acima do limite máximo recomendado (5%)`;
+      } else if (percentage > 4) {
+        amountAlert = `⚠️ Alto Risco: ${percentage.toFixed(1)}% da banca - apenas para apostas com alta convicção`;
+      } else if (percentage > 3) {
+        amountAlert = `⚡ Agressivo: ${percentage.toFixed(1)}% da banca - certifique-se de ter bons fundamentos`;
+      } else if (percentage > 2.5 && finalOdds < 1.8) {
+        amountAlert = `⚠️ Moderado-alto: ${percentage.toFixed(1)}% em odds baixa - risco x retorno desfavorável`;
+      }
+
+      // Alerta de ROI baseado em risco e odds
+      if (roi < 10 && percentage > 2) {
+        roiWarning = `⚡ ROI muito baixo (${roi}%) com ${percentage.toFixed(1)}% da banca - não recomendado`;
+      } else if (roi < 20 && percentage > 3) {
+        roiWarning = `⚡ ROI baixo (${roi}%) para aposta agressiva - avalie se vale o risco`;
+      } else if (roi < 30 && finalOdds < 1.5) {
+        roiWarning = `⚡ ROI ${roi}% em odds baixa - considere odds melhores`;
+      }
+
+      // Sugestões inteligentes baseadas em gestão de risco
+      const riskEmoji = percentage <= 1 ? '✅' : percentage <= 2 ? '⚖️' : percentage <= 3 ? '⚡' : percentage <= 4 ? '⚠️' : '🚨';
+      stakeSuggestion = `${riskEmoji} ${percentage.toFixed(1)}% da banca | Perfil: ${riskLevel} | R$ ${totalAmount.toFixed(2)}`;
+    }
+
     return {
-      oddsAlert: finalOdds < 1.5 ? 'Odds baixa: considere analisar o risco/retorno' : null,
-      amountAlert: totalAmount > 1000 ? 'Valor alto apostado! Certifique-se de estar dentro do gerenciamento' : null,
-      stakeSuggestion: totalAmount > 0
-        ? `Sugestão: Esta aposta representa ~${((totalAmount / 1000) * 100).toFixed(1)}% de uma banca de R$ 1.000`
-        : 'Preencha os valores para ver sugestões',
-      roiWarning: roi < 20 ? 'ROI abaixo de 20%: avalie se vale o risco' : null,
+      oddsAlert,
+      amountAlert,
+      stakeSuggestion,
+      roiWarning,
     };
   }, [calculations]);
 
