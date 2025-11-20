@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
-import { useForm, FormProvider, Controller, useFieldArray } from 'react-hook-form';
+import { useForm, FormProvider, Controller, useFieldArray, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import ReactSelect from 'react-select';
 import { useBettingData } from '@/hooks/useBettingData';
@@ -129,7 +129,10 @@ export default function AddBet() {
   const watchedData = watch();
   const betType = watch('betType');
   const multipleQuantity = watch('multipleQuantity');
-  const legs = watch('legs');
+  const legs = useWatch({
+    control,
+    name: 'legs',
+  });
 
   useEffect(() => {
     const quantity = parseInt(multipleQuantity);
@@ -157,6 +160,16 @@ export default function AddBet() {
   }, [locationState, setValue]);
 
   const calculations = useMemo(() => {
+    if (!legs || legs.length === 0) {
+      return {
+        totalAmount: '0.00',
+        finalOdds: '0.00',
+        potentialReturn: '0.00',
+        potentialProfit: '0.00',
+        roi: '0.00'
+      };
+    }
+
     const totalAmount = legs.reduce((sum, leg) => {
       const value = parseFloat(leg.amount);
       return sum + (isNaN(value) ? 0 : value);
@@ -177,6 +190,9 @@ export default function AddBet() {
   }, [legs]);
 
   const aggregatedBadges = useMemo(() => {
+    if (!legs || legs.length === 0) {
+      return [];
+    }
     const badges: string[] = [];
     legs.forEach(leg => {
       if (leg.hasBoost) badges.push(`BOOST +${leg.boostPercentage}%`);
