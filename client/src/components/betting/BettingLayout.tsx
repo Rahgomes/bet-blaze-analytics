@@ -37,17 +37,12 @@ export function BettingLayout({ children }: BettingLayoutProps) {
     let ticking = false;
 
     const handleScroll = () => {
-      if (!scrollContainerRef.current || ticking) return;
+      if (ticking) return;
 
       ticking = true;
 
       window.requestAnimationFrame(() => {
-        if (!scrollContainerRef.current) {
-          ticking = false;
-          return;
-        }
-
-        const currentScrollY = scrollContainerRef.current.scrollTop;
+        const currentScrollY = window.scrollY;
         const scrollDifference = currentScrollY - lastScrollY.current;
 
         if (currentScrollY < 10) {
@@ -70,15 +65,10 @@ export function BettingLayout({ children }: BettingLayoutProps) {
       });
     };
 
-    const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
-    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      if (scrollContainer) {
-        scrollContainer.removeEventListener('scroll', handleScroll);
-      }
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -241,7 +231,7 @@ export function BettingLayout({ children }: BettingLayoutProps) {
           duration: 0.3,
           ease: [0.4, 0, 0.2, 1]
         }}
-        className="flex-1 overflow-auto pt-16"
+        className="flex-1 pt-16"
       >
         <div className="container mx-auto p-6">
           {children}
