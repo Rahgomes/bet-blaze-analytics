@@ -77,7 +77,8 @@ export interface Transaction {
   type: 'deposit' | 'withdrawal';
   amount: number;
   dateTime: string;
-  description: string;
+  title?: string;
+  description?: string;
   balanceAfter: number;
   createdAt: string;
   updatedAt: string;
