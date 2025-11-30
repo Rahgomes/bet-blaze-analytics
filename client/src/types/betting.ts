@@ -98,21 +98,78 @@ export interface UserSettings {
   exposureThreshold: number;
 }
 
+// Custom Stakes System
+export type StakeLabelMode = 'auto' | 'predefined' | 'custom';
+
+export const PREDEFINED_STAKE_LABELS = [
+  'Conservador',
+  'Moderado',
+  'Agressivo',
+  'Alto Risco',
+  'Super Odd',
+  'Máximo',
+  'Value Bet',
+  'Linha Segura',
+  'Experimental',
+  'Alta Convicção'
+] as const;
+
+export type PredefinedStakeLabel = typeof PREDEFINED_STAKE_LABELS[number];
+
+export interface CustomStake {
+  id: string;
+  percentage: number;          // e.g., 1.5 for 1.5%
+  labelMode: StakeLabelMode;
+  label: string;               // Display label
+  color: string;               // Hex color code
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Stop Loss/Gain Configuration
+export type StopMode = 'currency' | 'percentage';
+
+export interface StopLossGainConfig {
+  dailyLoss: number;
+  dailyLossMode: StopMode;
+  dailyGain: number;
+  dailyGainMode: StopMode;
+  weeklyLoss: number;
+  weeklyLossMode: StopMode;
+  weeklyGain: number;
+  weeklyGainMode: StopMode;
+  monthlyLoss: number;
+  monthlyLossMode: StopMode;
+  monthlyGain: number;
+  monthlyGainMode: StopMode;
+}
+
 export interface BankrollSettings {
   initialBankroll: number;
   currentBankroll: number;
   targetMode: 'percentage' | 'fixed';
   targetPercentage: number;
   targetAmount: number;
+
+  // Legacy fields (deprecated - kept for migration)
   stopLossWeekly: number;
   stopGainWeekly: number;
   stopLossMonthly: number;
   stopGainMonthly: number;
+
+  // New: Enhanced stop loss/gain
+  stopLossGain?: StopLossGainConfig;
+
+  // New: Custom stakes system
+  customStakes?: CustomStake[];
+  maxStakesRecommended?: number;  // Default: 6
+
   leagues?: string[];
   markets?: string[];
   strategies?: string[];
   language?: 'en' | 'pt-br';
   alertsEnabled?: boolean;
+  projectionMode?: 'linear' | 'compound';
   updatedAt: string;
 }
 

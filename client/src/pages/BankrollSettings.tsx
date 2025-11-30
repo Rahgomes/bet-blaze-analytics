@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useBettingData } from '@/hooks/useBettingData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,12 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,13 +42,25 @@ import {
   DollarSign,
   PieChart,
   History,
-  ChevronDown
+  ChevronDown,
+  HelpCircle
 } from 'lucide-react';
+import {
+  calculateLinearProjection,
+  calculateCompoundProjection,
+  calculateBettingROI,
+  calculateTotalGrowth,
+  calculateMonthlyProgress,
+  getBankrollAtMonthStart,
+} from '@/utils/goalsCalculations';
 import { AddManualDepositModal } from '@/components/betting/AddManualDepositModal';
 import { EditManualDepositModal } from '@/components/betting/EditManualDepositModal';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Transaction } from '@/types/betting';
+import { Transaction, CustomStake, StopLossGainConfig, StopMode } from '@/types/betting';
+import { StakeManager } from '@/components/betting/StakeManager';
+import { StopLossGainField } from '@/components/betting/StopLossGainField';
+import { convertStopValue } from '@/utils/stopLossGainUtils';
 
 interface ScheduledWithdrawal {
   trigger: 'monthly_profit' | 'target_reached';
@@ -104,12 +122,11 @@ export default function BankrollSettings() {
     stopGainWeekly: string;
     stopLossMonthly: string;
     stopGainMonthly: string;
-    stopLossDaily: string;
-    stopGainDaily: string;
-    maxStakePercentage: string;
-    minStakeAmount: string;
-    maxStakeAmount: string;
-    dynamicStaking: boolean;
+    // New: Enhanced stop loss/gain config
+    stopLossGain: StopLossGainConfig;
+    // New: Custom stakes
+    customStakes: CustomStake[];
+    maxStakesRecommended: number;
   }>({
     initialBankroll: bankroll.initialBankroll.toString(),
     targetMode: bankroll.targetMode || 'percentage',
@@ -119,12 +136,24 @@ export default function BankrollSettings() {
     stopGainWeekly: bankroll.stopGainWeekly.toString(),
     stopLossMonthly: bankroll.stopLossMonthly.toString(),
     stopGainMonthly: bankroll.stopGainMonthly.toString(),
-    stopLossDaily: '50',
-    stopGainDaily: '100',
-    maxStakePercentage: '5',
-    minStakeAmount: '10',
-    maxStakeAmount: '500',
-    dynamicStaking: false,
+    // New: Stop loss/gain config (with fallback to old values)
+    stopLossGain: bankroll.stopLossGain || {
+      dailyLoss: 50,
+      dailyLossMode: 'currency' as const,
+      dailyGain: 100,
+      dailyGainMode: 'currency' as const,
+      weeklyLoss: bankroll.stopLossWeekly || 100,
+      weeklyLossMode: 'currency' as const,
+      weeklyGain: bankroll.stopGainWeekly || 200,
+      weeklyGainMode: 'currency' as const,
+      monthlyLoss: bankroll.stopLossMonthly || 300,
+      monthlyLossMode: 'currency' as const,
+      monthlyGain: bankroll.stopGainMonthly || 500,
+      monthlyGainMode: 'currency' as const,
+    },
+    // New: Custom stakes (with fallback to empty array)
+    customStakes: bankroll.customStakes || [],
+    maxStakesRecommended: bankroll.maxStakesRecommended || 6,
   });
 
   // Store initial form data for change detection
@@ -162,6 +191,71 @@ export default function BankrollSettings() {
   const totalDeposits = deposits.reduce((sum, t) => sum + t.amount, 0);
   const totalWithdrawals = withdrawals.reduce((sum, t) => sum + t.amount, 0);
   const totalBetProfit = bets.reduce((sum, bet) => sum + bet.profit, 0);
+
+  // Projection mode state
+  const [projectionMode, setProjectionMode] = useState<'linear' | 'compound'>(
+    bankroll.projectionMode || 'linear'
+  );
+
+  // Goal calculations (derived state with useMemo)
+  const goalCalculations = useMemo(() => {
+    const monthlyGoal = formData.targetMode === 'percentage'
+      ? parseFloat(formData.targetPercentage || '0')
+      : (parseFloat(formData.targetAmount || '0') / bankroll.currentBankroll) * 100;
+
+    const currentBank = bankroll.currentBankroll;
+
+    // Calculate projections
+    const projection6 = projectionMode === 'linear'
+      ? calculateLinearProjection(monthlyGoal, 6, currentBank)
+      : calculateCompoundProjection(monthlyGoal, 6, currentBank);
+
+    const projection12 = projectionMode === 'linear'
+      ? calculateLinearProjection(monthlyGoal, 12, currentBank)
+      : calculateCompoundProjection(monthlyGoal, 12, currentBank);
+
+    // Calculate current performance
+    const bettingROI = calculateBettingROI(bets);
+    const totalGrowth = calculateTotalGrowth(
+      bankroll.initialBankroll,
+      currentBank,
+      totalDeposits,
+      totalWithdrawals
+    );
+
+    // Calculate monthly progress
+    const bankrollAtMonthStart = getBankrollAtMonthStart(
+      currentBank,
+      bets,
+      transactions
+    );
+
+    const monthlyProgress = calculateMonthlyProgress(
+      bets,
+      transactions,
+      monthlyGoal,
+      bankrollAtMonthStart
+    );
+
+    return {
+      projection6,
+      projection12,
+      bettingROI,
+      totalGrowth,
+      monthlyProgress
+    };
+  }, [
+    formData.targetMode,
+    formData.targetPercentage,
+    formData.targetAmount,
+    projectionMode,
+    bankroll.currentBankroll,
+    bankroll.initialBankroll,
+    bets,
+    transactions,
+    totalDeposits,
+    totalWithdrawals
+  ]);
 
   const handleCheckboxChange = (checked: boolean) => {
     if (checked) {
@@ -222,6 +316,78 @@ export default function BankrollSettings() {
     setDepositToDelete(null);
   };
 
+  // === NEW HANDLERS FOR CUSTOM STAKES ===
+
+  const handleAddStake = (stakeData: Omit<CustomStake, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newStake: CustomStake = {
+      ...stakeData,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setFormData({
+      ...formData,
+      customStakes: [...formData.customStakes, newStake],
+    });
+  };
+
+  const handleUpdateStake = (id: string, updates: Partial<CustomStake>) => {
+    setFormData({
+      ...formData,
+      customStakes: formData.customStakes.map(s =>
+        s.id === id ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s
+      ),
+    });
+  };
+
+  const handleDeleteStake = (id: string) => {
+    setFormData({
+      ...formData,
+      customStakes: formData.customStakes.filter(s => s.id !== id),
+    });
+  };
+
+  // === NEW HANDLERS FOR STOP LOSS/GAIN ===
+
+  const handleStopValueChange = (
+    field: keyof StopLossGainConfig,
+    value: number
+  ) => {
+    setFormData({
+      ...formData,
+      stopLossGain: {
+        ...formData.stopLossGain,
+        [field]: value,
+      },
+    });
+  };
+
+  const handleStopModeChange = (
+    field: keyof StopLossGainConfig,
+    mode: StopMode
+  ) => {
+    // When mode changes, convert the value
+    const valueField = field.replace('Mode', '') as keyof StopLossGainConfig;
+    const currentValue = formData.stopLossGain[valueField] as number;
+    const currentMode = formData.stopLossGain[field] as StopMode;
+
+    const convertedValue = convertStopValue(
+      currentValue,
+      currentMode,
+      mode,
+      bankroll.currentBankroll
+    );
+
+    setFormData({
+      ...formData,
+      stopLossGain: {
+        ...formData.stopLossGain,
+        [valueField]: convertedValue,
+        [field]: mode,
+      },
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -229,7 +395,7 @@ export default function BankrollSettings() {
     const targetPercentage = parseFloat(formData.targetPercentage);
     const targetAmount = formData.targetMode === 'fixed'
       ? parseFloat(formData.targetAmount)
-      : initialBankroll * (1 + targetPercentage / 100);
+      : initialBankroll * (targetPercentage / 100);
     const stopLossWeekly = parseFloat(formData.stopLossWeekly);
     const stopGainWeekly = parseFloat(formData.stopGainWeekly);
     const stopLossMonthly = parseFloat(formData.stopLossMonthly);
@@ -244,6 +410,11 @@ export default function BankrollSettings() {
       stopGainWeekly,
       stopLossMonthly,
       stopGainMonthly,
+      projectionMode: projectionMode,
+      // NEW: Save stop loss/gain and custom stakes
+      stopLossGain: formData.stopLossGain,
+      customStakes: formData.customStakes,
+      maxStakesRecommended: formData.maxStakesRecommended,
     });
 
     // After saving, disable editing initial bankroll
@@ -493,7 +664,7 @@ export default function BankrollSettings() {
                   <Target className="h-5 w-5" />
                   Meta Principal
                 </CardTitle>
-                <CardDescription>Configure sua meta anual e acompanhe o progresso</CardDescription>
+                <CardDescription>Configure sua meta mensal e acompanhe o progresso</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
@@ -515,7 +686,7 @@ export default function BankrollSettings() {
 
                 {formData.targetMode === 'percentage' ? (
                   <div className="space-y-2">
-                    <Label htmlFor="targetPercentage">Meta Anual (%)</Label>
+                    <Label htmlFor="targetPercentage">Meta Mensal (%)</Label>
                     <Input
                       id="targetPercentage"
                       type="number"
@@ -525,12 +696,12 @@ export default function BankrollSettings() {
                       onChange={(e) => setFormData({ ...formData, targetPercentage: e.target.value })}
                     />
                     <p className="text-sm text-muted-foreground">
-                      Valor alvo: R$ {(parseFloat(formData.initialBankroll || '0') * (1 + parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2)}
+                      Valor alvo mensal: R$ {(parseFloat(formData.initialBankroll || '0') * (parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2)}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Label htmlFor="targetAmount">Valor da Meta (R$)</Label>
+                    <Label htmlFor="targetAmount">Valor da Meta Mensal (R$)</Label>
                     <Input
                       id="targetAmount"
                       type="number"
@@ -544,26 +715,91 @@ export default function BankrollSettings() {
 
                 <Separator />
 
-                {/* Metas Intermediárias */}
+                {/* Modo de Projeção */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Modo de Projeção</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="font-semibold mb-2">Linear vs Composto:</p>
+                          <ul className="space-y-1 text-xs">
+                            <li><strong>Linear:</strong> Multiplicação simples (5% × 6 = 30%)</li>
+                            <li><strong>Composto:</strong> Juros compostos ((1.05)^6 - 1 ≈ 34%)</li>
+                          </ul>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <RadioGroup
+                    value={projectionMode}
+                    onValueChange={(value) => setProjectionMode(value as 'linear' | 'compound')}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="linear" id="linear" />
+                      <Label htmlFor="linear">Linear</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="compound" id="compound" />
+                      <Label htmlFor="compound">Composto</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <Separator />
+
+                {/* Projeções */}
                 <div className="space-y-3">
-                  <Label>Metas Intermediárias</Label>
+                  <Label>Projeções</Label>
                   <div className="grid gap-3">
-                    <div className="p-3 border rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium text-sm">Meta Mensal</p>
-                          <p className="text-xs text-muted-foreground">1% ao mês</p>
+                    {/* 6 Month Projection */}
+                    <div className="p-3 border rounded-lg bg-slate-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-sm">6 Meses</span>
+                        <Badge variant="outline">
+                          {goalCalculations.projection6.percentage.toFixed(2)}%
+                        </Badge>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Banca projetada:</span>
+                          <span className="font-semibold">
+                            R$ {goalCalculations.projection6.bankroll.toFixed(2)}
+                          </span>
                         </div>
-                        <Badge variant="outline">Conservadora</Badge>
+                        <div className="flex justify-between text-sm text-green-600">
+                          <span>Lucro estimado:</span>
+                          <span className="font-semibold">
+                            +R$ {goalCalculations.projection6.profit.toFixed(2)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div className="p-3 border rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium text-sm">Meta Trimestral</p>
-                          <p className="text-xs text-muted-foreground">3% no trimestre</p>
+
+                    {/* 12 Month Projection */}
+                    <div className="p-3 border rounded-lg bg-slate-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-sm">12 Meses</span>
+                        <Badge variant="outline">
+                          {goalCalculations.projection12.percentage.toFixed(2)}%
+                        </Badge>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Banca projetada:</span>
+                          <span className="font-semibold">
+                            R$ {goalCalculations.projection12.bankroll.toFixed(2)}
+                          </span>
                         </div>
-                        <Badge variant="outline">Moderada</Badge>
+                        <div className="flex justify-between text-sm text-green-600">
+                          <span>Lucro estimado:</span>
+                          <span className="font-semibold">
+                            +R$ {goalCalculations.projection12.profit.toFixed(2)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -580,292 +816,264 @@ export default function BankrollSettings() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span>Progresso da Meta Anual</span>
-                    <span className="font-bold">25%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full" style={{width: '25%'}}></div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 pt-4">
-                    <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Este Mês</p>
-                      <p className="text-lg font-bold text-green-600">+2.5%</p>
-                      <p className="text-xs text-green-600">Meta: 1%</p>
+                  {/* TWO SEPARATE METRICS */}
+                  <div className="grid gap-4">
+                    {/* ROI das Apostas */}
+                    <div className="p-4 border rounded-lg bg-blue-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">ROI das Apostas</p>
+                          <p className="text-xs text-muted-foreground">Performance pura das apostas</p>
+                        </div>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="text-xs">Lucro das apostas ÷ Total apostado</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <p className={`text-2xl font-bold ${
+                        goalCalculations.bettingROI.roiPercentage >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {goalCalculations.bettingROI.roiPercentage >= 0 ? '+' : ''}
+                        {goalCalculations.bettingROI.roiPercentage.toFixed(2)}%
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        R$ {goalCalculations.bettingROI.roi.toFixed(2)} de lucro
+                      </p>
                     </div>
-                    <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <p className="text-sm text-muted-foreground">No Ano</p>
-                      <p className="text-lg font-bold text-blue-600">+8.2%</p>
-                      <p className="text-xs text-blue-600">Meta: {formData.targetPercentage}%</p>
+
+                    {/* Crescimento Total da Banca */}
+                    <div className="p-4 border rounded-lg bg-green-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Crescimento Total da Banca</p>
+                          <p className="text-xs text-muted-foreground">Inclui depósitos e saques</p>
+                        </div>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="text-xs">Crescimento considerando todas transações</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <p className={`text-2xl font-bold ${
+                        goalCalculations.totalGrowth.growthPercentage >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {goalCalculations.totalGrowth.growthPercentage >= 0 ? '+' : ''}
+                        {goalCalculations.totalGrowth.growthPercentage.toFixed(2)}%
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        R$ {goalCalculations.totalGrowth.growth.toFixed(2)} de crescimento
+                      </p>
                     </div>
                   </div>
 
                   <Separator />
 
-                  {/* Simulação de Crescimento */}
+                  {/* MONTHLY PROGRESS */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Projeção 12 Meses</Label>
-                    <div className="p-3 bg-slate-50 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <Label className="text-sm font-medium">Progresso Mensal</Label>
+                      {goalCalculations.monthlyProgress.isOnTrack ? (
+                        <Badge className="bg-green-500">No Caminho Certo</Badge>
+                      ) : (
+                        <Badge variant="destructive">Abaixo da Meta</Badge>
+                      )}
+                    </div>
+
+                    <div className="space-y-1">
                       <div className="flex justify-between text-sm">
-                        <span>Com meta atual:</span>
-                        <span className="font-bold">
-                          R$ {(parseFloat(formData.initialBankroll || '0') * (1 + parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2)}
-                        </span>
+                        <span>Meta do mês:</span>
+                        <span className="font-bold">{parseFloat(formData.targetPercentage || '0').toFixed(1)}%</span>
                       </div>
-                      <div className="flex justify-between text-sm text-green-600 mt-1">
-                        <span>Lucro estimado:</span>
-                        <span className="font-bold">
-                          +R$ {(parseFloat(formData.initialBankroll || '0') * (parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2)}
+                      <div className="flex justify-between text-sm">
+                        <span>Progresso atual:</span>
+                        <span className={`font-bold ${
+                          goalCalculations.monthlyProgress.currentProgressPercentage >= 0
+                            ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {goalCalculations.monthlyProgress.currentProgressPercentage >= 0 ? '+' : ''}
+                          {goalCalculations.monthlyProgress.currentProgressPercentage.toFixed(2)}%
                         </span>
                       </div>
                     </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <div
+                        className={`h-3 rounded-full transition-all ${
+                          goalCalculations.monthlyProgress.isOnTrack
+                            ? 'bg-gradient-to-r from-green-500 to-green-600'
+                            : 'bg-gradient-to-r from-yellow-500 to-orange-500'
+                        }`}
+                        style={{
+                          width: `${Math.min(100, Math.max(0,
+                            (goalCalculations.monthlyProgress.currentProgressPercentage /
+                             parseFloat(formData.targetPercentage || '1')) * 100
+                          ))}%`
+                        }}
+                      />
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      Dia {goalCalculations.monthlyProgress.daysElapsed} de{' '}
+                      {goalCalculations.monthlyProgress.daysInMonth} do mês
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-
-          {/* Alertas e Notificações */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" />
-                Alertas & Acompanhamento
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <Label htmlFor="daily-progress">Progresso Diário</Label>
-                    <p className="text-sm text-muted-foreground">Alertas diários de performance</p>
-                  </div>
-                  <Switch id="daily-progress" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <Label htmlFor="weekly-review">Review Semanal</Label>
-                    <p className="text-sm text-muted-foreground">Relatório semanal automático</p>
-                  </div>
-                  <Switch id="weekly-review" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <Label htmlFor="goal-alerts">Alertas de Meta</Label>
-                    <p className="text-sm text-muted-foreground">Notificações ao atingir marcos</p>
-                  </div>
-                  <Switch id="goal-alerts" defaultChecked />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* TAB 3: GESTÃO DE RISCO */}
         <TabsContent value="risk" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  Stop Loss & Stop Gain
-                </CardTitle>
-                <CardDescription>Defina limites de proteção por período</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="stopLossDaily">Stop Loss Diário (R$)</Label>
-                      <Input
-                        id="stopLossDaily"
-                        type="number"
-                        step="0.01"
-                        value={formData.stopLossDaily}
-                        onChange={(e) => setFormData({ ...formData, stopLossDaily: e.target.value })}
-                      />
-                      <p className="text-xs text-red-600 mt-1">
-                        {((parseFloat(formData.stopLossDaily || '0') / parseFloat(formData.initialBankroll || '1')) * 100).toFixed(1)}% da banca
-                      </p>
-                    </div>
-                    <div>
-                      <Label htmlFor="stopGainDaily">Stop Gain Diário (R$)</Label>
-                      <Input
-                        id="stopGainDaily"
-                        type="number"
-                        step="0.01"
-                        value={formData.stopGainDaily}
-                        onChange={(e) => setFormData({ ...formData, stopGainDaily: e.target.value })}
-                      />
-                      <p className="text-xs text-green-600 mt-1">
-                        {((parseFloat(formData.stopGainDaily || '0') / parseFloat(formData.initialBankroll || '1')) * 100).toFixed(1)}% da banca
-                      </p>
-                    </div>
-                  </div>
+          {/* Custom Stakes Manager */}
+          <StakeManager
+            stakes={formData.customStakes}
+            maxRecommended={formData.maxStakesRecommended}
+            onAddStake={handleAddStake}
+            onUpdateStake={handleUpdateStake}
+            onDeleteStake={handleDeleteStake}
+            currentBankroll={bankroll.currentBankroll}
+          />
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="stopLossWeekly">Stop Loss Semanal (R$)</Label>
-                      <Input
-                        id="stopLossWeekly"
-                        type="number"
-                        step="0.01"
-                        value={formData.stopLossWeekly}
-                        onChange={(e) => setFormData({ ...formData, stopLossWeekly: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="stopGainWeekly">Stop Gain Semanal (R$)</Label>
-                      <Input
-                        id="stopGainWeekly"
-                        type="number"
-                        step="0.01"
-                        value={formData.stopGainWeekly}
-                        onChange={(e) => setFormData({ ...formData, stopGainWeekly: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="stopLossMonthly">Stop Loss Mensal (R$)</Label>
-                      <Input
-                        id="stopLossMonthly"
-                        type="number"
-                        step="0.01"
-                        value={formData.stopLossMonthly}
-                        onChange={(e) => setFormData({ ...formData, stopLossMonthly: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="stopGainMonthly">Stop Gain Mensal (R$)</Label>
-                      <Input
-                        id="stopGainMonthly"
-                        type="number"
-                        step="0.01"
-                        value={formData.stopGainMonthly}
-                        onChange={(e) => setFormData({ ...formData, stopGainMonthly: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
-                  Regras de Stake
-                </CardTitle>
-                <CardDescription>Configure limites de apostas e regras dinâmicas</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4">
-                  <div>
-                    <Label htmlFor="maxStakePercentage">Stake Máximo (% da Banca)</Label>
-                    <Input
-                      id="maxStakePercentage"
-                      type="number"
-                      step="0.1"
-                      max="20"
-                      value={formData.maxStakePercentage}
-                      onChange={(e) => setFormData({ ...formData, maxStakePercentage: e.target.value })}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Valor atual: R$ {(parseFloat(formData.initialBankroll || '0') * (parseFloat(formData.maxStakePercentage || '0') / 100)).toFixed(2)}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="minStakeAmount">Stake Mínimo (R$)</Label>
-                      <Input
-                        id="minStakeAmount"
-                        type="number"
-                        step="0.01"
-                        value={formData.minStakeAmount}
-                        onChange={(e) => setFormData({ ...formData, minStakeAmount: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="maxStakeAmount">Stake Máximo (R$)</Label>
-                      <Input
-                        id="maxStakeAmount"
-                        type="number"
-                        step="0.01"
-                        value={formData.maxStakeAmount}
-                        onChange={(e) => setFormData({ ...formData, maxStakeAmount: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <Label htmlFor="dynamicStaking">Stake Dinâmico</Label>
-                      <p className="text-sm text-muted-foreground">Ajusta stake baseado na performance</p>
-                    </div>
-                    <Switch
-                      id="dynamicStaking"
-                      checked={formData.dynamicStaking}
-                      onCheckedChange={(checked) => setFormData({ ...formData, dynamicStaking: checked })}
-                    />
-                  </div>
-
-                  {formData.dynamicStaking && (
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-sm font-medium text-blue-900 mb-2">Regras Dinâmicas Ativas</p>
-                      <div className="space-y-1 text-xs text-blue-700">
-                        <p>• +0.5% após 3 vitórias consecutivas</p>
-                        <p>• -0.5% após 2 derrotas seguidas</p>
-                        <p>• Ajuste máximo: ±2% do stake base</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Alertas de Risco */}
+          {/* Stop Loss & Stop Gain */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5" />
-                Alertas de Proteção
+                Stop Loss & Stop Gain
               </CardTitle>
-              <CardDescription>Configure notificações automáticas de risco</CardDescription>
+              <CardDescription>
+                Defina limites de proteção por período. Alterne entre R$ e % conforme preferir.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Daily */}
+              <div className="grid grid-cols-2 gap-4">
+                <StopLossGainField
+                  label="Stop Loss Diário"
+                  value={formData.stopLossGain.dailyLoss}
+                  mode={formData.stopLossGain.dailyLossMode}
+                  onValueChange={(v) => handleStopValueChange('dailyLoss', v)}
+                  onModeChange={(m) => handleStopModeChange('dailyLossMode', m)}
+                  currentBankroll={bankroll.currentBankroll}
+                  type="loss"
+                  tooltip="Limite máximo de perda permitido em um único dia. Ao atingir, pare de apostar."
+                />
+                <StopLossGainField
+                  label="Stop Gain Diário"
+                  value={formData.stopLossGain.dailyGain}
+                  mode={formData.stopLossGain.dailyGainMode}
+                  onValueChange={(v) => handleStopValueChange('dailyGain', v)}
+                  onModeChange={(m) => handleStopModeChange('dailyGainMode', m)}
+                  currentBankroll={bankroll.currentBankroll}
+                  type="gain"
+                  tooltip="Meta de lucro diário. Ao atingir, considere parar para proteger ganhos."
+                />
+              </div>
+
+              {/* Weekly */}
+              <div className="grid grid-cols-2 gap-4">
+                <StopLossGainField
+                  label="Stop Loss Semanal"
+                  value={formData.stopLossGain.weeklyLoss}
+                  mode={formData.stopLossGain.weeklyLossMode}
+                  onValueChange={(v) => handleStopValueChange('weeklyLoss', v)}
+                  onModeChange={(m) => handleStopModeChange('weeklyLossMode', m)}
+                  currentBankroll={bankroll.currentBankroll}
+                  type="loss"
+                  tooltip="Limite máximo de perda permitido na semana. Protege contra sequências ruins."
+                />
+                <StopLossGainField
+                  label="Stop Gain Semanal"
+                  value={formData.stopLossGain.weeklyGain}
+                  mode={formData.stopLossGain.weeklyGainMode}
+                  onValueChange={(v) => handleStopValueChange('weeklyGain', v)}
+                  onModeChange={(m) => handleStopModeChange('weeklyGainMode', m)}
+                  currentBankroll={bankroll.currentBankroll}
+                  type="gain"
+                  tooltip="Meta de lucro semanal. Considere sacar parte dos ganhos ao atingir."
+                />
+              </div>
+
+              {/* Monthly */}
+              <div className="grid grid-cols-2 gap-4">
+                <StopLossGainField
+                  label="Stop Loss Mensal"
+                  value={formData.stopLossGain.monthlyLoss}
+                  mode={formData.stopLossGain.monthlyLossMode}
+                  onValueChange={(v) => handleStopValueChange('monthlyLoss', v)}
+                  onModeChange={(m) => handleStopModeChange('monthlyLossMode', m)}
+                  currentBankroll={bankroll.currentBankroll}
+                  type="loss"
+                  tooltip="Limite máximo de perda no mês. Revise sua estratégia se atingir."
+                />
+                <StopLossGainField
+                  label="Stop Gain Mensal"
+                  value={formData.stopLossGain.monthlyGain}
+                  mode={formData.stopLossGain.monthlyGainMode}
+                  onValueChange={(v) => handleStopValueChange('monthlyGain', v)}
+                  onModeChange={(m) => handleStopModeChange('monthlyGainMode', m)}
+                  currentBankroll={bankroll.currentBankroll}
+                  type="gain"
+                  tooltip="Meta de lucro mensal. Ao atingir, considere realizar lucros parciais."
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Alertas de Proteção - SKIP for now, Phase 2 */}
+          <Card className="opacity-60">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                Alertas de Proteção
+                <Badge variant="outline">Em breve</Badge>
+              </CardTitle>
+              <CardDescription>
+                Configure notificações automáticas de risco (próxima fase)
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
                   <div>
-                    <Label htmlFor="high-exposure">Alta Exposição</Label>
+                    <Label>Alta Exposição</Label>
                     <p className="text-sm text-muted-foreground">+3 apostas no mesmo time</p>
                   </div>
-                  <Switch id="high-exposure" defaultChecked />
+                  <Switch disabled />
                 </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
                   <div>
-                    <Label htmlFor="poor-performance">Performance Ruim</Label>
+                    <Label>Performance Ruim</Label>
                     <p className="text-sm text-muted-foreground">5 derrotas seguidas</p>
                   </div>
-                  <Switch id="poor-performance" defaultChecked />
+                  <Switch disabled />
                 </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
                   <div>
-                    <Label htmlFor="stop-reached">Stop Atingido</Label>
+                    <Label>Stop Atingido</Label>
                     <p className="text-sm text-muted-foreground">Stop loss/gain alcançado</p>
                   </div>
-                  <Switch id="stop-reached" defaultChecked />
+                  <Switch disabled />
                 </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
                   <div>
-                    <Label htmlFor="large-stake">Stake Elevado</Label>
+                    <Label>Stake Elevado</Label>
                     <p className="text-sm text-muted-foreground">Aposta &gt; 10% da banca</p>
                   </div>
-                  <Switch id="large-stake" defaultChecked />
+                  <Switch disabled />
                 </div>
               </div>
             </CardContent>

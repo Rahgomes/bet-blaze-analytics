@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Bet, BankrollSettings, Bookmaker, Transaction } from '@/types/betting';
+import { migrateBankrollSettings } from '@/utils/migrations';
 
 const STORAGE_KEYS = {
   BETS: 'betting_bets',
@@ -45,7 +46,20 @@ export function useBettingData() {
       const storedTransactions = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
 
       if (storedBets) setBets(JSON.parse(storedBets));
-      if (storedBankroll) setBankroll(JSON.parse(storedBankroll));
+
+      // Migrate bankroll settings if needed
+      if (storedBankroll) {
+        const parsed = JSON.parse(storedBankroll);
+        const migrated = migrateBankrollSettings(parsed);
+        setBankroll(migrated);
+
+        // Save migrated version back if it changed
+        if (JSON.stringify(parsed) !== JSON.stringify(migrated)) {
+          localStorage.setItem(STORAGE_KEYS.BANKROLL, JSON.stringify(migrated));
+          console.log('[useBettingData] Bankroll settings migrated successfully');
+        }
+      }
+
       if (storedBookmakers) setBookmakers(JSON.parse(storedBookmakers));
       if (storedTransactions) setTransactions(JSON.parse(storedTransactions));
     } catch (error) {

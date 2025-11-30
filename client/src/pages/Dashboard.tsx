@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, TrendingDown, Wallet, Target, Activity, AlertTriangle, Calendar, DollarSign } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Target, Activity, AlertTriangle, Calendar, DollarSign, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
 import { filterBetsByPeriod, calculateStats, TimePeriod } from '@/utils/dateFilters';
@@ -26,18 +27,22 @@ export default function Dashboard() {
   const currentMonthBets = useMemo(() => filterBetsByPeriod(bets, 'month'), [bets]);
   const currentMonthStats = useMemo(() => calculateStats(currentMonthBets), [currentMonthBets]);
 
-  // Valores de entrada baseados na banca atual
+  // Valores de entrada baseados nas stakes customizadas
   const stakeValues = useMemo(() => {
-    const current = bankroll.currentBankroll;
-    return {
-      stake05: current * 0.005, // 0.5%
-      stake1: current * 0.01,   // 1%
-      stake2: current * 0.02,   // 2%
-      stake3: current * 0.03,   // 3%
-      stake4: current * 0.04,   // 4%
-      stake5: current * 0.05    // 5%
-    };
-  }, [bankroll.currentBankroll]);
+    if (!bankroll.customStakes || bankroll.customStakes.length === 0) {
+      return [];
+    }
+
+    const sortedStakes = [...bankroll.customStakes].sort((a, b) => a.percentage - b.percentage);
+
+    return sortedStakes.map(stake => ({
+      id: stake.id,
+      percentage: stake.percentage,
+      amount: (stake.percentage / 100) * bankroll.currentBankroll,
+      label: stake.label,
+      color: stake.color,
+    }));
+  }, [bankroll.currentBankroll, bankroll.customStakes]);
 
   // Performance por casa de apostas (mês atual)
   const bookmakerPerformance = useMemo(() => {
@@ -233,41 +238,53 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Baseado na Banca Atual</CardTitle>
-            <CardDescription>Percentuais recomendados para gestão de risco</CardDescription>
+            <CardDescription>
+              Stakes personalizados para gestão de risco
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-4 text-center">
-              <div className="p-3 rounded-lg bg-purple-50 border border-purple-200">
-                <div className="text-lg font-bold text-purple-600">0,5%</div>
-                <div className="text-sm text-purple-600 font-medium">R$ {stakeValues.stake05.toFixed(2)}</div>
-                <div className="text-xs text-muted-foreground">Super Odd</div>
+            {stakeValues.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="mb-2">Nenhum stake configurado</p>
+                <p className="text-sm mb-4">Configure seus stakes na aba de Gestão de Risco</p>
+                <Button
+                  variant="outline"
+                  onClick={() => setLocation('/settings/bankroll')}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Configurar Stakes
+                </Button>
               </div>
-              <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
-                <div className="text-lg font-bold text-blue-600">1%</div>
-                <div className="text-sm text-blue-600 font-medium">R$ {stakeValues.stake1.toFixed(2)}</div>
-                <div className="text-xs text-muted-foreground">Conservador</div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
+                {stakeValues.map((stake) => (
+                  <div
+                    key={stake.id}
+                    className="p-3 rounded-lg border-2 transition-all hover:shadow-md"
+                    style={{
+                      backgroundColor: `${stake.color}08`,
+                      borderColor: stake.color,
+                    }}
+                  >
+                    <div
+                      className="text-lg font-bold"
+                      style={{ color: stake.color }}
+                    >
+                      {stake.percentage}%
+                    </div>
+                    <div
+                      className="text-sm font-medium"
+                      style={{ color: stake.color }}
+                    >
+                      R$ {stake.amount.toFixed(2)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {stake.label}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="p-3 rounded-lg bg-green-50 border border-green-200">
-                <div className="text-lg font-bold text-green-600">2%</div>
-                <div className="text-sm text-green-600 font-medium">R$ {stakeValues.stake2.toFixed(2)}</div>
-                <div className="text-xs text-muted-foreground">Moderado</div>
-              </div>
-              <div className="p-3 rounded-lg bg-orange-50 border border-orange-200">
-                <div className="text-lg font-bold text-orange-600">3%</div>
-                <div className="text-sm text-orange-600 font-medium">R$ {stakeValues.stake3.toFixed(2)}</div>
-                <div className="text-xs text-muted-foreground">Agressivo</div>
-              </div>
-              <div className="p-3 rounded-lg bg-red-50 border border-red-200">
-                <div className="text-lg font-bold text-red-600">4%</div>
-                <div className="text-sm text-red-600 font-medium">R$ {stakeValues.stake4.toFixed(2)}</div>
-                <div className="text-xs text-muted-foreground">Alto Risco</div>
-              </div>
-              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                <div className="text-lg font-bold text-slate-600">5%</div>
-                <div className="text-sm text-slate-600 font-medium">R$ {stakeValues.stake5.toFixed(2)}</div>
-                <div className="text-xs text-muted-foreground">Máximo</div>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>

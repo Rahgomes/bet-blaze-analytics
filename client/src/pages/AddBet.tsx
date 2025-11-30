@@ -19,6 +19,7 @@ import { betFormSchema, BetFormData } from '@/lib/schemas/betFormSchema';
 import { PreviewCard } from '@/components/betting/PreviewCard';
 import { LegAccordion } from '@/components/betting/LegAccordion';
 import { BetConfirmationModal } from '@/components/betting/BetConfirmationModal';
+import { sortStakesByPercentage } from '@/utils/stakeUtils';
 
 const protectionTypes = [
   'DC (Double Chance)',
@@ -210,34 +211,39 @@ export default function AddBet() {
     const totalAmount = parseFloat(calculations.totalAmount);
     const roi = parseFloat(calculations.roi);
 
-    // Gestão de Risco baseada em percentual da banca (mockado em R$ 1.000)
-    const MOCK_BANKROLL = 1000;
-    const percentage = (totalAmount / MOCK_BANKROLL) * 100;
+    // Use actual bankroll from hook
+    const percentage = (totalAmount / bankroll.currentBankroll) * 100;
 
-    // Classificação de risco
+    // Find matching custom stake
+    const sortedStakes = sortStakesByPercentage(bankroll.customStakes || []);
+    const matchingStake = sortedStakes.find(s => percentage <= s.percentage);
+
     let riskLevel = '';
     let riskColor = '';
-    if (percentage <= 0.5) {
-      riskLevel = 'Super Odd';
-      riskColor = 'verde';
-    } else if (percentage <= 1) {
-      riskLevel = 'Conservador';
-      riskColor = 'verde-claro';
-    } else if (percentage <= 2) {
-      riskLevel = 'Moderado';
-      riskColor = 'amarelo';
-    } else if (percentage <= 3) {
-      riskLevel = 'Agressivo';
-      riskColor = 'laranja';
-    } else if (percentage <= 4) {
-      riskLevel = 'Alto Risco';
-      riskColor = 'vermelho';
-    } else if (percentage <= 5) {
-      riskLevel = 'Máximo';
-      riskColor = 'vermelho-escuro';
+    let riskEmoji = '';
+
+    if (matchingStake) {
+      riskLevel = matchingStake.label;
+      riskColor = matchingStake.color;
+
+      // Determine emoji based on percentage
+      if (percentage <= 1) riskEmoji = '✅';
+      else if (percentage <= 2) riskEmoji = '⚖️';
+      else if (percentage <= 3) riskEmoji = '⚡';
+      else if (percentage <= 4) riskEmoji = '⚠️';
+      else riskEmoji = '🚨';
     } else {
-      riskLevel = 'CRÍTICO - Acima do limite';
-      riskColor = 'vermelho-crítico';
+      // Exceeds all configured stakes
+      const maxStake = sortedStakes[sortedStakes.length - 1];
+      if (maxStake) {
+        riskLevel = `ACIMA DE ${maxStake.label}`;
+        riskColor = '#991b1b'; // critical red
+        riskEmoji = '🚨';
+      } else {
+        riskLevel = 'Não classificado';
+        riskColor = '#64748b';
+        riskEmoji = '❓';
+      }
     }
 
     // Alertas contextualizados baseados em gestão de risco
@@ -257,14 +263,11 @@ export default function AddBet() {
       }
 
       // Alerta de valor baseado em gestão de risco
-      if (percentage > 5) {
-        amountAlert = `🚨 CRÍTICO: ${percentage.toFixed(1)}% da banca! Acima do limite máximo recomendado (5%)`;
-      } else if (percentage > 4) {
-        amountAlert = `⚠️ Alto Risco: ${percentage.toFixed(1)}% da banca - apenas para apostas com alta convicção`;
-      } else if (percentage > 3) {
-        amountAlert = `⚡ Agressivo: ${percentage.toFixed(1)}% da banca - certifique-se de ter bons fundamentos`;
-      } else if (percentage > 2.5 && finalOdds < 1.8) {
-        amountAlert = `⚠️ Moderado-alto: ${percentage.toFixed(1)}% em odds baixa - risco x retorno desfavorável`;
+      if (!matchingStake) {
+        amountAlert = `🚨 CRÍTICO: ${percentage.toFixed(1)}% da banca! Acima de todos os stakes configurados`;
+      } else if (percentage > matchingStake.percentage * 0.9) {
+        // Within 90% of the stake limit
+        amountAlert = `⚡ Próximo do limite de ${matchingStake.label}: ${percentage.toFixed(1)}% / ${matchingStake.percentage}%`;
       }
 
       // Alerta de ROI baseado em risco e odds
@@ -276,9 +279,10 @@ export default function AddBet() {
         roiWarning = `⚡ ROI ${roi}% em odds baixa - considere odds melhores`;
       }
 
-      // Sugestões inteligentes baseadas em gestão de risco
-      const riskEmoji = percentage <= 1 ? '✅' : percentage <= 2 ? '⚖️' : percentage <= 3 ? '⚡' : percentage <= 4 ? '⚠️' : '🚨';
-      stakeSuggestion = `${riskEmoji} ${percentage.toFixed(1)}% da banca | Perfil: ${riskLevel} | R$ ${totalAmount.toFixed(2)}`;
+      // Sugestões inteligentes
+      stakeSuggestion = matchingStake
+        ? `${riskEmoji} ${percentage.toFixed(1)}% da banca | Perfil: ${riskLevel} | R$ ${totalAmount.toFixed(2)}`
+        : `${riskEmoji} ${percentage.toFixed(1)}% | CRÍTICO - configure stakes adequados`;
     }
 
     return {
@@ -286,8 +290,11 @@ export default function AddBet() {
       amountAlert,
       stakeSuggestion,
       roiWarning,
+      matchingStake,
+      riskLevel,
+      riskColor,
     };
-  }, [calculations]);
+  }, [calculations, bankroll]);
 
   const handleFormSubmit = (data: BetFormData) => {
     setPendingFormData(data);
