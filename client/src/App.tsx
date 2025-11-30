@@ -11,6 +11,7 @@ import BetsList from "./pages/BetsList";
 import AddBet from "./pages/AddBet";
 import BankrollSettings from "./pages/BankrollSettings";
 import DepositsHistory from "./pages/DepositsHistory";
+import WithdrawalsHistory from "./pages/WithdrawalsHistory";
 import Analytics from "./pages/Analytics";
 import Tips from "./pages/Tips";
 import Watchlist from "./pages/Watchlist";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/faq" component={FAQ} />
             <Route path="/settings" component={BankrollSettings} />
             <Route path="/settings/deposits-history" component={DepositsHistory} />
+            <Route path="/settings/withdrawals-history" component={WithdrawalsHistory} />
             <Route component={NotFound} />
           </Switch>
         </BettingLayout>

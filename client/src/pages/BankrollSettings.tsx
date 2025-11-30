@@ -55,6 +55,8 @@ import {
 } from '@/utils/goalsCalculations';
 import { AddManualDepositModal } from '@/components/betting/AddManualDepositModal';
 import { EditManualDepositModal } from '@/components/betting/EditManualDepositModal';
+import { AddManualWithdrawalModal } from '@/components/betting/AddManualWithdrawalModal';
+import { EditManualWithdrawalModal } from '@/components/betting/EditManualWithdrawalModal';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Transaction, CustomStake, StopLossGainConfig, StopMode } from '@/types/betting';
@@ -62,28 +64,10 @@ import { StakeManager } from '@/components/betting/StakeManager';
 import { StopLossGainField } from '@/components/betting/StopLossGainField';
 import { convertStopValue } from '@/utils/stopLossGainUtils';
 
-interface ScheduledWithdrawal {
-  trigger: 'monthly_profit' | 'target_reached';
-  percentage: number;
-  minAmount: number;
-  description: string;
-  isActive: boolean;
-}
-
 export default function BankrollSettings() {
   const [, setLocation] = useLocation();
   const { bankroll, updateBankrollSettings, bets, transactions, addTransaction, updateTransaction, deleteTransaction } = useBettingData();
   const { toast } = useToast();
-
-  const [scheduledWithdrawals, setScheduledWithdrawals] = useState<ScheduledWithdrawal[]>([
-    {
-      trigger: 'monthly_profit',
-      percentage: 50,
-      minAmount: 200,
-      description: 'Proteção de lucros mensal',
-      isActive: true
-    }
-  ]);
 
   // State for protecting initial bankroll editing
   const [allowEditInitialBankroll, setAllowEditInitialBankroll] = useState(false);
@@ -95,23 +79,15 @@ export default function BankrollSettings() {
   const [selectedDeposit, setSelectedDeposit] = useState<Transaction | null>(null);
   const [depositToDelete, setDepositToDelete] = useState<Transaction | null>(null);
 
+  // State for manual withdrawals modals
+  const [showAddWithdrawalModal, setShowAddWithdrawalModal] = useState(false);
+  const [showEditWithdrawalModal, setShowEditWithdrawalModal] = useState(false);
+  const [selectedWithdrawal, setSelectedWithdrawal] = useState<Transaction | null>(null);
+  const [withdrawalToDelete, setWithdrawalToDelete] = useState<Transaction | null>(null);
+
   // State for "Load More" pagination
   const [visibleDepositsCount, setVisibleDepositsCount] = useState(3);
-
-  const addScheduledWithdrawal = () => {
-    const newWithdrawal: ScheduledWithdrawal = {
-      trigger: 'monthly_profit',
-      percentage: 25,
-      minAmount: 100,
-      description: 'Nova regra de saque',
-      isActive: true
-    };
-    setScheduledWithdrawals([...scheduledWithdrawals, newWithdrawal]);
-  };
-
-  const removeScheduledWithdrawal = (index: number) => {
-    setScheduledWithdrawals(scheduledWithdrawals.filter((_, i) => i !== index));
-  };
+  const [visibleWithdrawalsCount, setVisibleWithdrawalsCount] = useState(3);
 
   const [formData, setFormData] = useState<{
     initialBankroll: string;
@@ -316,6 +292,66 @@ export default function BankrollSettings() {
     setDepositToDelete(null);
   };
 
+  const handleAddWithdrawal = (withdrawal: {
+    title: string;
+    amount: number;
+    dateTime: string;
+    description?: string;
+  }) => {
+    if (withdrawal.amount > bankroll.currentBankroll) {
+      toast({
+        title: 'Erro',
+        description: 'O valor do saque não pode exceder a banca disponível.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    addTransaction({
+      type: 'withdrawal',
+      amount: withdrawal.amount,
+      dateTime: withdrawal.dateTime,
+      title: withdrawal.title,
+      description: withdrawal.description,
+    });
+  };
+
+  const handleUpdateWithdrawal = (withdrawalId: string, updates: {
+    title?: string;
+    amount?: number;
+    dateTime?: string;
+    description?: string;
+  }) => {
+    const withdrawal = transactions.find(t => t.id === withdrawalId);
+    if (!withdrawal) return;
+
+    const availableBankroll = bankroll.currentBankroll + withdrawal.amount;
+    const newAmount = updates.amount ?? withdrawal.amount;
+
+    if (newAmount > availableBankroll) {
+      toast({
+        title: 'Erro',
+        description: 'O valor do saque não pode exceder a banca disponível.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const amountDiff = newAmount - withdrawal.amount;
+    updateTransaction(withdrawalId, updates);
+
+    if (amountDiff !== 0) {
+      updateBankrollSettings({
+        currentBankroll: bankroll.currentBankroll - amountDiff,
+      });
+    }
+  };
+
+  const handleDeleteWithdrawal = (withdrawal: Transaction) => {
+    deleteTransaction(withdrawal.id);
+    setWithdrawalToDelete(null);
+  };
+
   // === NEW HANDLERS FOR CUSTOM STAKES ===
 
   const handleAddStake = (stakeData: Omit<CustomStake, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -476,7 +512,7 @@ export default function BankrollSettings() {
           </TabsTrigger>
           <TabsTrigger value="withdrawals" className="flex items-center gap-2">
             <CreditCard className="h-4 w-4" />
-            Saques & Retiradas
+            Saques
             {hasChanges() && <Badge variant="destructive" className="ml-1 h-2 w-2 p-0 rounded-full" />}
           </TabsTrigger>
         </TabsList>
@@ -1033,130 +1069,103 @@ export default function BankrollSettings() {
             </CardContent>
           </Card>
 
-          {/* Alertas de Proteção - SKIP for now, Phase 2 */}
-          <Card className="opacity-60">
+        </TabsContent>
+
+        {/* TAB 4: SAQUES */}
+        <TabsContent value="withdrawals" className="space-y-6">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" />
-                Alertas de Proteção
-                <Badge variant="outline">Em breve</Badge>
+                <TrendingDown className="h-5 w-5" />
+                Histórico de Saques Manuais
               </CardTitle>
-              <CardDescription>
-                Configure notificações automáticas de risco (próxima fase)
-              </CardDescription>
+              <CardDescription>Registre e acompanhe suas retiradas da banca</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
-                  <div>
-                    <Label>Alta Exposição</Label>
-                    <p className="text-sm text-muted-foreground">+3 apostas no mesmo time</p>
+              <div className="space-y-3">
+                {withdrawals.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>Nenhum saque registrado ainda</p>
+                    <p className="text-sm">Clique em "Registrar Saque Manual" para adicionar</p>
                   </div>
-                  <Switch disabled />
-                </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
-                  <div>
-                    <Label>Performance Ruim</Label>
-                    <p className="text-sm text-muted-foreground">5 derrotas seguidas</p>
-                  </div>
-                  <Switch disabled />
-                </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
-                  <div>
-                    <Label>Stop Atingido</Label>
-                    <p className="text-sm text-muted-foreground">Stop loss/gain alcançado</p>
-                  </div>
-                  <Switch disabled />
-                </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg opacity-50">
-                  <div>
-                    <Label>Stake Elevado</Label>
-                    <p className="text-sm text-muted-foreground">Aposta &gt; 10% da banca</p>
-                  </div>
-                  <Switch disabled />
+                ) : (
+                  <>
+                    {withdrawals
+                      .sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime())
+                      .slice(0, visibleWithdrawalsCount)
+                      .map((withdrawal) => (
+                        <div
+                          key={withdrawal.id}
+                          className="p-4 border-l-4 border-l-red-500 bg-red-50 rounded-lg space-y-2"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="font-semibold text-base">{withdrawal.title || 'Saque Manual'}</p>
+                              <p className="text-sm text-red-700 font-bold mt-1">
+                                -R$ {withdrawal.amount.toFixed(2)} • {format(new Date(withdrawal.dateTime), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                              </p>
+                              {withdrawal.description && (
+                                <p className="text-sm text-muted-foreground mt-1">{withdrawal.description}</p>
+                              )}
+                              <p className="text-xs text-muted-foreground mt-2">
+                                Banca após: R$ {withdrawal.balanceAfter.toFixed(2)}
+                              </p>
+                            </div>
+                            <div className="flex gap-2 ml-4">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedWithdrawal(withdrawal);
+                                  setShowEditWithdrawalModal(true);
+                                }}
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setWithdrawalToDelete(withdrawal)}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-600" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+
+                    {withdrawals.length > visibleWithdrawalsCount && (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setVisibleWithdrawalsCount(prev => prev + 3)}
+                      >
+                        <ChevronDown className="h-4 w-4 mr-2" />
+                        Carregar Mais ({withdrawals.length - visibleWithdrawalsCount} restantes)
+                      </Button>
+                    )}
+                  </>
+                )}
+
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAddWithdrawalModal(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Registrar Saque Manual
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setLocation('/settings/withdrawals-history')}
+                  >
+                    <History className="h-4 w-4 mr-2" />
+                    Visualizar Histórico Completo
+                  </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        {/* TAB 4: SAQUES & RETIRADAS */}
-        <TabsContent value="withdrawals" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Saques Programados
-                </CardTitle>
-                <CardDescription>Configure proteção automática de lucros</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {scheduledWithdrawals.map((withdrawal, index) => (
-                  <div key={index} className="p-3 border rounded-lg space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Badge variant={withdrawal.isActive ? "default" : "secondary"}>
-                        {withdrawal.trigger === 'monthly_profit' ? 'Lucro Mensal' : 'Meta Atingida'}
-                      </Badge>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeScheduledWithdrawal(index)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <p className="font-medium">{withdrawal.percentage}% do lucro</p>
-                    <p className="text-sm text-muted-foreground">{withdrawal.description}</p>
-                    <p className="text-xs text-muted-foreground">Mínimo: R$ {withdrawal.minAmount}</p>
-                  </div>
-                ))}
-                <Button variant="outline" className="w-full" onClick={addScheduledWithdrawal}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Regra de Saque
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingDown className="h-5 w-5" />
-                  Histórico de Saques
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {withdrawals.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <p>Nenhum saque registrado ainda</p>
-                    </div>
-                  ) : (
-                    withdrawals
-                      .sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime())
-                      .map((withdrawal) => (
-                        <div
-                          key={withdrawal.id}
-                          className="flex justify-between items-center p-3 border-l-4 border-l-red-500 bg-red-50 rounded"
-                        >
-                          <div>
-                            <p className="font-medium">{withdrawal.title || 'Saque'}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {format(new Date(withdrawal.dateTime), "dd/MM/yyyy", { locale: ptBR })}
-                            </p>
-                          </div>
-                          <span className="font-bold text-red-600">-R$ {withdrawal.amount.toFixed(2)}</span>
-                        </div>
-                      ))
-                  )}
-                  <Button variant="outline" className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Registrar Saque Manual
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
       </Tabs>
 
@@ -1188,7 +1197,7 @@ export default function BankrollSettings() {
         onUpdateDeposit={handleUpdateDeposit}
       />
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Deposit Confirmation Dialog */}
       <AlertDialog open={!!depositToDelete} onOpenChange={() => setDepositToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -1205,6 +1214,47 @@ export default function BankrollSettings() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => depositToDelete && handleDeleteDeposit(depositToDelete)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Sim, Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Withdrawal Modals */}
+      <AddManualWithdrawalModal
+        open={showAddWithdrawalModal}
+        onOpenChange={setShowAddWithdrawalModal}
+        currentBankroll={bankroll.currentBankroll}
+        onAddWithdrawal={handleAddWithdrawal}
+      />
+
+      <EditManualWithdrawalModal
+        open={showEditWithdrawalModal}
+        onOpenChange={setShowEditWithdrawalModal}
+        currentBankroll={bankroll.currentBankroll}
+        withdrawal={selectedWithdrawal}
+        onUpdateWithdrawal={handleUpdateWithdrawal}
+      />
+
+      {/* Delete Withdrawal Confirmation Dialog */}
+      <AlertDialog open={!!withdrawalToDelete} onOpenChange={() => setWithdrawalToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir saque?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este saque? Esta ação irá recalcular sua banca atual.
+              <div className="mt-4 p-3 bg-muted rounded-lg">
+                <p className="font-medium">{withdrawalToDelete?.title || 'Saque Manual'}</p>
+                <p className="text-sm text-red-600">-R$ {withdrawalToDelete?.amount.toFixed(2)}</p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => withdrawalToDelete && handleDeleteWithdrawal(withdrawalToDelete)}
               className="bg-red-600 hover:bg-red-700"
             >
               Sim, Excluir
