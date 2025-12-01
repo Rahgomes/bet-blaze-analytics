@@ -1,42 +1,48 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useExtendedData } from '@/hooks/useExtendedData';
 import { useBettingData } from '@/hooks/useBettingData';
+import { Bet } from '@/types/betting';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { 
-  PlusCircle, 
-  Trash2, 
-  AlertTriangle, 
-  Target, 
-  TrendingUp, 
-  TrendingDown,
-  Eye,
-  Edit3,
-  BarChart3,
+import {
   Activity,
   Star,
-  Shield,
-  Zap
+  Eye,
+  Clock,
+  Table,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Import new components
+import BetDetailModal from '@/components/betting/BetDetailModal';
+import LiveGameCard from '@/components/betting/LiveGameCard';
+import PendingGamesTable from '@/components/betting/PendingGamesTable';
+import ExposureSummaryGrid from '@/components/betting/ExposureSummaryGrid';
+import TeamConcentrationCard from '@/components/betting/TeamConcentrationCard';
+import ActivePLScenarios from '@/components/betting/ActivePLScenarios';
+import MarketDistributionChart from '@/components/betting/MarketDistributionChart';
+import TeamRatingFilters from '@/components/betting/TeamRatingFilters';
+
+// Import calculation utilities
+import {
+  groupLiveBetsByGame,
+  getPendingGamesToday,
+  calculateExposureMetrics,
+  calculatePLScenarios,
+} from '@/utils/exposureCalculations';
+
 // Sistema de rating automático
 const calculateRating = (winRate: number, avgROI: number, totalBets: number) => {
-  // Ajustar para amostra pequena
   const confidenceFactor = Math.min(totalBets / 10, 1);
   const adjustedWinRate = winRate * confidenceFactor;
   const adjustedROI = avgROI * confidenceFactor;
-  
+
   if (adjustedWinRate >= 75 && adjustedROI >= 15 && totalBets >= 5) return 'A++';
-  if (adjustedWinRate >= 65 && adjustedROI >= 10 && totalBets >= 3) return 'A+'; 
+  if (adjustedWinRate >= 65 && adjustedROI >= 10 && totalBets >= 3) return 'A+';
   if (adjustedWinRate >= 55 && adjustedROI >= 5) return 'A';
   if (adjustedWinRate >= 45 && adjustedROI >= 0) return 'B';
   return 'C';
@@ -59,28 +65,119 @@ const getRiskLevel = (rating: string, totalStake: number) => {
   return 'low';
 };
 
+// Mock bets data para demonstração visual
+const generateMockBets = (): Bet[] => {
+  const now = new Date();
+  const mockBets: Bet[] = [];
+  let operationNum = 1;
+
+  // 5 Jogos ao vivo
+  const liveGames = [
+    { home: 'Flamengo', away: 'Palmeiras', league: 'Brasileirão', minutesAgo: 35 },
+    { home: 'Real Madrid', away: 'Barcelona', league: 'La Liga', minutesAgo: 52 },
+    { home: 'Bayern Munich', away: 'Borussia Dortmund', league: 'Bundesliga', minutesAgo: 18 },
+    { home: 'Manchester City', away: 'Liverpool', league: 'Premier League', minutesAgo: 67 },
+    { home: 'PSG', away: 'Marseille', league: 'Ligue 1', minutesAgo: 41 },
+  ];
+
+  liveGames.forEach((game, idx) => {
+    const gameTime = new Date(now.getTime() - game.minutesAgo * 60000);
+    // 2-3 apostas por jogo ao vivo
+    const betCount = 2 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < betCount; i++) {
+      const markets = ['Resultado Final', 'Ambas Marcam', 'Total de Gols', 'Escanteios'];
+      const amount = 50 + Math.random() * 100;
+      const odds = 1.5 + Math.random() * 2;
+      mockBets.push({
+        id: `mock-live-${idx}-${i}`,
+        operationNumber: operationNum++,
+        bookmaker: 'Bet365',
+        date: gameTime.toISOString().split('T')[0],
+        betType: 'simple',
+        matchTime: gameTime.toISOString(),
+        teams: [game.home, game.away],
+        description: `${game.home} vs ${game.away}`,
+        league: game.league,
+        market: markets[i % markets.length],
+        amount: parseFloat(amount.toFixed(2)),
+        odds: parseFloat(odds.toFixed(2)),
+        return: parseFloat((amount * odds).toFixed(2)),
+        status: 'pending',
+        profit: 0,
+        createdAt: gameTime.toISOString(),
+        updatedAt: gameTime.toISOString(),
+      });
+    }
+  });
+
+  // 10 Jogos pendentes
+  const pendingGames = [
+    { home: 'Corinthians', away: 'São Paulo', league: 'Brasileirão', hoursAhead: 1.5 },
+    { home: 'Internacional', away: 'Grêmio', league: 'Brasileirão', hoursAhead: 2 },
+    { home: 'Atlético Madrid', away: 'Sevilla', league: 'La Liga', hoursAhead: 3 },
+    { home: 'Chelsea', away: 'Arsenal', league: 'Premier League', hoursAhead: 4 },
+    { home: 'Juventus', away: 'Inter Milan', league: 'Serie A', hoursAhead: 5 },
+    { home: 'Benfica', away: 'Porto', league: 'Primeira Liga', hoursAhead: 6 },
+    { home: 'Ajax', away: 'PSV', league: 'Eredivisie', hoursAhead: 7 },
+    { home: 'Napoli', away: 'Roma', league: 'Serie A', hoursAhead: 8 },
+    { home: 'Tottenham', away: 'Manchester United', league: 'Premier League', hoursAhead: 9 },
+    { home: 'Atlético Mineiro', away: 'Cruzeiro', league: 'Brasileirão', hoursAhead: 10 },
+  ];
+
+  pendingGames.forEach((game, idx) => {
+    const gameTime = new Date(now.getTime() + game.hoursAhead * 3600000);
+    // 1-2 apostas por jogo pendente
+    const betCount = 1 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < betCount; i++) {
+      const markets = ['Resultado Final', 'Ambas Marcam', 'Total de Gols', 'Handicap Asiático'];
+      const amount = 30 + Math.random() * 80;
+      const odds = 1.6 + Math.random() * 2.5;
+      mockBets.push({
+        id: `mock-pending-${idx}-${i}`,
+        operationNumber: operationNum++,
+        bookmaker: 'Bet365',
+        date: gameTime.toISOString().split('T')[0],
+        betType: 'simple',
+        matchTime: gameTime.toISOString(),
+        teams: [game.home, game.away],
+        description: `${game.home} vs ${game.away}`,
+        league: game.league,
+        market: markets[i % markets.length],
+        amount: parseFloat(amount.toFixed(2)),
+        odds: parseFloat(odds.toFixed(2)),
+        return: parseFloat((amount * odds).toFixed(2)),
+        status: 'pending',
+        profit: 0,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+      });
+    }
+  });
+
+  return mockBets;
+};
+
 // Mock teams data para demonstração com dados de performance
 const generateMockTeams = () => [
-  { 
-    id: 'mock-team-1', 
-    name: 'Bayern Munich', 
-    competition: 'Bundesliga', 
-    notes: 'Strong home form', 
-    isWatched: true, 
+  {
+    id: 'mock-team-1',
+    name: 'Bayern Munich',
+    competition: 'Bundesliga',
+    notes: 'Forte jogando em casa',
+    isWatched: true,
     createdAt: new Date().toISOString(),
-    // Dados de performance mockados
     totalBets: 12,
     wins: 10,
     totalStake: 240.00,
     totalProfit: 68.50,
     lastBetDate: '2024-11-03'
   },
-  { 
-    id: 'mock-team-2', 
-    name: 'Real Madrid', 
-    competition: 'La Liga', 
-    notes: 'Champions League favorites', 
-    isWatched: true, 
+  {
+    id: 'mock-team-2',
+    name: 'Real Madrid',
+    competition: 'La Liga',
+    notes: 'Favorito na Champions League',
+    isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 15,
     wins: 13,
@@ -88,12 +185,12 @@ const generateMockTeams = () => [
     totalProfit: 92.30,
     lastBetDate: '2024-11-04'
   },
-  { 
-    id: 'mock-team-3', 
-    name: 'Paris Saint-Germain', 
-    competition: 'Ligue 1', 
-    notes: 'High scoring matches', 
-    isWatched: true, 
+  {
+    id: 'mock-team-3',
+    name: 'Paris Saint-Germain',
+    competition: 'Ligue 1',
+    notes: 'Jogos com muitos gols',
+    isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 8,
     wins: 4,
@@ -101,12 +198,12 @@ const generateMockTeams = () => [
     totalProfit: -24.50,
     lastBetDate: '2024-10-28'
   },
-  { 
-    id: 'mock-team-4', 
-    name: 'Manchester City', 
-    competition: 'Premier League', 
-    notes: 'Excellent away record', 
-    isWatched: true, 
+  {
+    id: 'mock-team-4',
+    name: 'Manchester City',
+    competition: 'Premier League',
+    notes: 'Excelente desempenho fora de casa',
+    isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 18,
     wins: 14,
@@ -114,12 +211,12 @@ const generateMockTeams = () => [
     totalProfit: 123.75,
     lastBetDate: '2024-11-05'
   },
-  { 
-    id: 'mock-team-5', 
-    name: 'Barcelona', 
-    competition: 'La Liga', 
-    notes: 'Good value in El Clasico', 
-    isWatched: true, 
+  {
+    id: 'mock-team-5',
+    name: 'Barcelona',
+    competition: 'La Liga',
+    notes: 'Bom valor em clássicos',
+    isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 6,
     wins: 3,
@@ -127,12 +224,12 @@ const generateMockTeams = () => [
     totalProfit: 12.25,
     lastBetDate: '2024-11-01'
   },
-  { 
-    id: 'mock-team-6', 
-    name: 'Liverpool', 
-    competition: 'Premier League', 
-    notes: 'Strong at Anfield', 
-    isWatched: true, 
+  {
+    id: 'mock-team-6',
+    name: 'Liverpool',
+    competition: 'Premier League',
+    notes: 'Forte jogando em Anfield',
+    isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 20,
     wins: 16,
@@ -145,28 +242,74 @@ const generateMockTeams = () => [
 export default function Watchlist() {
   const { t } = useTranslation();
   const { teams: realTeams, addTeam, deleteTeam } = useExtendedData();
-  const { bets } = useBettingData();
+  const { bets, bankroll } = useBettingData();
+  const [, setLocation] = useLocation();
 
   const [activeTab, setActiveTab] = useState('exposure');
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    competition: '',
-    notes: '',
-  });
+  const [selectedBet, setSelectedBet] = useState<Bet | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+
+  // Filtros de rating de times
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRank, setFilterRank] = useState<string>('all');
+  const [filterWinRate, setFilterWinRate] = useState<string>('all');
+
+  // Paginação de times
+  const [visibleTeams, setVisibleTeams] = useState(6);
+
+  // Auto-refresh para jogos ao vivo (60 segundos)
+  useEffect(() => {
+    const liveGames = groupLiveBetsByGame(bets);
+    if (liveGames.length === 0) return;
+
+    const interval = setInterval(() => {
+      setLastUpdate(new Date());
+    }, 60000); // 60 segundos
+
+    return () => clearInterval(interval);
+  }, [bets]);
+
+  // Calcular métricas de exposição ativa
+  const activeExposure = useMemo(() => {
+    // Se não houver apostas reais, usar mock para visualização
+    const mockBets = generateMockBets();
+    const allBets = bets.length === 0 ? mockBets : bets;
+
+    const liveGames = groupLiveBetsByGame(allBets);
+    const pendingGames = getPendingGamesToday(allBets);
+    const metrics = calculateExposureMetrics(allBets, bankroll.currentBankroll || 1000);
+
+    return { liveGames, pendingGames, metrics, usingMockData: bets.length === 0 };
+  }, [bets, bankroll.currentBankroll, lastUpdate]);
+
+  // Calcular cenários de P&L
+  const plScenarios = useMemo(() => {
+    // Usar os mesmos dados que activeExposure
+    const mockBets = generateMockBets();
+    const allBets = bets.length === 0 ? mockBets : bets;
+
+    const wonBets = allBets.filter(b => b.status === 'won').length;
+    const totalFinished = allBets.filter(b => b.status !== 'pending').length;
+    // Se usar mock, assumir 55% de win rate histórico
+    const historicalWinRate = bets.length === 0 ? 55 : (totalFinished > 0 ? (wonBets / totalFinished) * 100 : 50);
+
+    return {
+      scenarios: calculatePLScenarios(allBets, historicalWinRate),
+      historicalWinRate,
+    };
+  }, [bets]);
 
   // Calcular métricas de performance baseadas no histórico real
   const teamPerformanceMetrics = useMemo(() => {
     const teamStats = new Map();
-    
-    // Processar apostas reais
+
     bets.forEach(bet => {
       if (!bet.description) return;
-      
-      // Extrair nome do time da descrição (método simples)
+
       const description = bet.description.toLowerCase();
       const teams = ['flamengo', 'palmeiras', 'real madrid', 'barcelona', 'bayern', 'manchester city', 'liverpool', 'psg'];
-      
+
       teams.forEach(teamName => {
         if (description.includes(teamName)) {
           if (!teamStats.has(teamName)) {
@@ -178,7 +321,7 @@ export default function Watchlist() {
               lastBetDate: bet.date
             });
           }
-          
+
           const stats = teamStats.get(teamName);
           stats.totalBets += 1;
           if (bet.status === 'won') stats.wins += 1;
@@ -188,26 +331,25 @@ export default function Watchlist() {
         }
       });
     });
-    
+
     return teamStats;
   }, [bets]);
 
   // Merge real teams with mock teams for demonstration
   const allTeams = useMemo(() => {
     const mockTeams = generateMockTeams();
-    
-    // Enriquecer com dados reais quando disponíveis
+
     const enrichedTeams = mockTeams.map(team => {
       const teamName = team.name.toLowerCase().replace(/\s+/g, ' ');
       const realStats = teamPerformanceMetrics.get(teamName);
-      
+
       if (realStats) {
         return { ...team, ...realStats };
       }
-      
+
       return team;
     });
-    
+
     return [...realTeams, ...enrichedTeams];
   }, [realTeams, teamPerformanceMetrics]);
 
@@ -218,7 +360,7 @@ export default function Watchlist() {
       const avgROI = team.totalStake ? (team.totalProfit / team.totalStake) * 100 : 0;
       const rating = calculateRating(winRate, avgROI, team.totalBets || 0);
       const riskLevel = getRiskLevel(rating, team.totalStake || 0);
-      
+
       return {
         ...team,
         winRate,
@@ -233,141 +375,45 @@ export default function Watchlist() {
     });
   }, [allTeams]);
 
-  // Tipos para exposição ativa
-  interface LiveGame {
-    match: string;
-    time: string;
-    activeBets: number;
-    totalStake: number;
-    potentialReturn: number;
-    riskLevel: string;
-    status: string;
-  }
+  // Aplicar filtros aos times
+  const filteredTeams = useMemo(() => {
+    return teamsWithRatings.filter(team => {
+      // Filtro por nome
+      const matchesSearch = searchTerm === '' ||
+        team.name.toLowerCase().includes(searchTerm.toLowerCase());
 
-  interface PendingGame {
-    match: string;
-    kickoff: string;
-    activeBets: number;
-    totalStake: number;
-    potentialReturn: number;
-    riskLevel: string;
-  }
+      // Filtro por rank
+      const matchesRank = filterRank === 'all' || team.rating === filterRank;
 
-  // Análise de exposição ativa
-  const activeExposure = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Jogos ao vivo mockados (simular jogos em andamento)
-    const liveGames: LiveGame[] = [
-      {
-        match: 'Flamengo vs Palmeiras',
-        time: '68 min',
-        activeBets: 2,
-        totalStake: 125.00,
-        potentialReturn: 237.50,
-        riskLevel: 'medium',
-        status: 'live'
-      },
-      {
-        match: 'Real Madrid vs Barcelona',
-        time: '45 min',
-        activeBets: 1,
-        totalStake: 75.00,
-        potentialReturn: 142.50,
-        riskLevel: 'low',
-        status: 'live'
+      // Filtro por taxa de acerto
+      let matchesWinRate = true;
+      if (filterWinRate !== 'all') {
+        switch (filterWinRate) {
+          case '0-25':
+            matchesWinRate = team.winRate >= 0 && team.winRate < 25;
+            break;
+          case '25-50':
+            matchesWinRate = team.winRate >= 25 && team.winRate < 50;
+            break;
+          case '50-75':
+            matchesWinRate = team.winRate >= 50 && team.winRate < 75;
+            break;
+          case '75-100':
+            matchesWinRate = team.winRate >= 75 && team.winRate <= 100;
+            break;
+        }
       }
-    ];
-    
-    // Jogos pendentes (apostas para hoje)
-    const pendingBets = bets.filter(bet => 
-      bet.status === 'pending' && 
-      bet.matchTime && 
-      bet.matchTime.startsWith(today)
-    );
-    
-    const pendingGamesMap: { [key: string]: PendingGame } = {};
-    
-    pendingBets.forEach(bet => {
-      const key = bet.description || 'Jogo sem descrição';
-      if (!pendingGamesMap[key]) {
-        pendingGamesMap[key] = {
-          match: key,
-          kickoff: bet.matchTime ? new Date(bet.matchTime).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) : 'N/A',
-          activeBets: 0,
-          totalStake: 0,
-          potentialReturn: 0,
-          riskLevel: 'low'
-        };
-      }
-      
-      pendingGamesMap[key].activeBets += 1;
-      pendingGamesMap[key].totalStake += bet.amount;
-      pendingGamesMap[key].potentialReturn += bet.amount * bet.odds;
-      
-      // Determinar nível de risco baseado no stake total
-      if (pendingGamesMap[key].totalStake > 200) pendingGamesMap[key].riskLevel = 'high';
-      else if (pendingGamesMap[key].totalStake > 100) pendingGamesMap[key].riskLevel = 'medium';
+
+      return matchesSearch && matchesRank && matchesWinRate;
     });
-    
-    const pendingGames = Object.values(pendingGamesMap);
-    const totalActiveStake = [...liveGames, ...pendingGames].reduce((sum, game) => sum + game.totalStake, 0);
-    
-    return {
-      liveGames,
-      pendingGames,
-      totalActiveStake
-    };
-  }, [bets]);
+  }, [teamsWithRatings, searchTerm, filterRank, filterWinRate]);
 
-  // Alertas inteligentes
-  const intelligentAlerts = useMemo(() => {
-    const alerts = [];
-    
-    // Alertas de alta exposição
-    teamsWithRatings.forEach(team => {
-      const activeBets = bets.filter(bet => 
-        bet.status === 'pending' && 
-        bet.description?.toLowerCase().includes(team.name.toLowerCase())
-      ).length;
-      
-      if (activeBets > 3) {
-        alerts.push({
-          type: 'high_exposure',
-          severity: 'warning',
-          message: `${team.name}: ${activeBets} apostas ativas - Considere hedge`,
-          team: team.name,
-          action: 'suggest_hedge'
-        });
-      }
-      
-      if (team.rating === 'C' && activeBets > 0) {
-        alerts.push({
-          type: 'poor_performance',
-          severity: 'danger',
-          message: `${team.name}: Rating baixo (${team.rating}) - Evitar novas apostas`,
-          team: team.name,
-          action: 'avoid_betting'
-        });
-      }
-      
-      if (team.rating === 'A++' && team.avgROI > 20) {
-        alerts.push({
-          type: 'high_value',
-          severity: 'success',
-          message: `${team.name}: Rating excelente (${team.rating}) - Oportunidade identificada`,
-          team: team.name,
-          action: 'consider_betting'
-        });
-      }
-    });
-    
-    return alerts;
-  }, [teamsWithRatings, bets]);
+  // Paginação - times exibidos
+  const displayedTeams = filteredTeams.slice(0, visibleTeams);
+  const hasMore = visibleTeams < filteredTeams.length;
 
   const teamExposure = useMemo(() => {
     return teamsWithRatings.filter(t => t.isWatched).map(team => {
-      // Calcular exposição real baseada nas apostas
       let teamBets = bets.filter(bet =>
         bet.status === 'pending' &&
         bet.description?.toLowerCase().includes(team.name.toLowerCase())
@@ -396,7 +442,7 @@ export default function Watchlist() {
 
       const totalStake = teamBets.reduce((sum, bet) => sum + bet.amount, 0);
       const potentialReturn = teamBets.reduce((sum, bet) => sum + (bet.amount * bet.odds), 0);
-      
+
       return {
         ...team,
         activeBets: teamBets.length,
@@ -405,14 +451,6 @@ export default function Watchlist() {
       };
     });
   }, [teamsWithRatings, bets]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    addTeam({ ...formData, isWatched: true });
-    setFormData({ name: '', competition: '', notes: '' });
-    setIsAddDialogOpen(false);
-    toast.success(t('common.success'));
-  };
 
   const handleDelete = (id: string) => {
     if (id.startsWith('mock-team-')) {
@@ -425,6 +463,43 @@ export default function Watchlist() {
     }
   };
 
+  const handleViewBet = (bet: Bet) => {
+    setSelectedBet(bet);
+    setModalOpen(true);
+  };
+
+  const handleViewTeamHistory = (teamName: string) => {
+    // Salvar origem no sessionStorage para exibir botão "Voltar"
+    sessionStorage.setItem('betsReturnPath', '/watchlist');
+    sessionStorage.setItem('betsReturnLabel', 'Voltar ao Monitoramento');
+
+    // Navegar para /bets com query param
+    setLocation(`/bets?team=${encodeURIComponent(teamName)}`);
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setFilterRank('all');
+    setFilterWinRate('all');
+    setVisibleTeams(6);
+  };
+
+  // Função para obter cor da borda por rank
+  const getRatingBorderColor = (rating: string) => {
+    switch (rating) {
+      case 'A++':
+      case 'A+':
+      case 'A':
+        return 'border-l-green-500';
+      case 'B':
+        return 'border-l-orange-500';
+      case 'C':
+        return 'border-l-red-500';
+      default:
+        return 'border-l-gray-400';
+    }
+  };
+
   // Componente de Rating Badge
   const RatingBadge = ({ rating }: { rating: string }) => (
     <div className={`inline-flex items-center px-3 py-1 rounded-full text-white font-bold text-sm bg-gradient-to-r ${getRatingColor(rating)}`}>
@@ -434,10 +509,7 @@ export default function Watchlist() {
 
   // Componente de Card de Time
   const TeamCard = ({ team }: { team: any }) => (
-    <Card className={`hover:shadow-lg transition-shadow border-l-4 ${
-      team.riskLevel === 'high' ? 'border-l-red-500' : 
-      team.riskLevel === 'medium' ? 'border-l-yellow-500' : 'border-l-green-500'
-    }`}>
+    <Card className={`hover:shadow-lg transition-shadow border-l-4 ${getRatingBorderColor(team.rating)}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -460,7 +532,7 @@ export default function Watchlist() {
             <div className="text-xs text-muted-foreground">ROI Médio</div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <span className="text-muted-foreground">Total de Apostas:</span>
@@ -481,11 +553,12 @@ export default function Watchlist() {
         )}
 
         <div className="flex gap-2 mt-4">
-          <Button size="sm" variant="outline" className="flex-1">
-            <Edit3 className="h-3 w-3 mr-1" />
-            Editar
-          </Button>
-          <Button size="sm" variant="outline" className="flex-1">
+          <Button
+            size="sm"
+            variant="outline"
+            className="flex-1"
+            onClick={() => handleViewTeamHistory(team.name)}
+          >
             <Eye className="h-3 w-3 mr-1" />
             Histórico
           </Button>
@@ -496,278 +569,192 @@ export default function Watchlist() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Central de Monitoramento</h1>
-          <p className="text-muted-foreground">Análise inteligente de performance e exposição</p>
-        </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Adicionar Time
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-card">
-            <DialogHeader>
-              <DialogTitle>Adicionar Time ao Monitoramento</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label>Nome do Time</Label>
-                <Input
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="ex: Flamengo, Palmeiras"
-                  required
-                />
-              </div>
-              <div>
-                <Label>Competição</Label>
-                <Input
-                  value={formData.competition}
-                  onChange={(e) => setFormData({ ...formData, competition: e.target.value })}
-                  placeholder="ex: Brasileirão, Libertadores"
-                />
-              </div>
-              <div>
-                <Label>Notas</Label>
-                <Input
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Observações sobre o time"
-                />
-              </div>
-              <Button type="submit" className="w-full">Salvar</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Central de Monitoramento</h1>
+        <p className="text-muted-foreground">Análise inteligente de performance e exposição</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="exposure" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
             Exposição Ativa
           </TabsTrigger>
           <TabsTrigger value="ratings" className="flex items-center gap-2">
             <Star className="h-4 w-4" />
-            Rating de Times
-          </TabsTrigger>
-          <TabsTrigger value="markets" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Análise Mercados
-          </TabsTrigger>
-          <TabsTrigger value="alerts" className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4" />
-            Alertas & Insights
+            Rank de Times
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="exposure" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Jogos ao Vivo */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                  Jogos ao Vivo
-                </CardTitle>
-                <CardDescription>Apostas em jogos que estão acontecendo agora</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {activeExposure.liveGames.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">Nenhum jogo ao vivo no momento</p>
-                ) : (
-                  <div className="space-y-4">
-                    {activeExposure.liveGames.map((game, index) => (
-                      <div key={index} className="p-4 border rounded-lg bg-red-50/30 border-red-200">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">{game.match}</h4>
-                          <Badge variant="destructive" className="animate-pulse">
-                            {game.time}
-                          </Badge>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Apostas:</span>
-                            <span className="font-medium ml-1">{game.activeBets}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Stake:</span>
-                            <span className="font-medium ml-1">R$ {game.totalStake.toFixed(2)}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Retorno:</span>
-                            <span className="font-medium ml-1 text-green-600">R$ {game.potentialReturn.toFixed(2)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Jogos Pendentes */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Jogos Pendentes Hoje
-                </CardTitle>
-                <CardDescription>Apostas para jogos que ainda vão começar</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {activeExposure.pendingGames.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">Nenhuma aposta pendente para hoje</p>
-                ) : (
-                  <div className="space-y-4">
-                    {activeExposure.pendingGames.map((game, index) => (
-                      <div key={index} className="p-4 border rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">{game.match}</h4>
-                          <Badge variant="outline">
-                            {game.kickoff}
-                          </Badge>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Apostas:</span>
-                            <span className="font-medium ml-1">{game.activeBets}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Stake:</span>
-                            <span className="font-medium ml-1">R$ {game.totalStake.toFixed(2)}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Retorno:</span>
-                            <span className="font-medium ml-1 text-green-600">R$ {game.potentialReturn.toFixed(2)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
           {/* Resumo de Exposição */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Resumo da Exposição</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-4">
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">
-                    R$ {activeExposure.totalActiveStake.toFixed(2)}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Stake Total Ativo</div>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {activeExposure.liveGames.length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Jogos ao Vivo</div>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">
-                    {activeExposure.pendingGames.length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Jogos Pendentes</div>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">
-                    {teamExposure.filter(t => t.activeBets > 0).length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Times com Apostas</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <ExposureSummaryGrid
+            metrics={activeExposure.metrics}
+            currentBankroll={bankroll.currentBankroll}
+          />
 
-        <TabsContent value="ratings" className="space-y-6">
+          {/* Jogos ao Vivo */}
           <Card>
             <CardHeader>
-              <CardTitle>Sistema de Rating Automático</CardTitle>
-              <CardDescription>
-                Classificação baseada em taxa de acerto e ROI médio do seu histórico
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {teamsWithRatings.map((team) => (
-                  <TeamCard key={team.id} team={team} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="markets" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Análise de Mercados</CardTitle>
-              <CardDescription>Performance por tipo de aposta e competição</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center text-muted-foreground py-12">
-                <BarChart3 className="mx-auto h-12 w-12 mb-4" />
-                <p>Análise de mercados em desenvolvimento</p>
-                <p className="text-sm">Será implementada com mais dados históricos</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="alerts" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Alertas & Insights Inteligentes</CardTitle>
-              <CardDescription>Avisos automáticos baseados na sua performance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {intelligentAlerts.length === 0 ? (
-                <div className="text-center text-muted-foreground py-12">
-                  <Shield className="mx-auto h-12 w-12 mb-4" />
-                  <p>Nenhum alerta no momento</p>
-                  <p className="text-sm">Tudo sob controle!</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                      Jogos ao Vivo
+                    </CardTitle>
+                    <CardDescription>Apostas em jogos que estão acontecendo agora</CardDescription>
+                  </div>
+                  {activeExposure.usingMockData && (
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
+                      Dados Demo
+                    </Badge>
+                  )}
                 </div>
+                {activeExposure.liveGames.length > 0 && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    Atualizado: {lastUpdate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {activeExposure.liveGames.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Nenhum jogo ao vivo no momento</p>
               ) : (
-                <div className="space-y-4">
-                  {intelligentAlerts.map((alert, index) => (
-                    <div 
-                      key={index} 
-                      className={`p-4 border-l-4 rounded-lg ${
-                        alert.severity === 'danger' ? 'border-l-red-500 bg-red-50/50' :
-                        alert.severity === 'warning' ? 'border-l-yellow-500 bg-yellow-50/50' :
-                        'border-l-green-500 bg-green-50/50'
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-0.5">
-                          {alert.severity === 'danger' && <AlertTriangle className="h-5 w-5 text-red-500" />}
-                          {alert.severity === 'warning' && <AlertTriangle className="h-5 w-5 text-yellow-500" />}
-                          {alert.severity === 'success' && <Zap className="h-5 w-5 text-green-500" />}
-                        </div>
-                        <div className="flex-grow">
-                          <p className="font-medium">{alert.message}</p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Tipo: {alert.type} • Time: {alert.team}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                <div className="max-h-[500px] overflow-y-auto space-y-4 pr-2">
+                  {activeExposure.liveGames.map((game) => (
+                    <LiveGameCard
+                      key={game.gameId}
+                      game={game}
+                      onViewBet={handleViewBet}
+                    />
                   ))}
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* Jogos Pendentes */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div>
+                  <CardTitle>Jogos Pendentes Hoje</CardTitle>
+                  <CardDescription>Apostas para jogos que ainda vão começar</CardDescription>
+                </div>
+                {activeExposure.usingMockData && (
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
+                    Dados Demo
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              <PendingGamesTable
+                games={activeExposure.pendingGames}
+                onViewBet={handleViewBet}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Análises Avançadas */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <TeamConcentrationCard teamExposure={activeExposure.metrics.teamConcentration} />
+            <MarketDistributionChart distribution={activeExposure.metrics.marketDistribution} />
+          </div>
+
+          {/* Cenários de Resultado - Full Width */}
+          <ActivePLScenarios
+            scenarios={plScenarios.scenarios}
+            historicalWinRate={plScenarios.historicalWinRate}
+          />
+        </TabsContent>
+
+        <TabsContent value="ratings" className="space-y-6">
+          {/* Filtros */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Filtros</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TeamRatingFilters
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filterRank={filterRank}
+                setFilterRank={setFilterRank}
+                filterWinRate={filterWinRate}
+                setFilterWinRate={setFilterWinRate}
+                onClearFilters={handleClearFilters}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Sistema de Rank Automático</CardTitle>
+              <CardDescription>
+                Classificação baseada em taxa de acerto e ROI médio do seu histórico
+                {filteredTeams.length !== teamsWithRatings.length && (
+                  <span className="ml-2 text-blue-600">
+                    ({filteredTeams.length} de {teamsWithRatings.length} times)
+                  </span>
+                )}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {filteredTeams.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Star className="mx-auto h-12 w-12 mb-4 opacity-50" />
+                  <p>Nenhum time encontrado com os filtros aplicados.</p>
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={handleClearFilters}
+                  >
+                    Limpar Filtros
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {displayedTeams.map((team) => (
+                      <TeamCard key={team.id} team={team} />
+                    ))}
+                  </div>
+
+                  {/* Botões de ação */}
+                  <div className="flex gap-3 justify-center mt-6">
+                    {hasMore && (
+                      <Button
+                        variant="outline"
+                        onClick={() => setVisibleTeams(prev => prev + 3)}
+                      >
+                        Carregar Mais Times ({filteredTeams.length - visibleTeams} restantes)
+                      </Button>
+                    )}
+
+                    <Button
+                      onClick={() => setLocation('/watchlist/teams')}
+                    >
+                      <Table className="h-4 w-4 mr-2" />
+                      Visualizar Monitoramento Completo
+                    </Button>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modal de Detalhes da Aposta */}
+      <BetDetailModal
+        bet={selectedBet}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
     </div>
   );
 }

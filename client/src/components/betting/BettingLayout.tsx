@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
-import { BarChart3, PlusCircle, Settings, TrendingUp, Wallet, Lightbulb, Eye, Upload, HelpCircle, ChevronLeft, ChevronRight, Bell, User } from 'lucide-react';
+import { BarChart3, PlusCircle, Settings, TrendingUp, Wallet, Eye, Upload, HelpCircle, ChevronLeft, ChevronRight, Bell, User } from 'lucide-react';
 import { LanguageToggle } from './LanguageToggle';
 import { useTranslation } from '@/hooks/useTranslation';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
@@ -17,7 +17,6 @@ const getNavItems = (t: (key: string) => string) => [
   { path: '/bets', label: t('nav.bets'), icon: Wallet },
   { path: '/add-bet', label: t('nav.addBet'), icon: PlusCircle },
   { path: '/analytics', label: t('nav.analytics'), icon: TrendingUp },
-  { path: '/tips', label: t('nav.tips'), icon: Lightbulb },
   { path: '/watchlist', label: t('nav.watchlist'), icon: Eye },
   { path: '/import', label: t('nav.import'), icon: Upload },
   { path: '/faq', label: t('nav.faq'), icon: HelpCircle },

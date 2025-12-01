@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useBettingData } from '@/hooks/useBettingData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Pencil, Trash2, Search, Eye, Calendar, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Pencil, Trash2, Search, Eye, Calendar, Filter, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { BetType, BetStatus, Bet } from '@/types/betting';
 import { TimePeriod, filterBetsByPeriod } from '@/utils/dateFilters';
 import { generateMockBets } from '@/utils/mockData';
@@ -22,18 +23,25 @@ type PeriodFilter = 'today-games' | 'week-games' | 'month-games' | 'last-10' | '
 export default function BetsList() {
   const { bets: realBets, bookmakers, deleteBet, updateBet } = useBettingData();
   const isMobile = useIsMobile();
+  const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBookmaker, setFilterBookmaker] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPeriod, setFilterPeriod] = useState<PeriodFilter>('all');
   const [filterProfit, setFilterProfit] = useState<string>('all');
+  const [filterTeam, setFilterTeam] = useState<string>('all');
   const [selectedBet, setSelectedBet] = useState<Bet | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [betToDelete, setBetToDelete] = useState<string>('');
   const [editForm, setEditForm] = useState<Bet | null>(null);
+
+  // Estados para botão "Voltar"
+  const [showReturnButton, setShowReturnButton] = useState(false);
+  const [returnPath, setReturnPath] = useState('/');
+  const [returnLabel, setReturnLabel] = useState('Voltar');
   
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,11 +62,39 @@ export default function BetsList() {
   const [sortColumn, setSortColumn] = useState<string>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
+  // Verificar query params e sessionStorage ao montar
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const teamParam = params.get('team');
+
+    if (teamParam) {
+      setFilterTeam(decodeURIComponent(teamParam));
+    }
+
+    const savedPath = sessionStorage.getItem('betsReturnPath');
+    const savedLabel = sessionStorage.getItem('betsReturnLabel');
+
+    if (savedPath) {
+      setShowReturnButton(true);
+      setReturnPath(savedPath);
+      setReturnLabel(savedLabel || 'Voltar');
+    }
+  }, []);
+
   // Merge real bets with mock bets for demonstration
   const allBets = useMemo(() => {
     const mockBets = realBets.length === 0 ? generateMockBets() : [];
     return [...realBets, ...mockBets];
   }, [realBets]);
+
+  // Extrair times únicos
+  const uniqueTeams = useMemo(() => {
+    const teams = new Set<string>();
+    allBets.forEach(bet => {
+      bet.teams?.forEach(team => teams.add(team));
+    });
+    return Array.from(teams).sort();
+  }, [allBets]);
 
   // Função para filtrar por período avançado
   const filterBetsByAdvancedPeriod = (bets: Bet[], period: PeriodFilter): Bet[] => {
@@ -113,9 +149,13 @@ export default function BetsList() {
       const matchesBookmaker = filterBookmaker === 'all' || bet.bookmaker === filterBookmaker;
       const matchesType = filterType === 'all' || bet.betType === filterType;
       const matchesStatus = filterStatus === 'all' || bet.status === filterStatus;
-      
+
+      // Filtro de time (compara exatamente com o nome do time)
+      const matchesTeam = filterTeam === 'all' ||
+        bet.teams?.some(t => t === filterTeam || t.toLowerCase() === filterTeam.toLowerCase());
+
       // Filtro de lucro/prejuízo
-      const matchesProfit = filterProfit === 'all' || 
+      const matchesProfit = filterProfit === 'all' ||
         (filterProfit === 'profit' && bet.profit > 0) ||
         (filterProfit === 'loss' && bet.profit < 0) ||
         (filterProfit === 'breakeven' && bet.profit === 0);
@@ -135,8 +175,8 @@ export default function BetsList() {
       const matchesCredits = !filterUsedCredits || usedCredits;
       const matchesProtected = !filterIsProtected || isProtected;
 
-      return matchesSearch && matchesBookmaker && matchesType && matchesStatus && 
-             matchesProfit && matchesOddsRange && matchesAmountRange &&
+      return matchesSearch && matchesBookmaker && matchesType && matchesStatus &&
+             matchesTeam && matchesProfit && matchesOddsRange && matchesAmountRange &&
              matchesBoost && matchesCashout && matchesCredits && matchesProtected;
     });
 
@@ -173,8 +213,8 @@ export default function BetsList() {
     });
 
     return filtered;
-  }, [bets, searchTerm, filterBookmaker, filterType, filterStatus, filterProfit, 
-      oddsRange, amountRange, filterHasBoost, filterHasCashout, filterUsedCredits, 
+  }, [bets, searchTerm, filterBookmaker, filterType, filterStatus, filterTeam, filterProfit,
+      oddsRange, amountRange, filterHasBoost, filterHasCashout, filterUsedCredits,
       filterIsProtected, sortColumn, sortDirection]);
 
   // Paginação
@@ -256,6 +296,13 @@ export default function BetsList() {
     }
   };
 
+  const handleReturnClick = () => {
+    // Limpar sessionStorage ao clicar em voltar
+    sessionStorage.removeItem('betsReturnPath');
+    sessionStorage.removeItem('betsReturnLabel');
+    setLocation(returnPath);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start">
@@ -264,6 +311,15 @@ export default function BetsList() {
           <p className="text-muted-foreground">Gerencie e visualize todas as suas apostas ({filteredBets.length} encontradas)</p>
         </div>
         <div className="flex gap-2">
+          {showReturnButton && (
+            <Button
+              variant="outline"
+              onClick={handleReturnClick}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {returnLabel}
+            </Button>
+          )}
           <Select value={filterPeriod} onValueChange={(v) => setFilterPeriod(v as PeriodFilter)}>
             <SelectTrigger className="w-[200px]">
               <Calendar className="h-4 w-4 mr-2" />
@@ -315,7 +371,7 @@ export default function BetsList() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Filtros básicos */}
-          <div className="grid gap-4 md:grid-cols-5">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -325,6 +381,17 @@ export default function BetsList() {
                 className="pl-8"
               />
             </div>
+            <Select value={filterTeam} onValueChange={setFilterTeam}>
+              <SelectTrigger>
+                <SelectValue placeholder="Todos os Times" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Times</SelectItem>
+                {uniqueTeams.map((team) => (
+                  <SelectItem key={team} value={team}>{team}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Select value={filterBookmaker} onValueChange={setFilterBookmaker}>
               <SelectTrigger>
                 <SelectValue placeholder="Todas as Casas" />
