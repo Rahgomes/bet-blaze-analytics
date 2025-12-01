@@ -16,6 +16,8 @@ import Analytics from "./pages/Analytics";
 import Tips from "./pages/Tips";
 import Watchlist from "./pages/Watchlist";
 import Import from "./pages/Import";
+import ImportPreview from "./pages/ImportPreview";
+import ImportHistory from "./pages/ImportHistory";
 import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 
@@ -34,6 +36,8 @@ const App = () => (
             <Route path="/tips" component={Tips} />
             <Route path="/watchlist" component={Watchlist} />
             <Route path="/import" component={Import} />
+            <Route path="/import/preview" component={ImportPreview} />
+            <Route path="/import/history" component={ImportHistory} />
             <Route path="/faq" component={FAQ} />
             <Route path="/settings" component={BankrollSettings} />
             <Route path="/settings/deposits-history" component={DepositsHistory} />

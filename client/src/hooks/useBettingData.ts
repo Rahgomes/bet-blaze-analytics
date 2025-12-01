@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Bet, BankrollSettings, Bookmaker, Transaction } from '@/types/betting';
+import { ImportSession } from '@/types/import';
 import { migrateBankrollSettings } from '@/utils/migrations';
 
 const STORAGE_KEYS = {
@@ -7,6 +8,7 @@ const STORAGE_KEYS = {
   BANKROLL: 'betting_bankroll',
   BOOKMAKERS: 'betting_bookmakers',
   TRANSACTIONS: 'betting_transactions',
+  IMPORT_SESSIONS: 'betting_import_sessions',
 };
 
 const DEFAULT_BANKROLL: BankrollSettings = {
@@ -35,6 +37,7 @@ export function useBettingData() {
   const [bankroll, setBankroll] = useState<BankrollSettings>(DEFAULT_BANKROLL);
   const [bookmakers, setBookmakers] = useState<Bookmaker[]>(DEFAULT_BOOKMAKERS);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [importSessions, setImportSessions] = useState<ImportSession[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load data from localStorage on mount
@@ -44,6 +47,7 @@ export function useBettingData() {
       const storedBankroll = localStorage.getItem(STORAGE_KEYS.BANKROLL);
       const storedBookmakers = localStorage.getItem(STORAGE_KEYS.BOOKMAKERS);
       const storedTransactions = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
+      const storedImportSessions = localStorage.getItem(STORAGE_KEYS.IMPORT_SESSIONS);
 
       if (storedBets) setBets(JSON.parse(storedBets));
 
@@ -62,6 +66,7 @@ export function useBettingData() {
 
       if (storedBookmakers) setBookmakers(JSON.parse(storedBookmakers));
       if (storedTransactions) setTransactions(JSON.parse(storedTransactions));
+      if (storedImportSessions) setImportSessions(JSON.parse(storedImportSessions));
     } catch (error) {
       console.error('Error loading data from localStorage:', error);
     } finally {
@@ -211,7 +216,7 @@ export function useBettingData() {
     if (!transaction) return;
 
     saveTransactions(transactions.filter(t => t.id !== id));
-    
+
     // Recalculate bankroll
     const amountChange = transaction.type === 'deposit' ? -transaction.amount : transaction.amount;
     const newBankroll = {
@@ -222,11 +227,41 @@ export function useBettingData() {
     saveBankroll(newBankroll);
   }, [transactions, bankroll, saveTransactions, saveBankroll]);
 
+  // Save import sessions to localStorage
+  const saveImportSessions = useCallback((newSessions: ImportSession[]) => {
+    setImportSessions(newSessions);
+    localStorage.setItem(STORAGE_KEYS.IMPORT_SESSIONS, JSON.stringify(newSessions));
+  }, []);
+
+  // Add import session
+  const addImportSession = useCallback((session: ImportSession) => {
+    const newSessions = [...importSessions, session];
+    saveImportSessions(newSessions);
+  }, [importSessions, saveImportSessions]);
+
+  // Get all import sessions (sorted by date, most recent first)
+  const getImportSessions = useCallback(() => {
+    return [...importSessions].sort((a, b) =>
+      new Date(b.importDate).getTime() - new Date(a.importDate).getTime()
+    );
+  }, [importSessions]);
+
+  // Get import session by ID
+  const getImportSessionById = useCallback((id: string): ImportSession | null => {
+    return importSessions.find(s => s.id === id) || null;
+  }, [importSessions]);
+
+  // Delete import session (optional - for future use)
+  const deleteImportSession = useCallback((id: string) => {
+    saveImportSessions(importSessions.filter(s => s.id !== id));
+  }, [importSessions, saveImportSessions]);
+
   return {
     bets,
     bankroll,
     bookmakers,
     transactions,
+    importSessions,
     loading,
     addBet,
     updateBet,
@@ -236,5 +271,9 @@ export function useBettingData() {
     addTransaction,
     updateTransaction,
     deleteTransaction,
+    addImportSession,
+    getImportSessions,
+    getImportSessionById,
+    deleteImportSession,
   };
 }

@@ -30,6 +30,7 @@ export interface Bet {
   matchTime?: string;
   sourceType?: 'manual' | 'tip' | 'import';
   sourceTipId?: string;
+  importSessionId?: string; // Link to ImportSession when bet comes from bulk import
   createdAt: string;
   updatedAt: string;
 }

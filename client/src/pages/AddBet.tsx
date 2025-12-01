@@ -87,7 +87,7 @@ const createEmptyLeg = () => ({
 
 export default function AddBet() {
   const [, setLocation] = useLocation();
-  const { addBet, bookmakers } = useBettingData();
+  const { addBet, bookmakers, bankroll } = useBettingData();
   const { updateTip } = useExtendedData();
   const { toast } = useToast();
 
