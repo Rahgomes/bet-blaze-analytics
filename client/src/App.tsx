@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { Route, Switch } from "wouter";
 import { BettingLayout } from "./components/betting/BettingLayout";
 import { TranslationProvider } from "./hooks/useTranslation";
 import { queryClient } from "@/lib/queryClient";
+import { initializeBettingStore } from "@/stores/betting";
 import Dashboard from "./pages/Dashboard";
 import BetsList from "./pages/BetsList";
 import AddBet from "./pages/AddBet";
@@ -21,7 +23,13 @@ import ImportHistory from "./pages/ImportHistory";
 import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 
-const App = () => (
+const App = () => {
+  // Inicializar stores uma única vez no mount
+  useEffect(() => {
+    initializeBettingStore();
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TranslationProvider>
       <TooltipProvider>
@@ -48,6 +56,7 @@ const App = () => (
       </TooltipProvider>
     </TranslationProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

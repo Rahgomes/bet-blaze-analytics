@@ -1,4 +1,5 @@
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
+import { selectTodayBets, selectTodayStats, selectWeekBets, selectWeekStats, selectMonthBets, selectMonthStats } from '@/stores/betting/selectors';
 import { StatCard } from '@/components/betting/StatCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -8,24 +9,24 @@ import { TrendingUp, TrendingDown, Wallet, Target, Activity, AlertTriangle, Cale
 import { Button } from '@/components/ui/button';
 import { useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
-import { filterBetsByPeriod, calculateStats, TimePeriod } from '@/utils/dateFilters';
+import { calculateStats } from '@/utils/dateFilters';
 
 export default function Dashboard() {
-  const { bets, bankroll, loading } = useBettingData();
+  // Usar Zustand store ao invés de useBettingData
+  const bets = useBettingStore(state => state.bets);
+  const bankroll = useBettingStore(state => state.bankroll);
+  const loading = useBettingStore(state => state.loading);
+
+  // Usar selectors para dados computados
+  const todayBets = useBettingStore(selectTodayBets);
+  const todayStats = useBettingStore(selectTodayStats);
+  const currentWeekBets = useBettingStore(selectWeekBets);
+  const currentWeekStats = useBettingStore(selectWeekStats);
+  const currentMonthBets = useBettingStore(selectMonthBets);
+  const currentMonthStats = useBettingStore(selectMonthStats);
+
   const [, setLocation] = useLocation();
-
-  // Data específica para hoje
   const today = new Date();
-  const todayBets = useMemo(() => filterBetsByPeriod(bets, 'today'), [bets]);
-  const todayStats = useMemo(() => calculateStats(todayBets), [todayBets]);
-
-  // Data específica para semana atual
-  const currentWeekBets = useMemo(() => filterBetsByPeriod(bets, 'week'), [bets]);
-  const currentWeekStats = useMemo(() => calculateStats(currentWeekBets), [currentWeekBets]);
-
-  // Data específica para mês atual
-  const currentMonthBets = useMemo(() => filterBetsByPeriod(bets, 'month'), [bets]);
-  const currentMonthStats = useMemo(() => calculateStats(currentMonthBets), [currentMonthBets]);
 
   // Valores de entrada baseados nas stakes customizadas
   const stakeValues = useMemo(() => {

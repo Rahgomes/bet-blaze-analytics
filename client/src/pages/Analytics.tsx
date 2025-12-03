@@ -55,8 +55,9 @@ export default function Analytics() {
   const availableTeams = useMemo(() => {
     const teams = new Set<string>();
     bets.forEach(bet => {
-      if (bet.homeTeam) teams.add(bet.homeTeam);
-      if (bet.awayTeam) teams.add(bet.awayTeam);
+      if (bet.teams && Array.isArray(bet.teams)) {
+        bet.teams.forEach(team => teams.add(team));
+      }
     });
     return Array.from(teams).sort();
   }, [bets]);
@@ -107,8 +108,7 @@ export default function Analytics() {
       if (selectedStatuses.length > 0 && !selectedStatuses.includes(bet.status)) return false;
 
       if (selectedTeams.length > 0) {
-        const hasTeam = (bet.homeTeam && selectedTeams.includes(bet.homeTeam)) ||
-                       (bet.awayTeam && selectedTeams.includes(bet.awayTeam));
+        const hasTeam = bet.teams?.some(team => selectedTeams.includes(team));
         if (!hasTeam) return false;
       }
 
