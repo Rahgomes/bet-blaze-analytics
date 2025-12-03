@@ -47,15 +47,15 @@ export const createBankrollSlice: StateCreator<
   },
 
   setBankroll: (bankroll) => {
-    const merged = {
+    const merged: BankrollSettings = {
       customStakes: [],
       maxStakesRecommended: 6,
       leagues: [],
       markets: [],
       strategies: [],
-      language: 'pt-br',
+      language: 'pt-br' as const,
       alertsEnabled: true,
-      projectionMode: 'linear',
+      projectionMode: 'linear' as const,
       ...bankroll,
     };
     set({ bankroll: merged });
