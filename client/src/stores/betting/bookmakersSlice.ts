@@ -1,6 +1,11 @@
 import { StateCreator } from 'zustand';
 import { Bookmaker } from '@/types/betting';
 
+const DEFAULT_BOOKMAKERS: Bookmaker[] = [
+  { id: 'bet365', name: 'Bet365', color: '#00703C' },
+  { id: 'seu_bet', name: 'Seu.bet', color: '#FF6B00' },
+];
+
 export interface BookmakersSlice {
   bookmakers: Bookmaker[];
 
@@ -17,7 +22,7 @@ export const createBookmakersSlice: StateCreator<
   [],
   BookmakersSlice
 > = (set, get) => ({
-  bookmakers: [],
+  bookmakers: DEFAULT_BOOKMAKERS,
 
   addBookmaker: (bookmakerData) => {
     const newBookmaker: Bookmaker = {

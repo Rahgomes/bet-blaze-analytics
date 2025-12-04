@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { useForm, FormProvider, Controller, useFieldArray, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import ReactSelect from 'react-select';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
 import { useExtendedData } from '@/hooks/useExtendedData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -87,7 +87,12 @@ const createEmptyLeg = () => ({
 
 export default function AddBet() {
   const [, setLocation] = useLocation();
-  const { addBet, bookmakers, bankroll } = useBettingData();
+
+  // Dados e actions da betting store
+  const addBet = useBettingStore(state => state.addBet);
+  const bookmakers = useBettingStore(state => state.bookmakers);
+  const bankroll = useBettingStore(state => state.bankroll);
+
   const { updateTip } = useExtendedData();
   const { toast } = useToast();
 

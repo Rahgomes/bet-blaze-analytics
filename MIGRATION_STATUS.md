@@ -178,15 +178,73 @@ const {
 
 ---
 
+## ✅ FASE 5: Migração AddBet - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/AddBet.tsx`
+
+### Mudanças Realizadas no AddBet
+**Antes:**
+```typescript
+const { addBet, bookmakers, bankroll } = useBettingData();
+```
+
+**Depois:**
+```typescript
+// Dados e actions da betting store
+const addBet = useBettingStore(state => state.addBet);
+const bookmakers = useBettingStore(state => state.bookmakers);
+const bankroll = useBettingStore(state => state.bankroll);
+```
+
+### Benefícios Obtidos
+- **Hook antigo removido** - não usa mais `useBettingData`
+- **Estados locais preservados** - formulários mantidos com useState/useForm (correto!)
+- **Actions da store** - criação de apostas via Zustand
+
+---
+
+## ✅ FASE 6: Migração BankrollSettings - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/BankrollSettings.tsx`
+
+### Mudanças Realizadas no BankrollSettings
+**Antes:**
+```typescript
+const { bankroll, updateBankrollSettings, bets, transactions,
+        addTransaction, updateTransaction, deleteTransaction } = useBettingData();
+```
+
+**Depois:**
+```typescript
+// Dados e actions da betting store
+const bankroll = useBettingStore(state => state.bankroll);
+const updateBankrollSettings = useBettingStore(state => state.updateBankrollSettings);
+const bets = useBettingStore(state => state.bets);
+const transactions = useBettingStore(state => state.transactions);
+const addTransaction = useBettingStore(state => state.addTransaction);
+const updateTransaction = useBettingStore(state => state.updateTransaction);
+const deleteTransaction = useBettingStore(state => state.deleteTransaction);
+```
+
+### Benefícios Obtidos
+- **Hook antigo removido** - não usa mais `useBettingData`
+- **Acesso completo à store** - bankroll, transactions e todas as actions
+- **Estados locais preservados** - modais e formulários mantidos locais (correto!)
+
+---
+
 ## 🔄 PRÓXIMAS FASES
 
-### FASE 5+: Demais Páginas (FUTURAS)
-- [ ] AddBet.tsx
-- [ ] BankrollSettings.tsx
-- [ ] Import.tsx
-- [ ] Watchlist.tsx
-- [ ] Tips.tsx
-- [ ] Outras páginas
+### FASE 7-8: Migração History Pages (PRÓXIMAS)
+- [ ] DepositsHistory.tsx
+- [ ] WithdrawalsHistory.tsx
+
+### FASES 9-14: Demais Páginas
+- [ ] Import.tsx, ImportHistory.tsx, ImportPreview.tsx
+- [ ] Watchlist.tsx, WatchlistTeams.tsx
+- [ ] Reports.tsx
 
 ---
 

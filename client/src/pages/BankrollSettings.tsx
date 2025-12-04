@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'wouter';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,7 +66,16 @@ import { convertStopValue } from '@/utils/stopLossGainUtils';
 
 export default function BankrollSettings() {
   const [, setLocation] = useLocation();
-  const { bankroll, updateBankrollSettings, bets, transactions, addTransaction, updateTransaction, deleteTransaction } = useBettingData();
+
+  // Dados e actions da betting store
+  const bankroll = useBettingStore(state => state.bankroll);
+  const updateBankrollSettings = useBettingStore(state => state.updateBankrollSettings);
+  const bets = useBettingStore(state => state.bets);
+  const transactions = useBettingStore(state => state.transactions);
+  const addTransaction = useBettingStore(state => state.addTransaction);
+  const updateTransaction = useBettingStore(state => state.updateTransaction);
+  const deleteTransaction = useBettingStore(state => state.deleteTransaction);
+
   const { toast } = useToast();
 
   // State for protecting initial bankroll editing
