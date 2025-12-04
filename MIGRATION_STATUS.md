@@ -5,7 +5,7 @@
 Migração de hooks customizados (`useBettingData`, `useExtendedData`) para gerenciamento de estado global com Zustand.
 
 **Data de início:** 03/12/2025
-**Última atualização:** 03/12/2025
+**Última atualização:** 04/12/2025
 
 ---
 
@@ -73,30 +73,112 @@ const todayStats = useBettingStore(selectTodayStats);
 
 ---
 
+## ✅ FASE 3: Migração Analytics - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/Analytics.tsx`
+
+### Mudanças Realizadas no Analytics
+**Antes:**
+```typescript
+const { bets, bankroll } = useBettingData();
+const [period, setPeriod] = useState('30days');
+const [selectedBookmakers, setSelectedBookmakers] = useState<string[]>([]);
+const [selectedLeagues, setSelectedLeagues] = useState<string[]>([]);
+const [selectedBetTypes, setSelectedBetTypes] = useState<string[]>([]);
+const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
+const [oddsRange, setOddsRange] = useState({ min: 1.01, max: 10 });
+const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+```
+
+**Depois:**
+```typescript
+// Dados da betting store
+const bets = useBettingStore(state => state.bets);
+const bankroll = useBettingStore(state => state.bankroll);
+
+// Filtros da analytics filter store
+const {
+  period, selectedBookmakers, selectedLeagues, selectedBetTypes,
+  selectedMarkets, oddsRange, selectedStatuses, selectedTeams,
+  setPeriod, setSelectedBookmakers, setSelectedLeagues,
+  setSelectedBetTypes, setSelectedMarkets, setOddsRange,
+  setSelectedStatuses, setSelectedTeams, clearFilters,
+} = useAnalyticsFilterStore();
+```
+
+### Benefícios Obtidos
+- **8 useState removidos** - todos os filtros agora vêm da store
+- **Filtros persistem em sessionStorage** - usuário volta e os filtros continuam aplicados
+- **Função clearFilters centralizada** - mais simples e consistente
+- Código mais limpo e organizado
+
+---
+
+## ✅ FASE 4: Migração BetsList - CONCLUÍDA
+
+### Arquivos Criados
+- [x] `client/src/stores/filters/betsListFilterStore.ts`
+
+### Arquivos Migrados
+- [x] `client/src/pages/BetsList.tsx`
+
+### Mudanças Realizadas no BetsList
+**Antes:**
+```typescript
+const { bets: realBets, bookmakers, deleteBet, updateBet } = useBettingData();
+const [searchTerm, setSearchTerm] = useState('');
+const [filterBookmaker, setFilterBookmaker] = useState<string>('all');
+const [filterType, setFilterType] = useState<string>('all');
+const [filterStatus, setFilterStatus] = useState<string>('all');
+const [filterPeriod, setFilterPeriod] = useState<PeriodFilter>('all');
+const [filterProfit, setFilterProfit] = useState<string>('all');
+const [filterTeam, setFilterTeam] = useState<string>('all');
+const [oddsRange, setOddsRange] = useState({min: 1, max: 10});
+const [amountRange, setAmountRange] = useState({min: 0, max: 1000});
+const [filterHasBoost, setFilterHasBoost] = useState(false);
+const [filterHasCashout, setFilterHasCashout] = useState(false);
+const [filterUsedCredits, setFilterUsedCredits] = useState(false);
+const [filterIsProtected, setFilterIsProtected] = useState(false);
+const [sortColumn, setSortColumn] = useState<string>('date');
+const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+const [currentPage, setCurrentPage] = useState(1);
+const [itemsPerPage, setItemsPerPage] = useState(50);
+const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+```
+
+**Depois:**
+```typescript
+// Dados da betting store
+const realBets = useBettingStore(state => state.bets);
+const bookmakers = useBettingStore(state => state.bookmakers);
+const deleteBet = useBettingStore(state => state.deleteBet);
+const updateBet = useBettingStore(state => state.updateBet);
+
+// Filtros da BetsList filter store (19 filtros!)
+const {
+  searchTerm, filterBookmaker, filterType, filterStatus, filterPeriod,
+  filterProfit, filterTeam, oddsRange, amountRange, filterHasBoost,
+  filterHasCashout, filterUsedCredits, filterIsProtected, sortColumn,
+  sortDirection, currentPage, itemsPerPage, showAdvancedFilters,
+  setSearchTerm, setFilterBookmaker, setFilterType, setFilterStatus,
+  setFilterPeriod, setFilterProfit, setFilterTeam, setOddsRange,
+  setAmountRange, setFilterHasBoost, setFilterHasCashout,
+  setFilterUsedCredits, setFilterIsProtected, setSortColumn,
+  setSortDirection, setCurrentPage, setItemsPerPage, setShowAdvancedFilters,
+} = useBetsListFilterStore();
+```
+
+### Benefícios Obtidos
+- **19 useState removidos** - todos os filtros e controles de UI agora vêm da store
+- **Filtros persistem em sessionStorage** - usuário volta e os filtros, ordenação e paginação continuam aplicados
+- **Store mais complexa** - suporte para filtros avançados (ranges, características especiais)
+- **Melhor UX** - usuário não perde contexto ao navegar entre páginas
+
+---
+
 ## 🔄 PRÓXIMAS FASES
-
-### FASE 3: Migração Analytics (PRÓXIMA SESSÃO)
-- [ ] Migrar `client/src/pages/Analytics.tsx`
-- [ ] Substituir useState de filtros por `useAnalyticsFilterStore`
-- [ ] Testar persistência de filtros em sessionStorage
-- [ ] Validar cálculos complexos
-
-**Arquivos envolvidos:**
-- `client/src/pages/Analytics.tsx`
-- `client/src/components/betting/AnalyticsFilters.tsx` (pode precisar ajustar props)
-
-### FASE 4: Migração BetsList (FUTURA)
-- [ ] Criar `client/src/stores/filters/betsListFilterStore.ts`
-- [ ] Migrar `client/src/pages/BetsList.tsx`
-- [ ] Testar filtros e paginação
-
-**Filtros a incluir:**
-- searchTerm, filterBookmaker, filterType, filterStatus
-- filterPeriod, filterProfit, filterTeam
-- oddsRange, amountRange
-- filterHasBoost, filterHasCashout, filterUsedCredits, filterIsProtected
-- sortColumn, sortDirection
-- currentPage, itemsPerPage
 
 ### FASE 5+: Demais Páginas (FUTURAS)
 - [ ] AddBet.tsx

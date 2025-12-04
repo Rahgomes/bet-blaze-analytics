@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
+import { useBetsListFilterStore, PeriodFilter } from '@/stores/filters/betsListFilterStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -17,20 +18,30 @@ import { BetType, BetStatus, Bet } from '@/types/betting';
 import { TimePeriod, filterBetsByPeriod } from '@/utils/dateFilters';
 import { generateMockBets } from '@/utils/mockData';
 
-// Tipos para os novos filtros avançados
-type PeriodFilter = 'today-games' | 'week-games' | 'month-games' | 'last-10' | 'last-20' | 'last-50' | 'last-100' | 'custom' | 'all';
-
 export default function BetsList() {
-  const { bets: realBets, bookmakers, deleteBet, updateBet } = useBettingData();
+  // Dados da betting store
+  const realBets = useBettingStore(state => state.bets);
+  const bookmakers = useBettingStore(state => state.bookmakers);
+  const deleteBet = useBettingStore(state => state.deleteBet);
+  const updateBet = useBettingStore(state => state.updateBet);
+
+  // Filtros da BetsList filter store
+  const {
+    searchTerm, filterBookmaker, filterType, filterStatus, filterPeriod,
+    filterProfit, filterTeam, oddsRange, amountRange, filterHasBoost,
+    filterHasCashout, filterUsedCredits, filterIsProtected, sortColumn,
+    sortDirection, currentPage, itemsPerPage, showAdvancedFilters,
+    setSearchTerm, setFilterBookmaker, setFilterType, setFilterStatus,
+    setFilterPeriod, setFilterProfit, setFilterTeam, setOddsRange,
+    setAmountRange, setFilterHasBoost, setFilterHasCashout,
+    setFilterUsedCredits, setFilterIsProtected, setSortColumn,
+    setSortDirection, setCurrentPage, setItemsPerPage, setShowAdvancedFilters,
+  } = useBetsListFilterStore();
+
   const isMobile = useIsMobile();
   const [, setLocation] = useLocation();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterBookmaker, setFilterBookmaker] = useState<string>('all');
-  const [filterType, setFilterType] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterPeriod, setFilterPeriod] = useState<PeriodFilter>('all');
-  const [filterProfit, setFilterProfit] = useState<string>('all');
-  const [filterTeam, setFilterTeam] = useState<string>('all');
+
+  // Estados locais (não relacionados a filtros)
   const [selectedBet, setSelectedBet] = useState<Bet | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -42,25 +53,6 @@ export default function BetsList() {
   const [showReturnButton, setShowReturnButton] = useState(false);
   const [returnPath, setReturnPath] = useState('/');
   const [returnLabel, setReturnLabel] = useState('Voltar');
-  
-  // Paginação
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(50);
-  
-  // Filtros avançados por range
-  const [oddsRange, setOddsRange] = useState<{min: number; max: number}>({min: 1, max: 10});
-  const [amountRange, setAmountRange] = useState<{min: number; max: number}>({min: 0, max: 1000});
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  
-  // Filtros por características especiais
-  const [filterHasBoost, setFilterHasBoost] = useState(false);
-  const [filterHasCashout, setFilterHasCashout] = useState(false);
-  const [filterUsedCredits, setFilterUsedCredits] = useState(false);
-  const [filterIsProtected, setFilterIsProtected] = useState(false);
-  
-  // Ordenação
-  const [sortColumn, setSortColumn] = useState<string>('date');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   // Verificar query params e sessionStorage ao montar
   useEffect(() => {
@@ -79,7 +71,7 @@ export default function BetsList() {
       setReturnPath(savedPath);
       setReturnLabel(savedLabel || 'Voltar');
     }
-  }, []);
+  }, [setFilterTeam]);
 
   // Merge real bets with mock bets for demonstration
   const allBets = useMemo(() => {

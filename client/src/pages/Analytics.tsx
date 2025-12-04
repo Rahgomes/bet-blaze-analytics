@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useMemo } from 'react';
+import { useBettingStore } from '@/stores/betting';
+import { useAnalyticsFilterStore } from '@/stores/filters/analyticsFilterStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AnalyticsFilters } from '@/components/betting/AnalyticsFilters';
@@ -24,17 +25,30 @@ import { ptBR } from 'date-fns/locale';
 import { TrendingUp, DollarSign, Target as TargetIcon, Activity } from 'lucide-react';
 
 export default function Analytics() {
-  const { bets, bankroll } = useBettingData();
+  // Dados da betting store
+  const bets = useBettingStore(state => state.bets);
+  const bankroll = useBettingStore(state => state.bankroll);
 
-  // Estados dos filtros
-  const [period, setPeriod] = useState('30days');
-  const [selectedBookmakers, setSelectedBookmakers] = useState<string[]>([]);
-  const [selectedLeagues, setSelectedLeagues] = useState<string[]>([]);
-  const [selectedBetTypes, setSelectedBetTypes] = useState<string[]>([]);
-  const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
-  const [oddsRange, setOddsRange] = useState({ min: 1.01, max: 10 });
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+  // Filtros da analytics filter store
+  const {
+    period,
+    selectedBookmakers,
+    selectedLeagues,
+    selectedBetTypes,
+    selectedMarkets,
+    oddsRange,
+    selectedStatuses,
+    selectedTeams,
+    setPeriod,
+    setSelectedBookmakers,
+    setSelectedLeagues,
+    setSelectedBetTypes,
+    setSelectedMarkets,
+    setOddsRange,
+    setSelectedStatuses,
+    setSelectedTeams,
+    clearFilters,
+  } = useAnalyticsFilterStore();
 
   // Extrair listas únicas de filtros
   const availableBookmakers = useMemo(() =>
@@ -331,16 +345,9 @@ export default function Analytics() {
     }).filter(r => r.bets > 0);
   }, [currentBets]);
 
-  // Função de limpar filtros
+  // Função de limpar filtros (agora usa a action da store)
   const handleClearFilters = () => {
-    setPeriod('30days');
-    setSelectedBookmakers([]);
-    setSelectedLeagues([]);
-    setSelectedBetTypes([]);
-    setSelectedMarkets([]);
-    setOddsRange({ min: 1.01, max: 10 });
-    setSelectedStatuses([]);
-    setSelectedTeams([]);
+    clearFilters();
   };
 
   return (
