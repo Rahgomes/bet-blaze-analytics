@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, TrendingUp, Activity, Target } from 'lucide-react';
@@ -9,7 +9,7 @@ import TeamsTable from '@/components/betting/TeamsTable';
 
 export default function WatchlistTeams() {
   const [, setLocation] = useLocation();
-  const { bets } = useBettingData();
+  const bets = useBettingStore(state => state.bets);
 
   // Estados de filtros
   const [searchTerm, setSearchTerm] = useState('');

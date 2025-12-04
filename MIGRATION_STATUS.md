@@ -365,14 +365,147 @@ const addImportSession = useBettingStore(state => state.addImportSession);
 
 ---
 
-## 🔄 PRÓXIMAS FASES
+## ✅ FASE 12: Migração Watchlist.tsx - CONCLUÍDA
 
-### FASES 12-13: Migração Watchlist Pages (PRÓXIMAS)
-- [ ] Watchlist.tsx
-- [ ] WatchlistTeams.tsx
+### Arquivos Migrados
+- [x] `client/src/pages/Watchlist.tsx`
 
-### FASE 14: Reports
-- [ ] Reports.tsx
+### Mudanças Realizadas no Watchlist
+**Antes:**
+```typescript
+const { teams: realTeams, addTeam, deleteTeam } = useExtendedData();
+const { bets, bankroll } = useBettingData();
+```
+
+**Depois:**
+```typescript
+const realTeams = useBettingStore(state => state.teams);
+const addTeam = useBettingStore(state => state.addTeam);
+const deleteTeam = useBettingStore(state => state.deleteTeam);
+const bets = useBettingStore(state => state.bets);
+const bankroll = useBettingStore(state => state.bankroll);
+```
+
+### Benefícios Obtidos
+- **Hooks antigos removidos** - não usa mais `useExtendedData` nem `useBettingData`
+- **Acesso a teams, bets e bankroll** - dados centralizados na store
+- **Estados locais preservados** - filtros, tabs e modais mantidos com useState (correto!)
+
+---
+
+## ✅ FASE 13: Migração WatchlistTeams.tsx - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/WatchlistTeams.tsx`
+
+### Mudanças Realizadas no WatchlistTeams
+**Antes:**
+```typescript
+const { bets } = useBettingData();
+```
+
+**Depois:**
+```typescript
+const bets = useBettingStore(state => state.bets);
+```
+
+### Benefícios Obtidos
+- **Hook antigo removido** - não usa mais `useBettingData`
+- **Acesso a bets** - calcula estatísticas de times a partir das apostas
+- **Estados locais preservados** - filtros, ordenação e paginação mantidos com useState (correto!)
+
+---
+
+## ✅ FASE 14: Migração Reports.tsx - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/Reports.tsx`
+
+### Mudanças Realizadas no Reports
+**Antes:**
+```typescript
+const { bets } = useBettingData();
+```
+
+**Depois:**
+```typescript
+const bets = useBettingStore(state => state.bets);
+```
+
+### Benefícios Obtidos
+- **Hook antigo removido** - não usa mais `useBettingData`
+- **Acesso a bets** - gera relatórios por times, ligas e estratégias
+- **Estados locais preservados** - período selecionado e modal de detalhes mantidos com useState (correto!)
+
+---
+
+## 🎉 MIGRAÇÃO COMPLETA - 100%
+
+### Resumo Final
+
+**Total de páginas migradas: 13/13 (100%)**
+
+✅ **Todas as páginas concluídas:**
+1. Dashboard.tsx
+2. Analytics.tsx
+3. BetsList.tsx
+4. AddBet.tsx
+5. BankrollSettings.tsx
+6. DepositsHistory.tsx
+7. WithdrawalsHistory.tsx
+8. Import.tsx
+9. ImportHistory.tsx
+10. ImportPreview.tsx
+11. Watchlist.tsx
+12. WatchlistTeams.tsx
+13. Reports.tsx
+
+### Stores Criadas
+
+**Betting Store (principal):**
+- `betsSlice.ts` - Gerenciamento de apostas
+- `bankrollSlice.ts` - Gerenciamento de banca
+- `transactionsSlice.ts` - Aportes e saques
+- `bookmakersSlice.ts` - Casas de apostas
+- `selectors.ts` - Seletores computados
+- `index.ts` - Store combinada com DevTools
+
+**Filter Stores:**
+- `analyticsFilterStore.ts` - 8 filtros (Analytics)
+- `betsListFilterStore.ts` - 19 filtros (BetsList)
+
+**Middleware:**
+- `sessionStorageMiddleware.ts` - Persistência de filtros
+
+### Hooks Antigos (Podem ser removidos)
+
+Após validação completa, os seguintes hooks podem ser deletados:
+- ❌ `client/src/hooks/useBettingData.ts`
+- ❌ `client/src/hooks/useExtendedData.ts`
+
+### Benefícios da Migração
+
+1. **Performance:**
+   - Selectors computados evitam recálculos desnecessários
+   - Renderizações otimizadas com acesso granular ao estado
+
+2. **Persistência:**
+   - localStorage para dados principais (bets, bankroll, transactions, bookmakers)
+   - sessionStorage para filtros de UI (Analytics, BetsList)
+
+3. **DevTools:**
+   - Redux DevTools habilitado para debugging
+   - Time-travel debugging disponível
+
+4. **Organização:**
+   - Código mais limpo e modular
+   - Separação clara entre estado global e local
+   - Stores especializadas por domínio
+
+5. **Manutenibilidade:**
+   - Código centralizado e reutilizável
+   - Menor acoplamento entre componentes
+   - Mais fácil de testar
 
 ---
 

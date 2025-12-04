@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useExtendedData } from '@/hooks/useExtendedData';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
 import { Bet } from '@/types/betting';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -241,8 +240,11 @@ const generateMockTeams = () => [
 
 export default function Watchlist() {
   const { t } = useTranslation();
-  const { teams: realTeams, addTeam, deleteTeam } = useExtendedData();
-  const { bets, bankroll } = useBettingData();
+  const realTeams = useBettingStore(state => state.teams);
+  const addTeam = useBettingStore(state => state.addTeam);
+  const deleteTeam = useBettingStore(state => state.deleteTeam);
+  const bets = useBettingStore(state => state.bets);
+  const bankroll = useBettingStore(state => state.bankroll);
   const [, setLocation] = useLocation();
 
   const [activeTab, setActiveTab] = useState('exposure');

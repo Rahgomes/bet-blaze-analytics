@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
 import { generateMockBets } from '@/utils/mockData';
 import { filterBetsByPeriod, calculateStats, TimePeriod } from '@/utils/dateFilters';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +14,7 @@ import { Eye } from 'lucide-react';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
 export default function Reports() {
-  const { bets } = useBettingData();
+  const bets = useBettingStore(state => state.bets);
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
   const [detailView, setDetailView] = useState<{ type: string; value: string; bets: any[] } | null>(null);
 
