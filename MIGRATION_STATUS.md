@@ -235,15 +235,143 @@ const deleteTransaction = useBettingStore(state => state.deleteTransaction);
 
 ---
 
+## ✅ FASE 7: Migração DepositsHistory - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/DepositsHistory.tsx`
+
+### Mudanças Realizadas no DepositsHistory
+**Antes:**
+```typescript
+const { bankroll, transactions, updateTransaction, deleteTransaction } = useBettingData();
+```
+
+**Depois:**
+```typescript
+// Dados e actions da betting store
+const bankroll = useBettingStore(state => state.bankroll);
+const transactions = useBettingStore(state => state.transactions);
+const updateTransaction = useBettingStore(state => state.updateTransaction);
+const deleteTransaction = useBettingStore(state => state.deleteTransaction);
+```
+
+### Benefícios Obtidos
+- **Hook antigo removido** - não usa mais `useBettingData`
+- **Acesso a transactions** - filtra por tipo 'deposit' localmente
+- **Estados locais preservados** - filtros e modais mantidos com useState (correto!)
+
+---
+
+## ✅ FASE 8: Migração WithdrawalsHistory - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/WithdrawalsHistory.tsx`
+
+### Mudanças Realizadas no WithdrawalsHistory
+**Antes:**
+```typescript
+const { bankroll, transactions, updateTransaction, deleteTransaction } = useBettingData();
+```
+
+**Depois:**
+```typescript
+// Dados e actions da betting store
+const bankroll = useBettingStore(state => state.bankroll);
+const transactions = useBettingStore(state => state.transactions);
+const updateTransaction = useBettingStore(state => state.updateTransaction);
+const deleteTransaction = useBettingStore(state => state.deleteTransaction);
+```
+
+### Benefícios Obtidos
+- **Hook antigo removido** - não usa mais `useBettingData`
+- **Acesso a transactions** - filtra por tipo 'withdrawal' localmente
+- **Estados locais preservados** - filtros e modais mantidos com useState (correto!)
+
+---
+
+## ✅ FASE 9: Migração Import.tsx - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/Import.tsx`
+
+### Mudanças Realizadas no Import
+**Antes:**
+```typescript
+const { getImportSessions } = useBettingData();
+const importSessions = getImportSessions();
+```
+
+**Depois:**
+```typescript
+const getImportSessions = useBettingStore(state => state.getImportSessions);
+const importSessions = getImportSessions();
+```
+
+### Benefícios Obtidos
+- **Hook antigo removido** - não usa mais `useBettingData`
+- **Acesso a import sessions** - busca sessões de importação da store
+- **Estados locais preservados** - file upload e UI states mantidos locais (correto!)
+
+---
+
+## ✅ FASE 10: Migração ImportHistory.tsx - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/ImportHistory.tsx`
+
+### Mudanças Realizadas no ImportHistory
+**Antes:**
+```typescript
+const { getImportSessions, bets } = useBettingData();
+const sessions = getImportSessions();
+```
+
+**Depois:**
+```typescript
+const getImportSessions = useBettingStore(state => state.getImportSessions);
+const bets = useBettingStore(state => state.bets);
+const sessions = getImportSessions();
+```
+
+### Benefícios Obtidos
+- **Hook antigo removido** - não usa mais `useBettingData`
+- **Acesso a bets e sessions** - relaciona apostas com sessões de importação
+- **Estados locais preservados** - filtros e expansão mantidos com useState (correto!)
+
+---
+
+## ✅ FASE 11: Migração ImportPreview.tsx - CONCLUÍDA
+
+### Arquivos Migrados
+- [x] `client/src/pages/ImportPreview.tsx`
+
+### Mudanças Realizadas no ImportPreview
+**Antes:**
+```typescript
+const { addBet, bookmakers, addImportSession } = useBettingData();
+```
+
+**Depois:**
+```typescript
+const addBet = useBettingStore(state => state.addBet);
+const bookmakers = useBettingStore(state => state.bookmakers);
+const addImportSession = useBettingStore(state => state.addImportSession);
+```
+
+### Benefícios Obtidos
+- **Hook antigo removido** - não usa mais `useBettingData`
+- **Actions da store** - importação em massa via Zustand
+- **Estados locais preservados** - preview state, filtros e modais mantidos locais (correto!)
+
+---
+
 ## 🔄 PRÓXIMAS FASES
 
-### FASE 7-8: Migração History Pages (PRÓXIMAS)
-- [ ] DepositsHistory.tsx
-- [ ] WithdrawalsHistory.tsx
+### FASES 12-13: Migração Watchlist Pages (PRÓXIMAS)
+- [ ] Watchlist.tsx
+- [ ] WatchlistTeams.tsx
 
-### FASES 9-14: Demais Páginas
-- [ ] Import.tsx, ImportHistory.tsx, ImportPreview.tsx
-- [ ] Watchlist.tsx, WatchlistTeams.tsx
+### FASE 14: Reports
 - [ ] Reports.tsx
 
 ---

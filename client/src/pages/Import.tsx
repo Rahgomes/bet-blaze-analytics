@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
 import { parseImportFile, validateFileType, validateFileSize } from '@/utils/importParser';
 import { validateImportRows } from '@/utils/importValidator';
 import { ImportPreviewState } from '@/types/import';
@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 
 export default function Import() {
   const [, setLocation] = useLocation();
-  const { getImportSessions } = useBettingData();
+  const getImportSessions = useBettingStore(state => state.getImportSessions);
   const importSessions = getImportSessions();
 
   const [file, setFile] = useState<File | null>(null);

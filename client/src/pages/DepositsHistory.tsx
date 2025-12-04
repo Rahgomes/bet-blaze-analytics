@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +22,10 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function DepositsHistory() {
   const [, setLocation] = useLocation();
-  const { bankroll, transactions, updateTransaction, deleteTransaction } = useBettingData();
+  const bankroll = useBettingStore(state => state.bankroll);
+  const transactions = useBettingStore(state => state.transactions);
+  const updateTransaction = useBettingStore(state => state.updateTransaction);
+  const deleteTransaction = useBettingStore(state => state.deleteTransaction);
   const { toast } = useToast();
 
   // Get all deposits

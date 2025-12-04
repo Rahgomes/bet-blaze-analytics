@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { ImportSession } from '@/types/import';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
 import { ImportHistoryCard } from '@/components/betting/ImportHistoryCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +15,8 @@ import { ptBR } from 'date-fns/locale';
 
 export default function ImportHistory() {
   const [, setLocation] = useLocation();
-  const { getImportSessions, bets } = useBettingData();
+  const getImportSessions = useBettingStore(state => state.getImportSessions);
+  const bets = useBettingStore(state => state.bets);
   const sessions = getImportSessions();
 
   const [searchTerm, setSearchTerm] = useState('');

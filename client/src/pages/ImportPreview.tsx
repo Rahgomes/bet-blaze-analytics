@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { ImportPreviewState, ImportRow, ImportPreviewFilters } from '@/types/import';
 import { BetFormData } from '@/lib/schemas/betFormSchema';
-import { useBettingData } from '@/hooks/useBettingData';
+import { useBettingStore } from '@/stores/betting';
 import { validateImportRows, getValidationSummary } from '@/utils/importValidator';
 import { ImportPreviewTable } from '@/components/betting/ImportPreviewTable';
 import { ImportEditModal } from '@/components/betting/ImportEditModal';
@@ -26,7 +26,9 @@ import { toast } from 'sonner';
 
 export default function ImportPreview() {
   const [, setLocation] = useLocation();
-  const { addBet, bookmakers, addImportSession } = useBettingData();
+  const addBet = useBettingStore(state => state.addBet);
+  const bookmakers = useBettingStore(state => state.bookmakers);
+  const addImportSession = useBettingStore(state => state.addImportSession);
 
   // Load preview state from sessionStorage
   const [previewState, setPreviewState] = useState<ImportPreviewState | null>(() => {
