@@ -238,6 +238,8 @@ export default function ImportPreview() {
 
           const profit = return_ - totalAmount;
 
+          const betStatus = (allWon ? 'won' : anyLost ? 'lost' : anyVoid ? 'void' : 'pending') as 'pending' | 'won' | 'lost' | 'void';
+          
           const betData = {
             bookmaker: row.data.bookmaker!,
             date: row.data.date!,
@@ -246,7 +248,7 @@ export default function ImportPreview() {
             odds: finalOdds,
             return: return_,
             profit,
-            status: allWon ? 'won' : anyLost ? 'lost' : anyVoid ? 'void' : 'pending',
+            status: betStatus,
             description: row.data.description!,
             stakeLogic: row.data.stakeLogic,
             isProtected: row.data.legs?.some((leg) => leg.protectionTypes.length > 0),
@@ -255,7 +257,6 @@ export default function ImportPreview() {
             importSessionId: importSession.id,
             legs: row.data.legs,
             tags: row.data.tags,
-            operationNumber: row.data.operationNumber,
           };
 
           const bet = addBet(betData);

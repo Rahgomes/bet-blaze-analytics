@@ -4,8 +4,9 @@ import { createBetsSlice, BetsSlice } from './betsSlice';
 import { createBankrollSlice, BankrollSlice } from './bankrollSlice';
 import { createTransactionsSlice, TransactionsSlice } from './transactionsSlice';
 import { createBookmakersSlice, BookmakersSlice } from './bookmakersSlice';
+import { createImportSessionsSlice, ImportSessionsSlice } from './importSessionsSlice';
 
-export type BettingStore = BetsSlice & BankrollSlice & TransactionsSlice & BookmakersSlice;
+export type BettingStore = BetsSlice & BankrollSlice & TransactionsSlice & BookmakersSlice & ImportSessionsSlice;
 
 export const useBettingStore = create<BettingStore>()(
   devtools(
@@ -14,6 +15,7 @@ export const useBettingStore = create<BettingStore>()(
       ...createBankrollSlice(...args),
       ...createTransactionsSlice(...args),
       ...createBookmakersSlice(...args),
+      ...createImportSessionsSlice(...args),
     }),
     { name: 'BettingStore' }
   )
@@ -68,6 +70,17 @@ export const initializeBettingStore = () => {
       } catch (error) {
         console.error('Error parsing bookmakers data:', error);
         localStorage.removeItem('betting_bookmakers');
+      }
+    }
+
+    // Load import sessions
+    const importSessionsData = localStorage.getItem('betting_import_sessions');
+    if (importSessionsData) {
+      try {
+        store.setImportSessions(JSON.parse(importSessionsData));
+      } catch (error) {
+        console.error('Error parsing import sessions data:', error);
+        localStorage.removeItem('betting_import_sessions');
       }
     }
   } catch (error) {

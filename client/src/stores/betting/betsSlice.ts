@@ -6,7 +6,7 @@ export interface BetsSlice {
   loading: boolean;
 
   // Actions
-  addBet: (bet: Omit<Bet, 'id' | 'createdAt' | 'updatedAt' | 'operationNumber'>) => void;
+  addBet: (bet: Omit<Bet, 'id' | 'createdAt' | 'updatedAt' | 'operationNumber'>) => Bet;
   updateBet: (id: string, updates: Partial<Bet>) => void;
   deleteBet: (id: string) => void;
   setBets: (bets: Bet[]) => void;
@@ -38,6 +38,7 @@ export const createBetsSlice: StateCreator<
 
     set({ bets: [...bets, newBet] });
     localStorage.setItem('betting_bets', JSON.stringify([...bets, newBet]));
+    return newBet;
   },
 
   updateBet: (id, updates) => {
