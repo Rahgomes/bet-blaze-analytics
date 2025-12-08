@@ -19,49 +19,18 @@ import { PreviewCard } from '@/components/betting/PreviewCard';
 import { LegAccordion } from '@/components/betting/LegAccordion';
 import { BetConfirmationModal } from '@/components/betting/BetConfirmationModal';
 import { sortStakesByPercentage } from '@/utils/stakeUtils';
+import { useTranslation } from '@/hooks/useTranslation';
 
-const protectionTypes = [
-  'DC (Double Chance)',
-  'DNB (Draw No Bet)',
-  'Asian Handicap',
-  'European Handicap',
-  'Cash Out Available'
-];
+interface SportMarketsMap {
+  [key: string]: string[];
+}
 
-const sportMarkets: Record<string, string[]> = {
-  'Futebol': [
-    'Resultado Final', 'Ambas Marcam', 'Total de Gols',
-    'Aposta Criada/Bet Builder', 'Back ao Favorito', 'Back à Zebra',
-    'Escanteios', 'Cartões', 'Handicap', 'Resultado 1º Tempo'
-  ],
-  'Basquete': ['Spread', 'Total de Pontos', 'Vencedor'],
-  'Tênis': ['Vencedor da Partida', 'Total de Games', 'Handicap Games'],
-  'E-Sports': ['Vencedor', 'Mapas', 'Total de Kills'],
-  'Outros': ['Vencedor', 'Handicap', 'Total']
-};
-
-const strategies = [
-  'Linha Segura', 'Value Betting', 'Arbitragem',
-  'Kelly Criterion', 'Flat Betting', 'Progressão'
-];
-
-const leagues = [
-  'Brasileirão Série A', 'Premier League', 'La Liga',
-  'Champions League', 'Libertadores', 'Copa do Brasil',
-  'Serie A', 'Bundesliga', 'Ligue 1', 'Europa League'
-];
-
-const predefinedTags = [
-  'Value Bet', 'Linha Segura', 'Alto Risco', 'Arbitragem',
-  'Aposta Principal', 'Hedge', 'Experimental', 'Seguindo Tipster'
-];
-
-const createEmptyLeg = () => ({
+const createEmptyLeg = (defaultSport: string) => ({
   amount: '',
   odds: '',
   homeTeam: '',
   awayTeam: '',
-  sport: 'Futebol',
+  sport: defaultSport,
   market: '',
   league: '',
   matchTime: new Date().toISOString().slice(0, 16),
@@ -85,7 +54,68 @@ const createEmptyLeg = () => ({
 });
 
 export default function AddBet() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
+
+  const protectionTypes = useMemo(() => [
+    t('protections.dc'),
+    t('protections.dnb'),
+    t('protections.asianHandicap'),
+    t('protections.europeanHandicap'),
+    t('protections.cashOut')
+  ], [t]);
+
+  const sportMarkets = useMemo<SportMarketsMap>(() => ({
+    [t('sports.soccer')]: [
+      t('markets.matchResult'),
+      t('markets.btts'),
+      t('markets.totalGoals'),
+      t('markets.betBuilder'),
+      t('markets.backFavorite'),
+      t('markets.backUnderdog'),
+      t('markets.corners'),
+      t('markets.cards'),
+      t('markets.handicap'),
+      t('markets.firstHalfResult')
+    ],
+    [t('sports.basketball')]: [t('markets.spread'), t('markets.totalPoints'), t('markets.winner')],
+    [t('sports.tennis')]: [t('markets.winner'), t('markets.totalGames'), t('markets.handicapGames')],
+    [t('sports.eSports')]: [t('markets.winner'), t('markets.maps'), t('markets.totalKills')],
+    [t('sports.others')]: [t('markets.winner'), t('markets.handicap'), t('markets.totalGoals')]
+  }), [t]);
+
+  const strategies = useMemo(() => [
+    t('strategies.safeLine'),
+    t('strategies.valueBetting'),
+    t('strategies.arbitrage'),
+    t('strategies.kellyCriterion'),
+    t('strategies.flatBetting'),
+    t('strategies.progressive')
+  ], [t]);
+
+  const leagues = useMemo(() => [
+    t('leagues.brasileiraoA'),
+    t('leagues.premierLeague'),
+    t('leagues.laLiga'),
+    t('leagues.championsLeague'),
+    t('leagues.libertadores'),
+    t('leagues.copaDoBrasil'),
+    t('leagues.serieA'),
+    t('leagues.bundesliga'),
+    t('leagues.ligue1'),
+    t('leagues.europaLeague')
+  ], [t]);
+
+  const predefinedTags = useMemo(() => [
+    t('tags.valueBet'),
+    t('tags.safeLine'),
+    t('tags.highRisk'),
+    t('tags.arbitrage'),
+    t('tags.mainBet'),
+    t('tags.hedge'),
+    t('tags.experimental'),
+    t('tags.followingTipster')
+  ], [t]);
 
   // Dados e actions da betting store
   const addBet = useBettingStore(state => state.addBet);
@@ -108,6 +138,8 @@ export default function AddBet() {
     sourceTipId?: string;
   } | null;
 
+  const defaultSport = t('sports.soccer');
+
   const methods = useForm<BetFormData>({
     resolver: zodResolver(betFormSchema),
     defaultValues: {
@@ -116,7 +148,7 @@ export default function AddBet() {
       betType: 'simple',
       multipleQuantity: '1',
       operationNumber: '',
-      legs: [createEmptyLeg()],
+      legs: [createEmptyLeg(defaultSport)],
       description: '',
       stakeLogic: '',
       tags: [],
@@ -145,7 +177,7 @@ export default function AddBet() {
     if (quantity !== currentLegsCount) {
       if (quantity > currentLegsCount) {
         for (let i = currentLegsCount; i < quantity; i++) {
-          append(createEmptyLeg());
+          append(createEmptyLeg(defaultSport));
         }
       } else {
         for (let i = currentLegsCount - 1; i >= quantity; i--) {
@@ -368,8 +400,8 @@ export default function AddBet() {
     <FormProvider {...methods}>
       <div className="space-y-6 max-w-6xl mx-auto pb-12">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Adicionar Aposta</h1>
-          <p className="text-muted-foreground">Registrar uma nova aposta com funcionalidades avançadas</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('addBet.title')}</h1>
+          <p className="text-muted-foreground">{t('addBet.description')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

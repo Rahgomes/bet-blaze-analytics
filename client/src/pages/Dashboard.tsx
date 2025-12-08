@@ -8,8 +8,10 @@ import { useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { calculateStats } from '@/utils/dateFilters';
 import { isToday, isThisWeek, isThisMonth } from 'date-fns';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Dashboard() {
+  const { t, language } = useTranslation();
   const bets = useBettingStore(state => state.bets);
   const bankroll = useBettingStore(state => state.bankroll);
   const loading = useBettingStore(state => state.loading);
@@ -105,24 +107,23 @@ export default function Dashboard() {
     return result.slice(0, 3);
   }, [currentMonthBets]);
 
-  // Últimos 5 meses para comparação
   const last5MonthsData = useMemo(() => {
     const months = [];
     const currentDate = new Date();
-    
+    const locale = language === 'pt-br' ? 'pt-BR' : 'en-US';
+
     for (let i = 0; i < 5; i++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-      const monthName = date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-      
-      // Filtrar apostas para este mês específico
+      const monthName = date.toLocaleDateString(locale, { month: 'short', year: 'numeric' });
+
       const monthBets = bets.filter(bet => {
         const betDate = new Date(bet.date);
-        return betDate.getMonth() === date.getMonth() && 
+        return betDate.getMonth() === date.getMonth() &&
                betDate.getFullYear() === date.getFullYear();
       });
 
       const stats = calculateStats(monthBets);
-      
+
       months.push({
         month: monthName,
         winRate: stats.winRate,
@@ -132,7 +133,6 @@ export default function Dashboard() {
       });
     }
 
-    // Se não há dados reais, usar mock data
     if (months.every(m => m.betsCount === 0)) {
       return [
         { month: 'nov/2025', winRate: 62, betsCount: 24, roi: 8.2, profit: 41.50 },
@@ -144,50 +144,49 @@ export default function Dashboard() {
     }
 
     return months;
-  }, [bets]);
+  }, [bets, language]);
 
-  // Informações de data
   const dateInfo = useMemo(() => {
     const today = new Date();
     const weekNumber = Math.ceil(today.getDate() / 7);
-    
+    const locale = language === 'pt-br' ? 'pt-BR' : 'en-US';
+    const weekSuffix = language === 'pt-br' ? 'ª semana' : 'week';
+
     return {
-      todayFormatted: today.toLocaleDateString('pt-BR'),
-      monthYear: today.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+      todayFormatted: today.toLocaleDateString(locale),
+      monthYear: today.toLocaleDateString(locale, { month: 'long', year: 'numeric' })
         .replace(/^\w/, c => c.toUpperCase()),
-      monthYearShort: today.toLocaleDateString('pt-BR', { month: '2-digit', year: '2-digit' }),
-      weekNumber: `${weekNumber}ª semana`
+      monthYearShort: today.toLocaleDateString(locale, { month: '2-digit', year: '2-digit' }),
+      weekNumber: `${weekNumber}${language === 'pt-br' ? 'ª' : ''} ${weekSuffix}`
     };
-  }, []);
+  }, [language]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="text-muted-foreground">Carregando...</div>
+        <div className="text-muted-foreground">{t('common.loading')}</div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Visão Geral</h1>
-          <p className="text-muted-foreground">Central de Comando – {dateInfo.monthYear}</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.overview')}</h1>
+          <p className="text-muted-foreground">{t('dashboard.commandCenter')} – {dateInfo.monthYear}</p>
         </div>
         <div className="text-right text-sm text-muted-foreground">
-          <p>Hoje: {dateInfo.todayFormatted}</p>
-          <p>Semana atual: {dateInfo.weekNumber}</p>
+          <p>{t('dashboard.today')}: {dateInfo.todayFormatted}</p>
+          <p>{t('dashboard.currentWeek')}: {dateInfo.weekNumber}</p>
         </div>
       </div>
 
-      {/* SEÇÃO: RESUMO */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Resumo</h2>
+        <h2 className="text-xl font-semibold">{t('dashboard.summary')}</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           <StatCard
-            title="Banca Atual"
+            title={t('dashboard.currentBankroll')}
             value={`R$ ${bankroll.currentBankroll.toFixed(2)}`}
             icon={<Wallet className="h-4 w-4 text-muted-foreground" />}
             trend={{
@@ -196,7 +195,7 @@ export default function Dashboard() {
             }}
           />
           <StatCard
-            title={`Lucro Hoje`}
+            title={t('dashboard.profitToday')}
             value={`R$ ${todayStats.totalProfit.toFixed(2)}`}
             icon={todayStats.totalProfit >= 0 ?
               <TrendingUp className="h-4 w-4 text-[hsl(var(--profit))]" /> :
@@ -206,7 +205,7 @@ export default function Dashboard() {
             className="cursor-pointer hover:bg-accent/50 transition-colors"
           />
           <StatCard
-            title={`Lucro Semana`}
+            title={t('dashboard.profitWeek')}
             value={`R$ ${currentWeekStats.totalProfit.toFixed(2)}`}
             icon={currentWeekStats.totalProfit >= 0 ?
               <TrendingUp className="h-4 w-4 text-[hsl(var(--profit))]" /> :
@@ -216,7 +215,7 @@ export default function Dashboard() {
             className="cursor-pointer hover:bg-accent/50 transition-colors"
           />
           <StatCard
-            title={`Lucro ${dateInfo.monthYearShort}`}
+            title={`${t('dashboard.profitMonth')} ${dateInfo.monthYearShort}`}
             value={`R$ ${currentMonthStats.totalProfit.toFixed(2)}`}
             icon={currentMonthStats.totalProfit >= 0 ?
               <TrendingUp className="h-4 w-4 text-[hsl(var(--profit))]" /> :
@@ -226,14 +225,14 @@ export default function Dashboard() {
             className="cursor-pointer hover:bg-accent/50 transition-colors"
           />
           <StatCard
-            title="Taxa de Acertos"
+            title={t('dashboard.winRate')}
             value={`${currentMonthStats.winRate.toFixed(1)}%`}
             icon={<Target className="h-4 w-4 text-muted-foreground" />}
             onClick={() => setLocation('/bets?period=month')}
             className="cursor-pointer hover:bg-accent/50 transition-colors"
           />
           <StatCard
-            title="ROI Mês Atual"
+            title={t('dashboard.roiCurrentMonth')}
             value={`${currentMonthStats.roi.toFixed(1)}%`}
             icon={<Activity className="h-4 w-4 text-muted-foreground" />}
             onClick={() => setLocation('/bets?period=month')}
@@ -242,27 +241,26 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* SEÇÃO: VALORES DE ENTRADA PADRÃO */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Valores de Entrada Padrão</h2>
+        <h2 className="text-xl font-semibold">{t('dashboard.standardStakeValues')}</h2>
         <Card>
           <CardHeader>
-            <CardTitle>Baseado na Banca Atual</CardTitle>
+            <CardTitle>{t('dashboard.basedOnCurrentBankroll')}</CardTitle>
             <CardDescription>
-              Stakes personalizados para gestão de risco
+              {t('dashboard.customStakesRiskManagement')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {stakeValues.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <p className="mb-2">Nenhum stake configurado</p>
-                <p className="text-sm mb-4">Configure seus stakes na aba de Gestão de Risco</p>
+                <p className="mb-2">{t('dashboard.noStakesConfigured')}</p>
+                <p className="text-sm mb-4">{t('dashboard.configureStakesInRiskTab')}</p>
                 <Button
                   variant="outline"
                   onClick={() => setLocation('/settings?tab=risk')}
                 >
                   <Settings className="h-4 w-4 mr-2" />
-                  Configurar Stakes
+                  {t('dashboard.configureStakes')}
                 </Button>
               </div>
             ) : (
@@ -299,47 +297,46 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* SEÇÃO: PERFORMANCE POR CASA DE APOSTAS */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Performance por Casa de Apostas</h2>
+        <h2 className="text-xl font-semibold">{t('dashboard.bookmakerPerformance')}</h2>
         <Card>
           <CardHeader>
-            <CardTitle>Resumo do Mês Atual</CardTitle>
-            <CardDescription>Apostado vs Retornado e performance por bookmaker</CardDescription>
+            <CardTitle>{t('dashboard.currentMonthSummary')}</CardTitle>
+            <CardDescription>{t('dashboard.stakedVsReturned')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {bookmakerPerformance.map((bookmaker, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
                   onClick={() => setLocation(`/bets?bookmaker=${encodeURIComponent(bookmaker.name)}&period=month`)}
                 >
                   <div className="flex justify-between items-center mb-3">
                     <span className="font-semibold text-lg">{bookmaker.name}</span>
-                    <Badge variant="outline">{bookmaker.betsCount} apostas</Badge>
+                    <Badge variant="outline">{bookmaker.betsCount} {t('dashboard.betsCount')}</Badge>
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Apostado:</span>
+                      <span className="text-muted-foreground">{t('dashboard.staked')}:</span>
                       <span className="font-medium">R$ {bookmaker.totalStaked.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Retornado:</span>
+                      <span className="text-muted-foreground">{t('dashboard.returned')}:</span>
                       <span className="font-medium">R$ {bookmaker.totalReturned.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Lucro/Prejuízo:</span>
+                      <span className="text-muted-foreground">{t('dashboard.profitLoss')}:</span>
                       <span className={`font-semibold ${bookmaker.totalProfit >= 0 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
                         {bookmaker.totalProfit >= 0 ? '+' : ''}R$ {bookmaker.totalProfit.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Banca Inicial:</span>
+                      <span className="text-muted-foreground">{t('dashboard.initialBankroll')}:</span>
                       <span className="font-medium">R$ {(bankroll.initialBankroll * 0.7).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Banca Atual:</span>
+                      <span className="text-muted-foreground">{t('dashboard.currentBankroll')}:</span>
                       <span className="font-medium">R$ {(bankroll.initialBankroll * 0.7 + bookmaker.totalProfit).toFixed(2)}</span>
                     </div>
                   </div>
@@ -350,9 +347,8 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* SEÇÃO: COMPARAÇÃO DE PERFORMANCE POR PERÍODO */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Comparação de Performance por Período</h2>
+        <h2 className="text-xl font-semibold">{t('dashboard.performanceComparison')}</h2>
         <div className="grid gap-4 md:grid-cols-5">
           {last5MonthsData.map((monthData, index) => (
             <Card key={index} className={`${index === 0 ? 'border-blue-500 bg-blue-50' : ''}`}>
@@ -366,10 +362,10 @@ export default function Dashboard() {
                   <div className={`text-2xl font-bold ${monthData.winRate >= 55 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
                     {monthData.winRate.toFixed(0)}%
                   </div>
-                  <div className="text-xs text-muted-foreground">Taxa de Acertos</div>
-                  <div className="text-sm font-medium">{monthData.betsCount} apostas</div>
+                  <div className="text-xs text-muted-foreground">{t('dashboard.winRate')}</div>
+                  <div className="text-sm font-medium">{monthData.betsCount} {t('dashboard.betsCount')}</div>
                   <div className={`text-sm ${monthData.roi >= 0 ? 'text-[hsl(var(--profit))]' : 'text-[hsl(var(--loss))]'}`}>
-                    ROI: {monthData.roi.toFixed(1)}%
+                    {t('dashboard.roi')}: {monthData.roi.toFixed(1)}%
                   </div>
                 </div>
               </CardContent>
@@ -378,19 +374,18 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* SEÇÃO: LIMITES DE ENTRADA X PARADA */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Limites de Entrada x Parada</h2>
+        <h2 className="text-xl font-semibold">{t('dashboard.stopLimits')}</h2>
         <Card>
           <CardHeader>
-            <CardTitle>Configurações de Proteção</CardTitle>
-            <CardDescription>Limites definidos para proteção da banca</CardDescription>
+            <CardTitle>{t('dashboard.protectionSettings')}</CardTitle>
+            <CardDescription>{t('dashboard.limitsForBankrollProtection')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <div className="p-4 border rounded-lg bg-green-50 border-green-200">
                 <div className="text-center">
-                  <div className="text-lg font-bold text-green-700">Stop Gain Mensal</div>
+                  <div className="text-lg font-bold text-green-700">{t('dashboard.monthlyStopGain')}</div>
                   <div className="text-2xl font-bold text-green-600">20%</div>
                   <div className="text-sm text-green-600 mt-1">
                     R$ {(bankroll.initialBankroll * 0.20).toFixed(2)}
@@ -399,7 +394,7 @@ export default function Dashboard() {
               </div>
               <div className="p-4 border rounded-lg bg-red-50 border-red-200">
                 <div className="text-center">
-                  <div className="text-lg font-bold text-red-700">Stop Loss Mensal</div>
+                  <div className="text-lg font-bold text-red-700">{t('dashboard.monthlyStopLoss')}</div>
                   <div className="text-2xl font-bold text-red-600">15%</div>
                   <div className="text-sm text-red-600 mt-1">
                     R$ {(bankroll.initialBankroll * 0.15).toFixed(2)}
@@ -408,7 +403,7 @@ export default function Dashboard() {
               </div>
               <div className="p-4 border rounded-lg bg-green-50 border-green-200">
                 <div className="text-center">
-                  <div className="text-lg font-bold text-green-700">Stop Gain Semanal</div>
+                  <div className="text-lg font-bold text-green-700">{t('dashboard.weeklyStopGain')}</div>
                   <div className="text-2xl font-bold text-green-600">7%</div>
                   <div className="text-sm text-green-600 mt-1">
                     R$ {(bankroll.initialBankroll * 0.07).toFixed(2)}
@@ -417,7 +412,7 @@ export default function Dashboard() {
               </div>
               <div className="p-4 border rounded-lg bg-red-50 border-red-200">
                 <div className="text-center">
-                  <div className="text-lg font-bold text-red-700">Stop Loss Semanal</div>
+                  <div className="text-lg font-bold text-red-700">{t('dashboard.weeklyStopLoss')}</div>
                   <div className="text-2xl font-bold text-red-600">5%</div>
                   <div className="text-sm text-red-600 mt-1">
                     R$ {(bankroll.initialBankroll * 0.05).toFixed(2)}

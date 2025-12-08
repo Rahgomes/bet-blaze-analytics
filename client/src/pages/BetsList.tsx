@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useBettingStore } from '@/stores/betting';
 import { useBetsListFilterStore, PeriodFilter } from '@/stores/filters/betsListFilterStore';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -19,6 +20,8 @@ import { TimePeriod, filterBetsByPeriod } from '@/utils/dateFilters';
 import { generateMockBets } from '@/utils/mockData';
 
 export default function BetsList() {
+  const { t, language } = useTranslation();
+
   // Dados da betting store
   const realBets = useBettingStore(state => state.bets);
   const bookmakers = useBettingStore(state => state.bookmakers);
@@ -52,7 +55,7 @@ export default function BetsList() {
   // Estados para botão "Voltar"
   const [showReturnButton, setShowReturnButton] = useState(false);
   const [returnPath, setReturnPath] = useState('/');
-  const [returnLabel, setReturnLabel] = useState('Voltar');
+  const [returnLabel, setReturnLabel] = useState(t('common.back'));
 
   // Verificar query params e sessionStorage ao montar
   useEffect(() => {
@@ -69,9 +72,9 @@ export default function BetsList() {
     if (savedPath) {
       setShowReturnButton(true);
       setReturnPath(savedPath);
-      setReturnLabel(savedLabel || 'Voltar');
+      setReturnLabel(savedLabel || t('common.back'));
     }
-  }, [setFilterTeam]);
+  }, [setFilterTeam, t]);
 
   // Merge real bets with mock bets for demonstration
   const allBets = useMemo(() => {
@@ -299,8 +302,8 @@ export default function BetsList() {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Apostas</h1>
-          <p className="text-muted-foreground">Gerencie e visualize todas as suas apostas ({filteredBets.length} encontradas)</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('bets.title')}</h1>
+          <p className="text-muted-foreground">{t('bets.manageAndView').replace('{count}', filteredBets.length.toString())}</p>
         </div>
         <div className="flex gap-2">
           {showReturnButton && (
@@ -315,17 +318,17 @@ export default function BetsList() {
           <Select value={filterPeriod} onValueChange={(v) => setFilterPeriod(v as PeriodFilter)}>
             <SelectTrigger className="w-[200px]">
               <Calendar className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Período" />
+              <SelectValue placeholder={t('bets.period')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas as Apostas</SelectItem>
-              <SelectItem value="today-games">Jogos de Hoje</SelectItem>
-              <SelectItem value="week-games">Jogos da Semana</SelectItem>
-              <SelectItem value="month-games">Jogos do Mês</SelectItem>
-              <SelectItem value="last-10">Últimas 10 Apostas</SelectItem>
-              <SelectItem value="last-20">Últimas 20 Apostas</SelectItem>
-              <SelectItem value="last-50">Últimas 50 Apostas</SelectItem>
-              <SelectItem value="last-100">Últimas 100 Apostas</SelectItem>
+              <SelectItem value="all">{t('bets.allBets')}</SelectItem>
+              <SelectItem value="today-games">{t('bets.todayGames')}</SelectItem>
+              <SelectItem value="week-games">{t('bets.weekGames')}</SelectItem>
+              <SelectItem value="month-games">{t('bets.monthGames')}</SelectItem>
+              <SelectItem value="last-10">{t('bets.last10')}</SelectItem>
+              <SelectItem value="last-20">{t('bets.last20')}</SelectItem>
+              <SelectItem value="last-50">{t('bets.last50')}</SelectItem>
+              <SelectItem value="last-100">{t('bets.last100')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={itemsPerPage.toString()} onValueChange={(v) => {
@@ -336,9 +339,9 @@ export default function BetsList() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="20">20 por página</SelectItem>
-              <SelectItem value="50">50 por página</SelectItem>
-              <SelectItem value="100">100 por página</SelectItem>
+              <SelectItem value="20">{t('bets.perPage').replace('{count}', '20')}</SelectItem>
+              <SelectItem value="50">{t('bets.perPage').replace('{count}', '50')}</SelectItem>
+              <SelectItem value="100">{t('bets.perPage').replace('{count}', '100')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -348,8 +351,8 @@ export default function BetsList() {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Filtros</CardTitle>
-              <CardDescription>Filtre suas apostas por diversos critérios</CardDescription>
+              <CardTitle>{t('bets.filters')}</CardTitle>
+              <CardDescription>{t('bets.filterByMultipleCriteria')}</CardDescription>
             </div>
             <Button
               variant="outline"
@@ -357,7 +360,7 @@ export default function BetsList() {
               className="flex items-center gap-2"
             >
               <Filter className="h-4 w-4" />
-              {showAdvancedFilters ? 'Ocultar Filtros Avançados' : 'Filtros Avançados'}
+              {showAdvancedFilters ? t('bets.hideAdvancedFilters') : t('bets.advancedFilters')}
             </Button>
           </div>
         </CardHeader>
@@ -367,7 +370,7 @@ export default function BetsList() {
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar..."
+                placeholder={t('bets.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-8"
@@ -375,10 +378,10 @@ export default function BetsList() {
             </div>
             <Select value={filterTeam} onValueChange={setFilterTeam}>
               <SelectTrigger>
-                <SelectValue placeholder="Todos os Times" />
+                <SelectValue placeholder={t('bets.allTeams')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os Times</SelectItem>
+                <SelectItem value="all">{t('bets.allTeams')}</SelectItem>
                 {uniqueTeams.map((team) => (
                   <SelectItem key={team} value={team}>{team}</SelectItem>
                 ))}
@@ -386,10 +389,10 @@ export default function BetsList() {
             </Select>
             <Select value={filterBookmaker} onValueChange={setFilterBookmaker}>
               <SelectTrigger>
-                <SelectValue placeholder="Todas as Casas" />
+                <SelectValue placeholder={t('bets.allHouses')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as Casas</SelectItem>
+                <SelectItem value="all">{t('bets.allHouses')}</SelectItem>
                 {bookmakers.map((bm) => (
                   <SelectItem key={bm.id} value={bm.name}>{bm.name}</SelectItem>
                 ))}
@@ -397,37 +400,37 @@ export default function BetsList() {
             </Select>
             <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger>
-                <SelectValue placeholder="Todos os Tipos" />
+                <SelectValue placeholder={t('bets.allTypes')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os Tipos</SelectItem>
-                <SelectItem value="simple">Simples</SelectItem>
-                <SelectItem value="multiple">Múltipla</SelectItem>
-                <SelectItem value="live">Ao Vivo</SelectItem>
-                <SelectItem value="system">Sistema</SelectItem>
+                <SelectItem value="all">{t('bets.allTypes')}</SelectItem>
+                <SelectItem value="simple">{t('bets.simple')}</SelectItem>
+                <SelectItem value="multiple">{t('bets.multiple')}</SelectItem>
+                <SelectItem value="live">{t('bets.live')}</SelectItem>
+                <SelectItem value="system">{t('bets.system')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger>
-                <SelectValue placeholder="Todos os Status" />
+                <SelectValue placeholder={t('bets.allStatus')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os Status</SelectItem>
-                <SelectItem value="pending">Pendente</SelectItem>
-                <SelectItem value="won">Ganha</SelectItem>
-                <SelectItem value="lost">Perdida</SelectItem>
-                <SelectItem value="void">Anulada</SelectItem>
+                <SelectItem value="all">{t('bets.allStatus')}</SelectItem>
+                <SelectItem value="pending">{t('common.pending')}</SelectItem>
+                <SelectItem value="won">{t('bets.won')}</SelectItem>
+                <SelectItem value="lost">{t('bets.lost')}</SelectItem>
+                <SelectItem value="void">{t('bets.void')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={filterProfit} onValueChange={setFilterProfit}>
               <SelectTrigger>
-                <SelectValue placeholder="Resultado" />
+                <SelectValue placeholder={t('common.filter')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os Resultados</SelectItem>
-                <SelectItem value="profit">Apenas Lucro</SelectItem>
-                <SelectItem value="loss">Apenas Prejuízo</SelectItem>
-                <SelectItem value="breakeven">Break-even</SelectItem>
+                <SelectItem value="all">{t('bets.allResults')}</SelectItem>
+                <SelectItem value="profit">{t('bets.onlyProfit')}</SelectItem>
+                <SelectItem value="loss">{t('bets.onlyLoss')}</SelectItem>
+                <SelectItem value="breakeven">{t('bets.breakeven')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -435,26 +438,26 @@ export default function BetsList() {
           {/* Filtros avançados */}
           {showAdvancedFilters && (
             <div className="space-y-4 pt-4 border-t">
-              <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Filtros Avançados</h4>
-              
+              <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.advancedFilters')}</h4>
+
               {/* Filtros de Range */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Range de Odds</Label>
+                  <Label className="text-sm font-medium">{t('bets.oddsRange')}</Label>
                   <div className="flex gap-2 items-center">
                     <Input
                       type="number"
                       step="0.1"
-                      placeholder="Min"
+                      placeholder={t('bets.min')}
                       value={oddsRange.min}
                       onChange={(e) => setOddsRange({...oddsRange, min: parseFloat(e.target.value) || 1})}
                       className="w-20"
                     />
-                    <span className="text-muted-foreground">até</span>
+                    <span className="text-muted-foreground">{t('bets.upTo')}</span>
                     <Input
                       type="number"
                       step="0.1"
-                      placeholder="Max"
+                      placeholder={t('bets.max')}
                       value={oddsRange.max}
                       onChange={(e) => setOddsRange({...oddsRange, max: parseFloat(e.target.value) || 10})}
                       className="w-20"
@@ -462,21 +465,21 @@ export default function BetsList() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Range de Valores (R$)</Label>
+                  <Label className="text-sm font-medium">{t('bets.amountRange')}</Label>
                   <div className="flex gap-2 items-center">
                     <Input
                       type="number"
                       step="0.01"
-                      placeholder="Min"
+                      placeholder={t('bets.min')}
                       value={amountRange.min}
                       onChange={(e) => setAmountRange({...amountRange, min: parseFloat(e.target.value) || 0})}
                       className="w-20"
                     />
-                    <span className="text-muted-foreground">até</span>
+                    <span className="text-muted-foreground">{t('bets.upTo')}</span>
                     <Input
                       type="number"
                       step="0.01"
-                      placeholder="Max"
+                      placeholder={t('bets.max')}
                       value={amountRange.max}
                       onChange={(e) => setAmountRange({...amountRange, max: parseFloat(e.target.value) || 1000})}
                       className="w-20"
@@ -487,7 +490,7 @@ export default function BetsList() {
 
               {/* Filtros por Características */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Características Especiais</Label>
+                <Label className="text-sm font-medium">{t('bets.specialCharacteristics')}</Label>
                 <div className="flex flex-wrap gap-4">
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
@@ -496,7 +499,7 @@ export default function BetsList() {
                       onChange={(e) => setFilterHasBoost(e.target.checked)}
                       className="rounded"
                     />
-                    <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700">💰 Com Boost</Badge>
+                    <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700">💰 {t('bets.withBoost')}</Badge>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
@@ -505,7 +508,7 @@ export default function BetsList() {
                       onChange={(e) => setFilterHasCashout(e.target.checked)}
                       className="rounded"
                     />
-                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">🏦 Com Cashout</Badge>
+                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">🏦 {t('bets.withCashout')}</Badge>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
@@ -514,7 +517,7 @@ export default function BetsList() {
                       onChange={(e) => setFilterUsedCredits(e.target.checked)}
                       className="rounded"
                     />
-                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700">💳 Créditos</Badge>
+                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700">💳 {t('bets.credits')}</Badge>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
@@ -523,7 +526,7 @@ export default function BetsList() {
                       onChange={(e) => setFilterIsProtected(e.target.checked)}
                       className="rounded"
                     />
-                    <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700">🛡️ Protegida</Badge>
+                    <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700">🛡️ {t('bets.protected')}</Badge>
                   </label>
                 </div>
               </div>
@@ -534,12 +537,12 @@ export default function BetsList() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Todas as Apostas ({filteredBets.length})</CardTitle>
-          <CardDescription>Histórico completo das suas apostas</CardDescription>
+          <CardTitle>{t('bets.allBetsCount').replace('{count}', filteredBets.length.toString())}</CardTitle>
+          <CardDescription>{t('bets.completeHistory')}</CardDescription>
         </CardHeader>
         <CardContent>
           {filteredBets.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">Nenhuma aposta encontrada com esses critérios</p>
+            <p className="text-center text-muted-foreground py-8">{t('bets.noBetsFound')}</p>
           ) : (
             isMobile ? (
               // Mobile: Cards layout
@@ -589,7 +592,7 @@ export default function BetsList() {
                                   : ''
                             }
                           >
-                            {bet.status === 'won' ? 'ganha' : bet.status === 'lost' ? 'perdida' : bet.status === 'pending' ? 'pendente' : bet.status === 'void' ? 'anulada' : bet.status}
+                            {bet.status === 'won' ? t('bets.won_lowercase') : bet.status === 'lost' ? t('bets.lost_lowercase') : bet.status === 'pending' ? t('bets.pending_lowercase') : bet.status === 'void' ? t('bets.void_lowercase') : bet.status}
                           </Badge>
                         </div>
                         
@@ -597,11 +600,11 @@ export default function BetsList() {
                         
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div>
-                            <span className="text-muted-foreground">Valor:</span>
+                            <span className="text-muted-foreground">{t('bets.amount')}:</span>
                             <span className="font-medium ml-1">R$ {bet.amount.toFixed(2)}</span>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Odds:</span>
+                            <span className="text-muted-foreground">{t('bets.odds')}:</span>
                             <span className="font-medium ml-1">{bet.odds.toFixed(2)}</span>
                           </div>
                         </div>
@@ -639,12 +642,12 @@ export default function BetsList() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>#</TableHead>
-                      <TableHead 
-                        className="cursor-pointer select-none hover:bg-muted/50" 
+                      <TableHead
+                        className="cursor-pointer select-none hover:bg-muted/50"
                         onClick={() => handleSort('date')}
                       >
                         <div className="flex items-center gap-1">
-                          Data
+                          {t('bets.date')}
                           {sortColumn === 'date' && (
                             <span className="text-xs">
                               {sortDirection === 'asc' ? '↑' : '↓'}
@@ -652,17 +655,17 @@ export default function BetsList() {
                           )}
                         </div>
                       </TableHead>
-                      <TableHead>Hora do Jogo</TableHead>
-                      <TableHead>Liga</TableHead>
-                      <TableHead>Mercado</TableHead>
-                      <TableHead>Casa</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead 
-                        className="text-right cursor-pointer select-none hover:bg-muted/50" 
+                      <TableHead>{t('bets.matchTime')}</TableHead>
+                      <TableHead>{t('bets.league')}</TableHead>
+                      <TableHead>{t('bets.market')}</TableHead>
+                      <TableHead>{t('bets.house')}</TableHead>
+                      <TableHead>{t('bets.type')}</TableHead>
+                      <TableHead
+                        className="text-right cursor-pointer select-none hover:bg-muted/50"
                         onClick={() => handleSort('amount')}
                       >
                         <div className="flex items-center justify-end gap-1">
-                          Valor
+                          {t('bets.amount')}
                           {sortColumn === 'amount' && (
                             <span className="text-xs">
                               {sortDirection === 'asc' ? '↑' : '↓'}
@@ -670,12 +673,12 @@ export default function BetsList() {
                           )}
                         </div>
                       </TableHead>
-                      <TableHead 
-                        className="text-right cursor-pointer select-none hover:bg-muted/50" 
+                      <TableHead
+                        className="text-right cursor-pointer select-none hover:bg-muted/50"
                         onClick={() => handleSort('odds')}
                       >
                         <div className="flex items-center justify-end gap-1">
-                          Odds
+                          {t('bets.odds')}
                           {sortColumn === 'odds' && (
                             <span className="text-xs">
                               {sortDirection === 'asc' ? '↑' : '↓'}
@@ -683,8 +686,8 @@ export default function BetsList() {
                           )}
                         </div>
                       </TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
+                      <TableHead>{t('bets.status')}</TableHead>
+                      <TableHead className="text-right">{t('bets.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -712,11 +715,11 @@ export default function BetsList() {
                         <div className="flex items-center gap-2">
                           {bet.betType === 'live' ? (
                             <Badge className="bg-red-500 text-white animate-pulse text-xs px-2 py-1">
-                              AO VIVO
+                              {t('bets.liveNow')}
                             </Badge>
                           ) : (
                             <span className="capitalize">
-                              {bet.betType === 'simple' ? 'simples' : bet.betType === 'multiple' ? 'múltipla' : bet.betType === 'system' ? 'sistema' : bet.betType}
+                              {bet.betType === 'simple' ? t('bets.simple') : bet.betType === 'multiple' ? t('bets.multiple') : bet.betType === 'system' ? t('bets.system') : bet.betType}
                             </span>
                           )}
                         </div>
@@ -734,7 +737,7 @@ export default function BetsList() {
                                 : ''
                           }
                         >
-                          {bet.status === 'won' ? 'ganha' : bet.status === 'lost' ? 'perdida' : bet.status === 'pending' ? 'pendente' : bet.status === 'void' ? 'anulada' : bet.status}
+                          {bet.status === 'won' ? t('bets.won_lowercase') : bet.status === 'lost' ? t('bets.lost_lowercase') : bet.status === 'pending' ? t('bets.pending_lowercase') : bet.status === 'void' ? t('bets.void_lowercase') : bet.status}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -767,7 +770,10 @@ export default function BetsList() {
           {totalPages > 1 && (
               <div className="flex items-center justify-between px-2 py-4">
                 <div className="text-sm text-muted-foreground">
-                  Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, filteredBets.length)} de {filteredBets.length} apostas
+                  {t('bets.showing')
+                    .replace('{start}', (((currentPage - 1) * itemsPerPage) + 1).toString())
+                    .replace('{end}', Math.min(currentPage * itemsPerPage, filteredBets.length).toString())
+                    .replace('{total}', filteredBets.length.toString())}
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -777,7 +783,7 @@ export default function BetsList() {
                     disabled={currentPage <= 1}
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    Anterior
+                    {t('bets.previous')}
                   </Button>
                   <div className="flex items-center space-x-1">
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -812,7 +818,7 @@ export default function BetsList() {
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage >= totalPages}
                   >
-                    Próxima
+                    {t('bets.next')}
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
@@ -825,25 +831,25 @@ export default function BetsList() {
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Detalhes Completos da Aposta</DialogTitle>
-            <DialogDescription>Análise detalhada e informações completas sobre esta aposta</DialogDescription>
+            <DialogTitle>{t('bets.completeDetails')}</DialogTitle>
+            <DialogDescription>{t('bets.detailedAnalysis')}</DialogDescription>
           </DialogHeader>
           {selectedBet && (
             <div className="space-y-6">
               {/* Identificação */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Identificação</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.identification')}</h4>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="p-3 bg-muted rounded-lg">
-                    <Label className="text-xs text-muted-foreground">Operação #</Label>
+                    <Label className="text-xs text-muted-foreground">{t('bets.operationHash')}</Label>
                     <p className="font-semibold text-lg">{selectedBet.operationNumber}</p>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
-                    <Label className="text-xs text-muted-foreground">Data da Aposta</Label>
-                    <p className="font-medium">{new Date(selectedBet.date).toLocaleDateString('pt-BR')}</p>
+                    <Label className="text-xs text-muted-foreground">{t('bets.betDate')}</Label>
+                    <p className="font-medium">{new Date(selectedBet.date).toLocaleDateString(language === 'pt-br' ? 'pt-BR' : 'en-US')}</p>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
-                    <Label className="text-xs text-muted-foreground">Casa de Aposta</Label>
+                    <Label className="text-xs text-muted-foreground">{t('bets.bookmakerHouse')}</Label>
                     <p className="font-medium">{selectedBet.bookmaker}</p>
                   </div>
                 </div>
@@ -851,7 +857,7 @@ export default function BetsList() {
 
               {/* Detalhes do Jogo */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Informações do Jogo</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.gameInfo')}</h4>
                 <div className="grid grid-cols-2 gap-4">
                   {selectedBet.matchTime && (
                     <div>
