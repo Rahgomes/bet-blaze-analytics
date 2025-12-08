@@ -1,12 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Tip, Team, GlossaryEntry, Tipster } from '@/types/betting';
+import { StateCreator } from 'zustand';
+import { GlossaryEntry } from '@/types/betting';
 
-const STORAGE_KEYS = {
-  TIPS: 'betting_tips',
-  TEAMS: 'betting_teams',
-  GLOSSARY: 'betting_glossary',
-  TIPSTERS: 'betting_tipsters',
-};
+export interface GlossarySlice {
+  glossary: GlossaryEntry[];
+}
+
+const STORAGE_KEY = 'betting_glossary';
 
 const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   // ENGLISH - General
@@ -18,7 +17,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '6', term: 'Edge', definition: 'Your advantage over the bookmaker. The difference between true probability and bookmaker\'s implied probability.', category: 'general', language: 'en' },
   { id: '7', term: 'Variance', definition: 'Statistical measure of short-term unpredictability in betting results. High variance means more swings in your bankroll.', category: 'general', language: 'en' },
   { id: '8', term: 'Expected Value (EV)', definition: 'The average amount you can expect to win or lose per bet over the long run. Positive EV means profitable over time.', category: 'general', language: 'en' },
-  
+
   // ENGLISH - Bet Types
   { id: '9', term: 'Single Bet', definition: 'A bet on one selection only. The simplest form of betting where you wager on a single outcome.', category: 'betTypes', language: 'en' },
   { id: '10', term: 'Multiple / Accumulator', definition: 'A bet combining multiple selections. All selections must win for the bet to pay out. Odds are multiplied together.', category: 'betTypes', language: 'en' },
@@ -27,7 +26,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '13', term: 'System Bet', definition: 'Multiple combinations of accumulators within one bet. Some selections can lose and you still get a return.', category: 'betTypes', language: 'en' },
   { id: '14', term: 'Each Way', definition: 'Two bets in one: one for the selection to win, one for it to place (finish in top positions). Common in racing.', category: 'betTypes', language: 'en' },
   { id: '15', term: 'Live / In-Play Bet', definition: 'Betting on an event while it is happening. Odds change dynamically based on what\'s occurring in the game.', category: 'betTypes', language: 'en' },
-  
+
   // ENGLISH - Markets
   { id: '16', term: 'ML (Moneyline)', definition: 'Straight bet on which team/player will win the match. No handicaps or spreads involved. Common in American sports.', category: 'markets', language: 'en' },
   { id: '17', term: '1X2', definition: 'Three-way market: 1 (Home Win), X (Draw), 2 (Away Win). Most common market in football betting.', category: 'markets', language: 'en' },
@@ -39,7 +38,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '23', term: 'HT/FT (Half Time / Full Time)', definition: 'Predict the result at both half-time and full-time (e.g., Draw/Home means draw at HT, home win at FT).', category: 'markets', language: 'en' },
   { id: '24', term: 'Total Corners', definition: 'Bet on the total number of corner kicks in a match, similar to Over/Under for goals.', category: 'markets', language: 'en' },
   { id: '25', term: 'First Goalscorer', definition: 'Bet on which player will score the first goal in the match. Popular in football betting.', category: 'markets', language: 'en' },
-  
+
   // ENGLISH - Strategies
   { id: '26', term: 'Flat Betting', definition: 'Staking the same amount on every bet, regardless of confidence or odds. Simple and reduces risk of ruin.', category: 'strategies', language: 'en' },
   { id: '27', term: 'Percentage Staking', definition: 'Betting a fixed percentage of your current bankroll on each bet (e.g., 2%). Adjusts stake as bankroll grows/shrinks.', category: 'strategies', language: 'en' },
@@ -51,7 +50,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '33', term: 'Matched Betting', definition: 'Using free bets and promotions from bookmakers with lay bets on exchanges to guarantee profit. Risk-free method.', category: 'strategies', language: 'en' },
   { id: '34', term: 'Stop Loss', definition: 'Predetermined limit on losses per day/week/month. Once reached, you stop betting to protect bankroll.', category: 'strategies', language: 'en' },
   { id: '35', term: 'Stop Gain', definition: 'Predetermined profit target. Once reached, you stop betting to lock in profits and avoid giving them back.', category: 'strategies', language: 'en' },
-  
+
   // NEW TERMS - Modern Technologies and Features
   { id: '116', term: 'Cash Out', definition: 'Feature allowing you to settle bets before event ends, securing partial profit or minimizing losses.', category: 'general', language: 'en' },
   { id: '117', term: 'Odds Boost', definition: 'Promotion where bookmaker increases odds on specific markets, offering higher potential returns temporarily.', category: 'general', language: 'en' },
@@ -63,7 +62,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '123', term: 'Best Odds Guaranteed', definition: 'Policy where bookmaker pays higher odds if price increases after you bet. Protects against odds drops.', category: 'general', language: 'en' },
   { id: '124', term: 'Betting Limits', definition: 'Maximum amount bookmaker allows you to bet on specific market. Varies by customer and event.', category: 'general', language: 'en' },
   { id: '125', term: 'House Edge', definition: 'Percentage built into odds that ensures bookmaker profit. Lower edge means better odds for players.', category: 'general', language: 'en' },
-  
+
   // New Markets and Specific Types
   { id: '126', term: 'Acca Boost', definition: 'Promotion increasing odds on accumulator bets with minimum selections and minimum odds requirements.', category: 'betTypes', language: 'en' },
   { id: '127', term: 'Both Teams To Score', definition: 'Bet on whether both teams will score at least one goal during the match. Yes or No options.', category: 'markets', language: 'en' },
@@ -71,7 +70,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '129', term: 'First/Last Goal', definition: 'Bet on which team will score first goal or last goal of the match.', category: 'markets', language: 'en' },
   { id: '130', term: 'Odd/Even Goals', definition: 'Bet on whether total number of goals will be odd or even. Entertainment market.', category: 'markets', language: 'en' },
   { id: '131', term: 'Half Time/Full Time', definition: 'Combination of half-time result and full-time result (e.g., Draw/Home means draw at HT, home win at FT).', category: 'markets', language: 'en' },
-  
+
   // Advanced Strategies and Technical Terms
   { id: '132', term: 'Closing Line Value', definition: 'Comparison between odds you got and closing odds. Positive CLV indicates long-term skill.', category: 'strategies', language: 'en' },
   { id: '133', term: 'Implied Probability', definition: 'Probability implied by odds. Calculated as 1/decimal odds. Useful for identifying value bets.', category: 'strategies', language: 'en' },
@@ -83,7 +82,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '139', term: 'Steam', definition: 'Rapid, coordinated odds movement caused by sharp money or important information.', category: 'strategies', language: 'en' },
   { id: '140', term: 'Reverse Line Movement', definition: 'When odds move against public money. Indicates sharp action on opposite side.', category: 'strategies', language: 'en' },
   { id: '141', term: 'Pinnacle Model', definition: 'Using Pinnacle odds as reference for "fair" odds due to low margin and acceptance of winners.', category: 'strategies', language: 'en' },
-  
+
   // PORTUGUESE-BR - Geral
   { id: '51', term: 'ROI', definition: 'Retorno sobre Investimento - Porcentagem que mede a lucratividade geral de sua atividade de apostas. Calculado como (Lucro Total / Stake Total) × 100.', category: 'general', language: 'pt-br' },
   { id: '52', term: 'Banca', definition: 'Quantia total de dinheiro dedicada exclusivamente para apostas. Deve ser dinheiro que você pode perder.', category: 'general', language: 'pt-br' },
@@ -93,7 +92,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '56', term: 'Edge', definition: 'Sua vantagem sobre a casa de apostas. A diferença entre probabilidade real e probabilidade implícita da casa.', category: 'general', language: 'pt-br' },
   { id: '57', term: 'Variância', definition: 'Medida estatística de imprevisibilidade de curto prazo nos resultados. Alta variância significa mais oscilações na banca.', category: 'general', language: 'pt-br' },
   { id: '58', term: 'Valor Esperado (EV)', definition: 'Valor médio que você pode esperar ganhar ou perder por aposta no longo prazo. EV positivo significa lucrativo ao longo do tempo.', category: 'general', language: 'pt-br' },
-  
+
   // PORTUGUESE-BR - Tipos de Aposta
   { id: '59', term: 'Aposta Simples', definition: 'Aposta em apenas uma seleção. A forma mais simples de apostar onde você aposta em um único resultado.', category: 'betTypes', language: 'pt-br' },
   { id: '60', term: 'Múltipla / Acumulada', definition: 'Aposta combinando múltiplas seleções. Todas as seleções devem ganhar para a aposta pagar. As odds são multiplicadas.', category: 'betTypes', language: 'pt-br' },
@@ -102,7 +101,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '63', term: 'Aposta Sistema', definition: 'Múltiplas combinações de acumuladas em uma aposta. Algumas seleções podem perder e você ainda recebe retorno.', category: 'betTypes', language: 'pt-br' },
   { id: '64', term: 'Each Way', definition: 'Duas apostas em uma: uma para vitória, outra para colocação (terminar nas primeiras posições). Comum em corridas.', category: 'betTypes', language: 'pt-br' },
   { id: '65', term: 'Aposta Ao Vivo', definition: 'Apostar em um evento enquanto está acontecendo. Odds mudam dinamicamente baseado no que ocorre no jogo.', category: 'betTypes', language: 'pt-br' },
-  
+
   // PORTUGUESE-BR - Mercados
   { id: '66', term: 'ML (Moneyline)', definition: 'Aposta direta em qual time/jogador vencerá a partida. Sem handicaps ou spreads. Comum em esportes americanos.', category: 'markets', language: 'pt-br' },
   { id: '67', term: '1X2', definition: 'Mercado três vias: 1 (Vitória Casa), X (Empate), 2 (Vitória Fora). Mercado mais comum em apostas de futebol.', category: 'markets', language: 'pt-br' },
@@ -114,7 +113,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '73', term: 'Intervalo/Final', definition: 'Prever resultado no intervalo e tempo final (ex: Empate/Casa significa empate no intervalo, vitória casa no final).', category: 'markets', language: 'pt-br' },
   { id: '74', term: 'Total de Escanteios', definition: 'Aposta no número total de escanteios na partida, similar a Over/Under para gols.', category: 'markets', language: 'pt-br' },
   { id: '75', term: 'Primeiro Goleador', definition: 'Aposta em qual jogador marcará o primeiro gol da partida. Popular em apostas de futebol.', category: 'markets', language: 'pt-br' },
-  
+
   // PORTUGUESE-BR - Estratégias
   { id: '76', term: 'Flat Betting', definition: 'Apostar o mesmo valor em todas as apostas, independente de confiança ou odds. Simples e reduz risco de ruína.', category: 'strategies', language: 'pt-br' },
   { id: '77', term: 'Stake Percentual', definition: 'Apostar porcentagem fixa de sua banca atual em cada aposta (ex: 2%). Ajusta stake conforme banca cresce/diminui.', category: 'strategies', language: 'pt-br' },
@@ -126,7 +125,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '83', term: 'Matched Betting', definition: 'Usar apostas grátis e promoções de casas com apostas lay em exchanges para garantir lucro. Método sem risco.', category: 'strategies', language: 'pt-br' },
   { id: '84', term: 'Stop Loss', definition: 'Limite predeterminado de perdas por dia/semana/mês. Uma vez atingido, você para de apostar para proteger banca.', category: 'strategies', language: 'pt-br' },
   { id: '85', term: 'Stop Gain', definition: 'Meta de lucro predefinida. Ao atingir, você para de apostar para garantir os ganhos e evitar devolvê-los.', category: 'strategies', language: 'pt-br' },
-  
+
   // NOVOS TERMOS - Tecnologias e Recursos Modernos
   { id: '142', term: 'Cashout', definition: 'Recurso que permite encerrar apostas antes do evento terminar, garantindo lucro parcial ou minimizando perdas.', category: 'general', language: 'pt-br' },
   { id: '143', term: 'Boost de Odds', definition: 'Promoção onde a casa aumenta as odds de mercados específicos, oferecendo retornos maiores temporariamente.', category: 'general', language: 'pt-br' },
@@ -138,7 +137,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '149', term: 'Melhores Odds Garantidas', definition: 'Política onde a casa paga odds maiores se preço subir depois da aposta. Protege contra quedas de odds.', category: 'general', language: 'pt-br' },
   { id: '150', term: 'Limites de Apostas', definition: 'Valor máximo que a casa permite apostar em mercado específico. Varia por cliente e evento.', category: 'general', language: 'pt-br' },
   { id: '151', term: 'Margem da Casa', definition: 'Porcentagem incluída nas odds que garante lucro da casa. Margem menor significa odds melhores para jogadores.', category: 'general', language: 'pt-br' },
-  
+
   // Novos Mercados e Tipos Específicos
   { id: '152', term: 'Boost de Múltiplas', definition: 'Promoção que aumenta odds em apostas múltiplas com mínimo de seleções e odds mínimas exigidas.', category: 'betTypes', language: 'pt-br' },
   { id: '153', term: 'Ambos Marcam', definition: 'Aposta se ambos times marcarão pelo menos um gol durante a partida. Opções Sim ou Não.', category: 'markets', language: 'pt-br' },
@@ -146,7 +145,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '155', term: 'Primeiro/Último Gol', definition: 'Aposta em qual time marcará o primeiro gol ou último gol da partida.', category: 'markets', language: 'pt-br' },
   { id: '156', term: 'Gols Pares/Ímpares', definition: 'Aposta se o total de gols será par ou ímpar. Mercado de entretenimento.', category: 'markets', language: 'pt-br' },
   { id: '157', term: 'Meio-tempo/Tempo Final', definition: 'Combinação do resultado do primeiro tempo e tempo final (ex: Empate/Casa = empate no 1T, vitória casa no final).', category: 'markets', language: 'pt-br' },
-  
+
   // Estratégias Avançadas e Termos Técnicos
   { id: '158', term: 'Valor da Linha de Fechamento', definition: 'Comparação entre odds que você pegou e odds de fechamento. CLV positivo indica habilidade a longo prazo.', category: 'strategies', language: 'pt-br' },
   { id: '159', term: 'Probabilidade Implícita', definition: 'Probabilidade implícita pelas odds. Calculada como 1/odds decimal. Útil para identificar apostas de valor.', category: 'strategies', language: 'pt-br' },
@@ -158,7 +157,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '165', term: 'Steam', definition: 'Movimento rápido e coordenado de odds causado por dinheiro sharp ou informação importante.', category: 'strategies', language: 'pt-br' },
   { id: '166', term: 'Movimento Reverso de Linha', definition: 'Quando odds se movem contra o dinheiro público. Indica ação sharp do lado oposto.', category: 'strategies', language: 'pt-br' },
   { id: '167', term: 'Modelo Pinnacle', definition: 'Usar odds da Pinnacle como referência para odds "justas" devido à baixa margem e aceitação de vencedores.', category: 'strategies', language: 'pt-br' },
-  
+
   // NOVOS TERMOS - Tecnologias e Funcionalidades Modernas
   { id: '86', term: 'Cashout', definition: 'Funcionalidade que permite encerrar aposta antes do evento terminar, garantindo lucro parcial ou minimizando perdas.', category: 'general', language: 'pt-br' },
   { id: '87', term: 'Boost de Odds', definition: 'Promoção onde casa aumenta odds de mercados específicos, oferecendo maior retorno potencial temporariamente.', category: 'general', language: 'pt-br' },
@@ -170,7 +169,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '93', term: 'Odds Garantidas', definition: 'Política onde casa paga odds maiores se preço subir após você apostar. Protege contra queda de odds.', category: 'general', language: 'pt-br' },
   { id: '94', term: 'Limite de Aposta', definition: 'Valor máximo que casa permite apostar em determinado mercado. Varia por cliente e evento.', category: 'general', language: 'pt-br' },
   { id: '95', term: 'Margem da Casa', definition: 'Percentual embutido nas odds que garante lucro da casa. Quanto menor a margem, melhores as odds.', category: 'general', language: 'pt-br' },
-  
+
   // Novos Mercados e Tipos Específicos
   { id: '96', term: 'Combo Boost', definition: 'Promoção que aumenta odds de apostas múltiplas com número mínimo de seleções e odds mínimas.', category: 'betTypes', language: 'pt-br' },
   { id: '97', term: 'Draw No Bet (DNB)', definition: 'Aposta em time para vencer. Se empatar, stake retorna. Elimina possibilidade de empate.', category: 'betTypes', language: 'pt-br' },
@@ -182,7 +181,7 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '103', term: 'Primeiro/Último Gol', definition: 'Aposta em qual time marcará primeiro gol ou último gol da partida.', category: 'markets', language: 'pt-br' },
   { id: '104', term: 'Gols Pares/Ímpares', definition: 'Aposta se número total de gols será par ou ímpar. Mercado de entretenimento.', category: 'markets', language: 'pt-br' },
   { id: '105', term: 'Intervalo/Final', definition: 'Combinação do resultado ao intervalo e resultado final (ex: Casa/Empate = casa ganha no 1º tempo, empata no final).', category: 'markets', language: 'pt-br' },
-  
+
   // Estratégias Avançadas e Termos Técnicos
   { id: '106', term: 'Closing Line Value (CLV)', definition: 'Comparação entre odds que você conseguiu e odds de fechamento. CLV positivo indica skill a longo prazo.', category: 'strategies', language: 'pt-br' },
   { id: '107', term: 'Implied Probability', definition: 'Probabilidade implícita nas odds. Calculada como 1/odds decimal. Useful para identificar value bets.', category: 'strategies', language: 'pt-br' },
@@ -196,113 +195,6 @@ const DEFAULT_GLOSSARY: GlossaryEntry[] = [
   { id: '115', term: 'Pinnacle Model', definition: 'Usar odds da Pinnacle como referência de odds "justas" devido à baixa margem e aceitação de winners.', category: 'strategies', language: 'pt-br' },
 ];
 
-const DEFAULT_TIPSTERS: Tipster[] = [
-  { id: '1', name: 'ProTipster', bio: 'Professional sports analyst', rating: 4.5, totalTips: 120, successRate: 68, createdAt: new Date().toISOString() },
-  { id: '2', name: 'BetGuru', bio: 'Expert in football betting', rating: 4.2, totalTips: 95, successRate: 65, createdAt: new Date().toISOString() },
-];
-
-export function useExtendedData() {
-  const [tips, setTips] = useState<Tip[]>([]);
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [glossary, setGlossary] = useState<GlossaryEntry[]>(DEFAULT_GLOSSARY);
-  const [tipsters, setTipsters] = useState<Tipster[]>(DEFAULT_TIPSTERS);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    try {
-      const storedTips = localStorage.getItem(STORAGE_KEYS.TIPS);
-      const storedTeams = localStorage.getItem(STORAGE_KEYS.TEAMS);
-      const storedGlossary = localStorage.getItem(STORAGE_KEYS.GLOSSARY);
-      const storedTipsters = localStorage.getItem(STORAGE_KEYS.TIPSTERS);
-
-      if (storedTips) setTips(JSON.parse(storedTips));
-      if (storedTeams) setTeams(JSON.parse(storedTeams));
-      if (storedGlossary) setGlossary(JSON.parse(storedGlossary));
-      if (storedTipsters) setTipsters(JSON.parse(storedTipsters));
-    } catch (error) {
-      console.error('Error loading extended data:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const saveTips = useCallback((newTips: Tip[]) => {
-    setTips(newTips);
-    localStorage.setItem(STORAGE_KEYS.TIPS, JSON.stringify(newTips));
-  }, []);
-
-  const saveTeams = useCallback((newTeams: Team[]) => {
-    setTeams(newTeams);
-    localStorage.setItem(STORAGE_KEYS.TEAMS, JSON.stringify(newTeams));
-  }, []);
-
-  const addTip = useCallback((tip: Omit<Tip, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newTip: Tip = {
-      ...tip,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    saveTips([...tips, newTip]);
-  }, [tips, saveTips]);
-
-  const updateTip = useCallback((id: string, updates: Partial<Tip>) => {
-    const updatedTips = tips.map(tip =>
-      tip.id === id ? { ...tip, ...updates, updatedAt: new Date().toISOString() } : tip
-    );
-    saveTips(updatedTips);
-  }, [tips, saveTips]);
-
-  const deleteTip = useCallback((id: string) => {
-    saveTips(tips.filter(t => t.id !== id));
-  }, [tips, saveTips]);
-
-  const addTeam = useCallback((team: Omit<Team, 'id' | 'createdAt'>) => {
-    const newTeam: Team = {
-      ...team,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-    };
-    saveTeams([...teams, newTeam]);
-  }, [teams, saveTeams]);
-
-  const updateTeam = useCallback((id: string, updates: Partial<Team>) => {
-    const updatedTeams = teams.map(team =>
-      team.id === id ? { ...team, ...updates } : team
-    );
-    saveTeams(updatedTeams);
-  }, [teams, saveTeams]);
-
-  const deleteTeam = useCallback((id: string) => {
-    saveTeams(teams.filter(t => t.id !== id));
-  }, [teams, saveTeams]);
-
-  const saveTipsters = useCallback((newTipsters: Tipster[]) => {
-    setTipsters(newTipsters);
-    localStorage.setItem(STORAGE_KEYS.TIPSTERS, JSON.stringify(newTipsters));
-  }, []);
-
-  const addTipster = useCallback((tipster: Omit<Tipster, 'id' | 'createdAt'>) => {
-    const newTipster: Tipster = {
-      ...tipster,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-    };
-    saveTipsters([...tipsters, newTipster]);
-  }, [tipsters, saveTipsters]);
-
-  return {
-    tips,
-    teams,
-    glossary,
-    tipsters,
-    loading,
-    addTip,
-    updateTip,
-    deleteTip,
-    addTeam,
-    updateTeam,
-    deleteTeam,
-    addTipster,
-  };
-}
+export const createGlossarySlice: StateCreator<GlossarySlice> = () => ({
+  glossary: DEFAULT_GLOSSARY,
+});

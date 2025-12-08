@@ -24,11 +24,11 @@ export const createImportSessionsSlice: StateCreator<
   addImportSession: (session) => {
     const sessions = [...get().importSessions, session];
     set({ importSessions: sessions });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
   },
 
   getImportSessions: () => {
-    return [...get().importSessions].sort((a, b) => 
+    return [...get().importSessions].sort((a, b) =>
       new Date(b.importDate).getTime() - new Date(a.importDate).getTime()
     );
   },
@@ -40,7 +40,7 @@ export const createImportSessionsSlice: StateCreator<
   deleteImportSession: (id) => {
     const sessions = get().importSessions.filter(s => s.id !== id);
     set({ importSessions: sessions });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
   },
 
   setImportSessions: (sessions) => set({ importSessions: sessions }),

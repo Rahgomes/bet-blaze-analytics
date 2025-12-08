@@ -186,7 +186,7 @@ export default function WithdrawalsHistory() {
         <div>
           <Button
             variant="ghost"
-            onClick={() => setLocation('/settings')}
+            onClick={() => setLocation('/settings?tab=withdrawals')}
             className="mb-2"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />

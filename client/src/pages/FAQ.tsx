@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useExtendedData } from '@/hooks/useExtendedData';
+import { useBettingStore } from '@/stores/betting';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,7 @@ import {
 
 export default function FAQ() {
   const { t, language } = useTranslation();
-  const { glossary } = useExtendedData();
+  const glossary = useBettingStore(state => state.glossary);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('glossary');

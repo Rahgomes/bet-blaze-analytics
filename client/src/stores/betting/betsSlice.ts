@@ -37,7 +37,7 @@ export const createBetsSlice: StateCreator<
     };
 
     set({ bets: [...bets, newBet] });
-    localStorage.setItem('betting_bets', JSON.stringify([...bets, newBet]));
+    sessionStorage.setItem('betting_bets', JSON.stringify([...bets, newBet]));
     return newBet;
   },
 
@@ -51,7 +51,7 @@ export const createBetsSlice: StateCreator<
     }));
 
     const updatedBets = get().bets;
-    localStorage.setItem('betting_bets', JSON.stringify(updatedBets));
+    sessionStorage.setItem('betting_bets', JSON.stringify(updatedBets));
   },
 
   deleteBet: (id) => {
@@ -60,7 +60,7 @@ export const createBetsSlice: StateCreator<
     }));
 
     const updatedBets = get().bets;
-    localStorage.setItem('betting_bets', JSON.stringify(updatedBets));
+    sessionStorage.setItem('betting_bets', JSON.stringify(updatedBets));
   },
 
   setBets: (bets) => set({ bets }),

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useExtendedData } from '@/hooks/useExtendedData';
+import { useBettingStore } from '@/stores/betting';
 import { generateMockTips } from '@/utils/mockData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +19,11 @@ import { Tip } from '@/types/betting';
 export default function Tips() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
-  const { tips: realTips, tipsters, addTip, updateTip, deleteTip } = useExtendedData();
+  const realTips = useBettingStore(state => state.tips);
+  const tipsters = useBettingStore(state => state.tipsters);
+  const addTip = useBettingStore(state => state.addTip);
+  const updateTip = useBettingStore(state => state.updateTip);
+  const deleteTip = useBettingStore(state => state.deleteTip);
 
   // Merge real tips with mock tips for demonstration
   const allTips = useMemo(() => {

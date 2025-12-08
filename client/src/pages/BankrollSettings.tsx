@@ -98,6 +98,18 @@ export default function BankrollSettings() {
   const [visibleDepositsCount, setVisibleDepositsCount] = useState(3);
   const [visibleWithdrawalsCount, setVisibleWithdrawalsCount] = useState(3);
 
+  // Tab navigation state - read from URL query parameter
+  const tabFromUrl = new URLSearchParams(window.location.search).get('tab');
+  const validTabs = ['bankroll', 'goals', 'risk', 'withdrawals'];
+  const initialTab = validTabs.includes(tabFromUrl || '') ? tabFromUrl : 'bankroll';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Handle tab changes - update URL with query parameter
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setLocation(`/settings?tab=${value}`);
+  };
+
   const [formData, setFormData] = useState<{
     initialBankroll: string;
     targetMode: 'percentage' | 'fixed';
@@ -502,7 +514,7 @@ export default function BankrollSettings() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="bankroll" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="bankroll" className="flex items-center gap-2">
             <Wallet className="h-4 w-4" />

@@ -4,7 +4,6 @@ import { useForm, FormProvider, Controller, useFieldArray, useWatch } from 'reac
 import { zodResolver } from '@hookform/resolvers/zod';
 import ReactSelect from 'react-select';
 import { useBettingStore } from '@/stores/betting';
-import { useExtendedData } from '@/hooks/useExtendedData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -92,8 +91,7 @@ export default function AddBet() {
   const addBet = useBettingStore(state => state.addBet);
   const bookmakers = useBettingStore(state => state.bookmakers);
   const bankroll = useBettingStore(state => state.bankroll);
-
-  const { updateTip } = useExtendedData();
+  const updateTip = useBettingStore(state => state.updateTip);
   const { toast } = useToast();
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);

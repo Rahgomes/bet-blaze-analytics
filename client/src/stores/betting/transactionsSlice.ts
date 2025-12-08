@@ -33,7 +33,7 @@ export const createTransactionsSlice: StateCreator<
     }));
 
     const updated = get().transactions;
-    localStorage.setItem('betting_transactions', JSON.stringify(updated));
+    sessionStorage.setItem('betting_transactions', JSON.stringify(updated));
   },
 
   updateTransaction: (id, updates) => {
@@ -46,7 +46,7 @@ export const createTransactionsSlice: StateCreator<
     }));
 
     const updated = get().transactions;
-    localStorage.setItem('betting_transactions', JSON.stringify(updated));
+    sessionStorage.setItem('betting_transactions', JSON.stringify(updated));
   },
 
   deleteTransaction: (id) => {
@@ -55,7 +55,7 @@ export const createTransactionsSlice: StateCreator<
     }));
 
     const updated = get().transactions;
-    localStorage.setItem('betting_transactions', JSON.stringify(updated));
+    sessionStorage.setItem('betting_transactions', JSON.stringify(updated));
   },
 
   setTransactions: (transactions) => set({ transactions }),

@@ -35,7 +35,7 @@ export const createBookmakersSlice: StateCreator<
     }));
 
     const updated = get().bookmakers;
-    localStorage.setItem('betting_bookmakers', JSON.stringify(updated));
+    sessionStorage.setItem('betting_bookmakers', JSON.stringify(updated));
   },
 
   updateBookmaker: (id, updates) => {
@@ -46,7 +46,7 @@ export const createBookmakersSlice: StateCreator<
     }));
 
     const updated = get().bookmakers;
-    localStorage.setItem('betting_bookmakers', JSON.stringify(updated));
+    sessionStorage.setItem('betting_bookmakers', JSON.stringify(updated));
   },
 
   deleteBookmaker: (id) => {
@@ -55,7 +55,7 @@ export const createBookmakersSlice: StateCreator<
     }));
 
     const updated = get().bookmakers;
-    localStorage.setItem('betting_bookmakers', JSON.stringify(updated));
+    sessionStorage.setItem('betting_bookmakers', JSON.stringify(updated));
   },
 
   setBookmakers: (bookmakers) => set({ bookmakers }),

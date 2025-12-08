@@ -20,12 +20,12 @@ const TranslationContext = createContext<TranslationContextType | undefined>(und
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
-    const stored = localStorage.getItem('app_language');
+    const stored = sessionStorage.getItem('app_language');
     return (stored === 'pt-br' || stored === 'en') ? stored : 'en';
   });
 
   useEffect(() => {
-    localStorage.setItem('app_language', language);
+    sessionStorage.setItem('app_language', language);
   }, [language]);
 
   const setLanguage = (lang: Language) => {

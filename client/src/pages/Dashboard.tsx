@@ -259,7 +259,7 @@ export default function Dashboard() {
                 <p className="text-sm mb-4">Configure seus stakes na aba de Gestão de Risco</p>
                 <Button
                   variant="outline"
-                  onClick={() => setLocation('/settings/bankroll')}
+                  onClick={() => setLocation('/settings?tab=risk')}
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Configurar Stakes

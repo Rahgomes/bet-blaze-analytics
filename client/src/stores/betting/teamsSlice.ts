@@ -28,7 +28,7 @@ export const createTeamsSlice: StateCreator<
     };
     const teams = [...get().teams, newTeam];
     set({ teams });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
   },
 
   updateTeam: (id, updates) => {
@@ -36,13 +36,13 @@ export const createTeamsSlice: StateCreator<
       team.id === id ? { ...team, ...updates } : team
     );
     set({ teams });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
   },
 
   deleteTeam: (id) => {
     const teams = get().teams.filter(t => t.id !== id);
     set({ teams });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
   },
 
   setTeams: (teams) => set({ teams }),

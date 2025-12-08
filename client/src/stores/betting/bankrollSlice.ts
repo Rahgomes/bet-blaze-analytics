@@ -43,7 +43,7 @@ export const createBankrollSlice: StateCreator<
       updatedAt: new Date().toISOString(),
     };
     set({ bankroll: updated });
-    localStorage.setItem('betting_bankroll', JSON.stringify(updated));
+    sessionStorage.setItem('betting_bankroll', JSON.stringify(updated));
   },
 
   setBankroll: (bankroll) => {
@@ -59,6 +59,6 @@ export const createBankrollSlice: StateCreator<
       ...bankroll,
     };
     set({ bankroll: merged });
-    localStorage.setItem('betting_bankroll', JSON.stringify(merged));
+    sessionStorage.setItem('betting_bankroll', JSON.stringify(merged));
   },
 });
