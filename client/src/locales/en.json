@@ -673,5 +673,65 @@
       "roi": "ROI %",
       "winRate": "Win Rate %"
     }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Detailed performance analysis by team, league, and strategy",
+    "periods": {
+      "today": "Today",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year",
+      "all": "All Time"
+    },
+    "tabs": {
+      "teams": "By Team",
+      "leagues": "By League",
+      "strategies": "By Strategy"
+    },
+    "teamStats": {
+      "title": "Performance by Team",
+      "subtitle": "Analyze your betting results for each team",
+      "tableTitle": "Team Statistics",
+      "noData": "No team data available"
+    },
+    "leagueStats": {
+      "title": "Performance by League",
+      "subtitle": "Analyze your betting results for each league",
+      "tableTitle": "League Statistics",
+      "noData": "No league data available"
+    },
+    "strategyStats": {
+      "title": "Performance by Strategy",
+      "subtitle": "Analyze your betting results for each strategy",
+      "tableTitle": "Strategy Statistics",
+      "noData": "No strategy data available"
+    },
+    "table": {
+      "team": "Team",
+      "league": "League",
+      "strategy": "Strategy",
+      "totalBets": "Total Bets",
+      "wins": "Wins",
+      "winRate": "Win Rate",
+      "totalStake": "Total Stake",
+      "profit": "Profit",
+      "roi": "ROI",
+      "actions": "Actions"
+    },
+    "chart": {
+      "profitLabel": "Profit (€)"
+    },
+    "detailDialog": {
+      "teamTitle": "Team: {value}",
+      "leagueTitle": "League: {value}",
+      "strategyTitle": "Strategy: {value}",
+      "date": "Date",
+      "description": "Description",
+      "stake": "Stake",
+      "odds": "Odds",
+      "status": "Status",
+      "profit": "Profit"
+    }
   }
 }

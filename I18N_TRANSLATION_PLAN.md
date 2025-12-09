@@ -53,9 +53,9 @@ Este documento é um guia completo para traduzir todas as páginas do aplicativo
 8. **Import.tsx** - 100% traduzido ✅ (08/12/2025)
 9. **BankrollSettings.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
 10. **ImportHistory.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
-11. **Reports.tsx** - EM BREVE
+11. **Reports.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
 
-### ❌ Páginas Com Texto Hardcoded (6/17)
+### ❌ Páginas Com Texto Hardcoded (5/17)
 Precisam ser traduzidas (ver seção de prioridades abaixo)
 
 ### 🆕 Páginas Recém Traduzidas (09/12/2025):
@@ -114,6 +114,46 @@ Precisam ser traduzidas (ver seção de prioridades abaixo)
 - `/client/src/pages/ImportHistory.tsx` (100% traduzido)
 - `/client/src/locales/pt-br.json` (20 novas chaves)
 - `/client/src/locales/en.json` (20 novas chaves)
+
+---
+
+#### ✅ **Reports.tsx** - CONCLUÍDO (09/12/2025)
+**Tempo real**: ~45 minutos
+**Status**: 100% traduzido e testado
+
+**O que foi feito**:
+- ✅ Adicionadas 50 novas chaves de tradução em `pt-br.json` e `en.json`
+- ✅ Importado hook `useTranslation`
+- ✅ Traduzidos título e subtítulo da página
+- ✅ Traduzidos filtros de período (Hoje, Semana, Mês, Ano, Todo Período)
+- ✅ Traduzidas abas principais (Por Time, Por Liga, Por Estratégia)
+- ✅ Traduzida seção de estatísticas de times (títulos, gráficos, tabelas)
+- ✅ Traduzida seção de estatísticas de ligas (títulos, gráficos, tabelas)
+- ✅ Traduzida seção de estatísticas de estratégias (títulos, gráficos, tabelas)
+- ✅ Traduzidos cabeçalhos de tabela (Time, Total de Apostas, Vitórias, etc)
+- ✅ Traduzidas mensagens de estado vazio para cada seção
+- ✅ Traduzido modal de detalhes com títulos dinâmicos
+- ✅ Suporte a substituição de variáveis em strings ({value})
+
+**Chaves adicionadas**:
+```json
+"reports": {
+  "title", "subtitle",
+  "periods": { 5 chaves },
+  "tabs": { 3 chaves },
+  "teamStats": { 4 chaves },
+  "leagueStats": { 4 chaves },
+  "strategyStats": { 4 chaves },
+  "table": { 9 chaves },
+  "chart": { 1 chave },
+  "detailDialog": { 9 chaves }
+}
+```
+
+**Arquivos modificados**:
+- `/client/src/pages/Reports.tsx` (100% traduzido)
+- `/client/src/locales/pt-br.json` (50 novas chaves)
+- `/client/src/locales/en.json` (50 novas chaves)
 
 ---
 
@@ -656,9 +696,9 @@ Traduzir as páginas restantes
 - [x] 5. Import.tsx ✅ (CONCLUÍDO em 08/12/2025)
 
 ### 📦 Páginas Secundárias
-- [ ] 6. BankrollSettings.tsx
-- [ ] 7. Reports.tsx
-- [ ] 8. ImportHistory.tsx
+- [x] 6. BankrollSettings.tsx ✅ (CONCLUÍDO em 09/12/2025)
+- [x] 7. Reports.tsx ✅ (CONCLUÍDO em 09/12/2025)
+- [x] 8. ImportHistory.tsx ✅ (CONCLUÍDO em 09/12/2025)
 - [ ] 9. ImportPreview.tsx
 - [ ] 10. DepositsHistory.tsx
 - [ ] 11. WithdrawalsHistory.tsx
@@ -1009,9 +1049,9 @@ toast({
 
 | Status | Páginas | Percentual |
 |--------|---------|------------|
-| ✅ Concluídas | 11/17 | 65% |
+| ✅ Concluídas | 12/17 | 71% |
 | 🔄 Em progresso | 0/17 | 0% |
-| ❌ Pendentes | 6/17 | 35% |
+| ❌ Pendentes | 5/17 | 29% |
 
 ### Progresso por Prioridade
 
@@ -1026,7 +1066,7 @@ toast({
 
 **Próximas páginas (Média Prioridade)**:
 1. ~~BankrollSettings.tsx~~ ✅ CONCLUÍDO
-2. Reports.tsx (3-4h)
+2. ~~Reports.tsx~~ ✅ CONCLUÍDO
 3. ImportPreview.tsx (2-3h)
 4. ~~ImportHistory.tsx~~ ✅ CONCLUÍDO
 5. DepositsHistory.tsx (2-3h)
@@ -1035,7 +1075,7 @@ toast({
 8. Index.tsx (1h)
 9. NotFound.tsx (30min)
 
-**Tempo restante estimado**: 12-18 horas para completar 100%
+**Tempo restante estimado**: 9-14 horas para completar 100%
 
 ---
 

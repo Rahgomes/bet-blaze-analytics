@@ -673,5 +673,65 @@
       "roi": "ROI %",
       "winRate": "Taxa de Acerto %"
     }
+  },
+  "reports": {
+    "title": "Relatórios",
+    "subtitle": "Análise detalhada de performance por time, liga e estratégia",
+    "periods": {
+      "today": "Hoje",
+      "week": "Semana",
+      "month": "Mês",
+      "year": "Ano",
+      "all": "Todo Período"
+    },
+    "tabs": {
+      "teams": "Por Time",
+      "leagues": "Por Liga",
+      "strategies": "Por Estratégia"
+    },
+    "teamStats": {
+      "title": "Performance por Time",
+      "subtitle": "Analise seus resultados de apostas para cada time",
+      "tableTitle": "Estatísticas por Time",
+      "noData": "Nenhum dado de time disponível"
+    },
+    "leagueStats": {
+      "title": "Performance por Liga",
+      "subtitle": "Analise seus resultados de apostas para cada liga",
+      "tableTitle": "Estatísticas por Liga",
+      "noData": "Nenhum dado de liga disponível"
+    },
+    "strategyStats": {
+      "title": "Performance por Estratégia",
+      "subtitle": "Analise seus resultados de apostas para cada estratégia",
+      "tableTitle": "Estatísticas por Estratégia",
+      "noData": "Nenhum dado de estratégia disponível"
+    },
+    "table": {
+      "team": "Time",
+      "league": "Liga",
+      "strategy": "Estratégia",
+      "totalBets": "Total de Apostas",
+      "wins": "Vitórias",
+      "winRate": "Taxa de Acerto",
+      "totalStake": "Total Apostado",
+      "profit": "Lucro",
+      "roi": "ROI",
+      "actions": "Ações"
+    },
+    "chart": {
+      "profitLabel": "Lucro (R$)"
+    },
+    "detailDialog": {
+      "teamTitle": "Time: {value}",
+      "leagueTitle": "Liga: {value}",
+      "strategyTitle": "Estratégia: {value}",
+      "date": "Data",
+      "description": "Descrição",
+      "stake": "Stake",
+      "odds": "Odds",
+      "status": "Status",
+      "profit": "Lucro"
+    }
   }
 }

@@ -10,10 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Eye } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
 export default function Reports() {
+  const { t } = useTranslation();
   const bets = useBettingStore(state => state.bets);
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
   const [detailView, setDetailView] = useState<{ type: string; value: string; bets: any[] } | null>(null);
@@ -110,32 +112,32 @@ export default function Reports() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
-        <p className="text-muted-foreground">Detailed performance analysis by team, league, and strategy</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('reports.title')}</h1>
+        <p className="text-muted-foreground">{t('reports.subtitle')}</p>
       </div>
 
       <Tabs value={selectedPeriod} onValueChange={(v) => setSelectedPeriod(v as TimePeriod)}>
         <TabsList>
-          <TabsTrigger value="today">Today</TabsTrigger>
-          <TabsTrigger value="week">Week</TabsTrigger>
-          <TabsTrigger value="month">Month</TabsTrigger>
-          <TabsTrigger value="year">Year</TabsTrigger>
-          <TabsTrigger value="all">All Time</TabsTrigger>
+          <TabsTrigger value="today">{t('reports.periods.today')}</TabsTrigger>
+          <TabsTrigger value="week">{t('reports.periods.week')}</TabsTrigger>
+          <TabsTrigger value="month">{t('reports.periods.month')}</TabsTrigger>
+          <TabsTrigger value="year">{t('reports.periods.year')}</TabsTrigger>
+          <TabsTrigger value="all">{t('reports.periods.all')}</TabsTrigger>
         </TabsList>
       </Tabs>
 
       <Tabs defaultValue="teams">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="teams">By Team</TabsTrigger>
-          <TabsTrigger value="leagues">By League</TabsTrigger>
-          <TabsTrigger value="strategies">By Strategy</TabsTrigger>
+          <TabsTrigger value="teams">{t('reports.tabs.teams')}</TabsTrigger>
+          <TabsTrigger value="leagues">{t('reports.tabs.leagues')}</TabsTrigger>
+          <TabsTrigger value="strategies">{t('reports.tabs.strategies')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="teams" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Performance by Team</CardTitle>
-              <CardDescription>Analyze your betting results for each team</CardDescription>
+              <CardTitle>{t('reports.teamStats.title')}</CardTitle>
+              <CardDescription>{t('reports.teamStats.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
               {teamStats.length > 0 && (
@@ -145,7 +147,7 @@ export default function Reports() {
                     <XAxis dataKey="team" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="profit" fill="#8884d8" name="Profit (€)" />
+                    <Bar dataKey="profit" fill="#8884d8" name={t('reports.chart.profitLabel')} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -154,27 +156,27 @@ export default function Reports() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Team Statistics</CardTitle>
+              <CardTitle>{t('reports.teamStats.tableTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Team</TableHead>
-                    <TableHead>Total Bets</TableHead>
-                    <TableHead>Wins</TableHead>
-                    <TableHead>Win Rate</TableHead>
-                    <TableHead>Total Stake</TableHead>
-                    <TableHead>Profit</TableHead>
-                    <TableHead>ROI</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('reports.table.team')}</TableHead>
+                    <TableHead>{t('reports.table.totalBets')}</TableHead>
+                    <TableHead>{t('reports.table.wins')}</TableHead>
+                    <TableHead>{t('reports.table.winRate')}</TableHead>
+                    <TableHead>{t('reports.table.totalStake')}</TableHead>
+                    <TableHead>{t('reports.table.profit')}</TableHead>
+                    <TableHead>{t('reports.table.roi')}</TableHead>
+                    <TableHead>{t('reports.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {teamStats.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={8} className="text-center text-muted-foreground">
-                        No team data available
+                        {t('reports.teamStats.noData')}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -212,8 +214,8 @@ export default function Reports() {
         <TabsContent value="leagues" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Performance by League</CardTitle>
-              <CardDescription>Analyze your betting results for each league</CardDescription>
+              <CardTitle>{t('reports.leagueStats.title')}</CardTitle>
+              <CardDescription>{t('reports.leagueStats.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
               {leagueStats.length > 0 && (
@@ -223,7 +225,7 @@ export default function Reports() {
                     <XAxis dataKey="league" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="profit" fill="#82ca9d" name="Profit (€)" />
+                    <Bar dataKey="profit" fill="#82ca9d" name={t('reports.chart.profitLabel')} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -232,27 +234,27 @@ export default function Reports() {
 
           <Card>
             <CardHeader>
-              <CardTitle>League Statistics</CardTitle>
+              <CardTitle>{t('reports.leagueStats.tableTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>League</TableHead>
-                    <TableHead>Total Bets</TableHead>
-                    <TableHead>Wins</TableHead>
-                    <TableHead>Win Rate</TableHead>
-                    <TableHead>Total Stake</TableHead>
-                    <TableHead>Profit</TableHead>
-                    <TableHead>ROI</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('reports.table.league')}</TableHead>
+                    <TableHead>{t('reports.table.totalBets')}</TableHead>
+                    <TableHead>{t('reports.table.wins')}</TableHead>
+                    <TableHead>{t('reports.table.winRate')}</TableHead>
+                    <TableHead>{t('reports.table.totalStake')}</TableHead>
+                    <TableHead>{t('reports.table.profit')}</TableHead>
+                    <TableHead>{t('reports.table.roi')}</TableHead>
+                    <TableHead>{t('reports.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {leagueStats.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={8} className="text-center text-muted-foreground">
-                        No league data available
+                        {t('reports.leagueStats.noData')}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -290,8 +292,8 @@ export default function Reports() {
         <TabsContent value="strategies" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Performance by Strategy</CardTitle>
-              <CardDescription>Analyze your betting results for each strategy</CardDescription>
+              <CardTitle>{t('reports.strategyStats.title')}</CardTitle>
+              <CardDescription>{t('reports.strategyStats.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
               {strategyStats.length > 0 && (
@@ -319,27 +321,27 @@ export default function Reports() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Strategy Statistics</CardTitle>
+              <CardTitle>{t('reports.strategyStats.tableTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Strategy</TableHead>
-                    <TableHead>Total Bets</TableHead>
-                    <TableHead>Wins</TableHead>
-                    <TableHead>Win Rate</TableHead>
-                    <TableHead>Total Stake</TableHead>
-                    <TableHead>Profit</TableHead>
-                    <TableHead>ROI</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('reports.table.strategy')}</TableHead>
+                    <TableHead>{t('reports.table.totalBets')}</TableHead>
+                    <TableHead>{t('reports.table.wins')}</TableHead>
+                    <TableHead>{t('reports.table.winRate')}</TableHead>
+                    <TableHead>{t('reports.table.totalStake')}</TableHead>
+                    <TableHead>{t('reports.table.profit')}</TableHead>
+                    <TableHead>{t('reports.table.roi')}</TableHead>
+                    <TableHead>{t('reports.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {strategyStats.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={8} className="text-center text-muted-foreground">
-                        No strategy data available
+                        {t('reports.strategyStats.noData')}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -381,21 +383,21 @@ export default function Reports() {
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {detailView?.type === 'team' && `Team: ${detailView.value}`}
-              {detailView?.type === 'league' && `League: ${detailView.value}`}
-              {detailView?.type === 'strategy' && `Strategy: ${detailView.value}`}
+              {detailView?.type === 'team' && t('reports.detailDialog.teamTitle').replace('{value}', detailView.value)}
+              {detailView?.type === 'league' && t('reports.detailDialog.leagueTitle').replace('{value}', detailView.value)}
+              {detailView?.type === 'strategy' && t('reports.detailDialog.strategyTitle').replace('{value}', detailView.value)}
             </DialogTitle>
           </DialogHeader>
           {detailView && (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Stake</TableHead>
-                  <TableHead>Odds</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Profit</TableHead>
+                  <TableHead>{t('reports.detailDialog.date')}</TableHead>
+                  <TableHead>{t('reports.detailDialog.description')}</TableHead>
+                  <TableHead>{t('reports.detailDialog.stake')}</TableHead>
+                  <TableHead>{t('reports.detailDialog.odds')}</TableHead>
+                  <TableHead>{t('reports.detailDialog.status')}</TableHead>
+                  <TableHead>{t('reports.detailDialog.profit')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
