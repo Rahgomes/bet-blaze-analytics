@@ -21,10 +21,12 @@ import {
   isAfter,
   isBefore,
 } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS } from 'date-fns/locale';
 import { TrendingUp, DollarSign, Target as TargetIcon, Activity } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Analytics() {
+  const { t, language } = useTranslation();
   // Dados da betting store
   const bets = useBettingStore(state => state.bets);
   const bankroll = useBettingStore(state => state.bankroll);
@@ -79,9 +81,10 @@ export default function Analytics() {
   // Função para obter data inicial com base no período
   const getStartDate = (periodKey: string): Date | null => {
     const now = new Date();
+    const locale = language === 'pt-br' ? ptBR : enUS;
     switch (periodKey) {
       case 'today': return startOfToday();
-      case 'week': return startOfWeek(now, { locale: ptBR });
+      case 'week': return startOfWeek(now, { locale });
       case 'month': return startOfMonth(now);
       case '30days': return subDays(now, 30);
       case '90days': return subDays(now, 90);
@@ -282,25 +285,26 @@ export default function Analytics() {
     });
 
     const statusLabels: Record<string, string> = {
-      won: 'Ganhas',
-      lost: 'Perdidas',
-      pending: 'Pendentes',
-      void: 'Anuladas',
-      cashout: 'Cashout',
+      won: t('analytics.status.won'),
+      lost: t('analytics.status.lost'),
+      pending: t('analytics.status.pending'),
+      void: t('analytics.status.void'),
+      cashout: t('analytics.status.cashout'),
     };
 
     return Array.from(statusMap.entries()).map(([status, value]) => ({
       name: statusLabels[status] || status,
       value,
     }));
-  }, [currentBets]);
+  }, [currentBets, t]);
 
   // Calcular evolução mensal
   const monthlyEvolution = useMemo(() => {
     const months = new Map<string, { profit: number; bets: number; stake: number }>();
+    const locale = language === 'pt-br' ? ptBR : enUS;
 
     currentBets.forEach(bet => {
-      const monthKey = format(new Date(bet.date), 'MMM/yy', { locale: ptBR });
+      const monthKey = format(new Date(bet.date), 'MMM/yy', { locale });
       const current = months.get(monthKey) || { profit: 0, bets: 0, stake: 0 };
       months.set(monthKey, {
         profit: current.profit + bet.profit,
@@ -317,7 +321,7 @@ export default function Analytics() {
         roi: data.stake > 0 ? (data.profit / data.stake) * 100 : 0,
       }))
       .sort((a, b) => a.month.localeCompare(b.month));
-  }, [currentBets]);
+  }, [currentBets, language]);
 
   // Calcular distribuição por faixa de odds
   const oddsDistribution = useMemo(() => {
@@ -354,8 +358,8 @@ export default function Analytics() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Análise Avançada</h1>
-        <p className="text-muted-foreground">Análise detalhada e comparativa de performance</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('analytics.title')}</h1>
+        <p className="text-muted-foreground">{t('analytics.subtitle')}</p>
       </div>
 
       {/* Filtros */}
@@ -386,10 +390,10 @@ export default function Analytics() {
       {/* Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="trends">Tendências</TabsTrigger>
-          <TabsTrigger value="risk">Risco e Projeções</TabsTrigger>
+          <TabsTrigger value="overview">{t('analytics.tabs.overview')}</TabsTrigger>
+          <TabsTrigger value="performance">{t('analytics.tabs.performance')}</TabsTrigger>
+          <TabsTrigger value="trends">{t('analytics.tabs.trends')}</TabsTrigger>
+          <TabsTrigger value="risk">{t('analytics.tabs.risk')}</TabsTrigger>
         </TabsList>
 
         {/* ABA: VISÃO GERAL */}
@@ -397,28 +401,28 @@ export default function Analytics() {
           {/* Cards de Métricas com Comparação */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <ComparisonMetricCard
-              title="Lucro Total"
+              title={t('analytics.metrics.totalProfit')}
               currentValue={currentMetrics.totalProfit}
               previousValue={previousMetrics.totalProfit}
               format="currency"
               icon={<DollarSign className="h-4 w-4" />}
             />
             <ComparisonMetricCard
-              title="ROI"
+              title={t('dashboard.roi')}
               currentValue={currentMetrics.roi}
               previousValue={previousMetrics.roi}
               format="percentage"
               icon={<TrendingUp className="h-4 w-4" />}
             />
             <ComparisonMetricCard
-              title="Taxa de Acerto"
+              title={t('analytics.metrics.winRate')}
               currentValue={currentMetrics.winRate}
               previousValue={previousMetrics.winRate}
               format="percentage"
               icon={<TargetIcon className="h-4 w-4" />}
             />
             <ComparisonMetricCard
-              title="Total de Apostas"
+              title={t('analytics.metrics.totalBets')}
               currentValue={currentMetrics.totalBets}
               previousValue={previousMetrics.totalBets}
               format="number"
@@ -428,9 +432,9 @@ export default function Analytics() {
 
           {/* Gráfico de Evolução Temporal */}
           <TrendLineChart
-            data={evolutionData.length > 0 ? evolutionData : [{ date: 'Sem dados', current: 0 }]}
-            title="Evolução do Lucro Acumulado"
-            yAxisLabel="Lucro (R$)"
+            data={evolutionData.length > 0 ? evolutionData : [{ date: t('analytics.charts.noData'), current: 0 }]}
+            title={t('analytics.charts.profitEvolution')}
+            yAxisLabel={t('analytics.charts.yAxisProfit')}
             format="currency"
             showComparison={period !== 'all' && evolutionData.length > 0}
           />
@@ -449,53 +453,53 @@ export default function Analytics() {
         <TabsContent value="performance" className="space-y-6">
           {/* Performance por Casa de Apostas */}
           <PerformanceTable
-            title="Performance por Casa de Apostas"
+            title={t('analytics.tables.performanceByBookmaker')}
             data={bookmakerPerformance}
             columns={[
-              { key: 'dimension', label: 'Casa de Apostas', sortable: true },
-              { key: 'totalBets', label: 'Apostas', format: 'number', sortable: true },
-              { key: 'totalStake', label: 'Valor Apostado', format: 'currency', sortable: true },
-              { key: 'profit', label: 'Lucro', format: 'currency', sortable: true, colorCode: true },
-              { key: 'roi', label: 'ROI', format: 'percentage', sortable: true, colorCode: true },
-              { key: 'winRate', label: 'Taxa de Acerto', format: 'percentage', sortable: true },
+              { key: 'dimension', label: t('analytics.tables.bookmaker'), sortable: true },
+              { key: 'totalBets', label: t('analytics.tables.bets'), format: 'number', sortable: true },
+              { key: 'totalStake', label: t('analytics.tables.staked'), format: 'currency', sortable: true },
+              { key: 'profit', label: t('analytics.tables.profit'), format: 'currency', sortable: true, colorCode: true },
+              { key: 'roi', label: t('dashboard.roi'), format: 'percentage', sortable: true, colorCode: true },
+              { key: 'winRate', label: t('analytics.metrics.winRate'), format: 'percentage', sortable: true },
             ]}
             defaultSortKey="profit"
             defaultSortDirection="desc"
-            emptyMessage="Nenhum dado de casa de apostas disponível"
+            emptyMessage={t('analytics.tables.emptyBookmaker')}
           />
 
           {/* Performance por Liga */}
           <PerformanceTable
-            title="Performance por Liga/Competição"
+            title={t('analytics.tables.performanceByLeague')}
             data={leaguePerformance}
             columns={[
-              { key: 'dimension', label: 'Liga', sortable: true },
-              { key: 'totalBets', label: 'Apostas', format: 'number', sortable: true },
-              { key: 'totalStake', label: 'Valor Apostado', format: 'currency', sortable: true },
-              { key: 'profit', label: 'Lucro', format: 'currency', sortable: true, colorCode: true },
-              { key: 'roi', label: 'ROI', format: 'percentage', sortable: true, colorCode: true },
-              { key: 'winRate', label: 'Taxa de Acerto', format: 'percentage', sortable: true },
+              { key: 'dimension', label: t('analytics.tables.league'), sortable: true },
+              { key: 'totalBets', label: t('analytics.tables.bets'), format: 'number', sortable: true },
+              { key: 'totalStake', label: t('analytics.tables.staked'), format: 'currency', sortable: true },
+              { key: 'profit', label: t('analytics.tables.profit'), format: 'currency', sortable: true, colorCode: true },
+              { key: 'roi', label: t('dashboard.roi'), format: 'percentage', sortable: true, colorCode: true },
+              { key: 'winRate', label: t('analytics.metrics.winRate'), format: 'percentage', sortable: true },
             ]}
             defaultSortKey="profit"
             defaultSortDirection="desc"
-            emptyMessage="Nenhum dado de liga disponível"
+            emptyMessage={t('analytics.tables.emptyLeague')}
           />
 
           {/* Performance por Mercado */}
           <PerformanceTable
-            title="Performance por Mercado"
+            title={t('analytics.tables.performanceByMarket')}
             data={marketPerformance}
             columns={[
-              { key: 'dimension', label: 'Mercado', sortable: true },
-              { key: 'totalBets', label: 'Apostas', format: 'number', sortable: true },
-              { key: 'totalStake', label: 'Valor Apostado', format: 'currency', sortable: true },
-              { key: 'profit', label: 'Lucro', format: 'currency', sortable: true, colorCode: true },
-              { key: 'roi', label: 'ROI', format: 'percentage', sortable: true, colorCode: true },
-              { key: 'winRate', label: 'Taxa de Acerto', format: 'percentage', sortable: true },
+              { key: 'dimension', label: t('analytics.tables.market'), sortable: true },
+              { key: 'totalBets', label: t('analytics.tables.bets'), format: 'number', sortable: true },
+              { key: 'totalStake', label: t('analytics.tables.staked'), format: 'currency', sortable: true },
+              { key: 'profit', label: t('analytics.tables.profit'), format: 'currency', sortable: true, colorCode: true },
+              { key: 'roi', label: t('dashboard.roi'), format: 'percentage', sortable: true, colorCode: true },
+              { key: 'winRate', label: t('analytics.metrics.winRate'), format: 'percentage', sortable: true },
             ]}
             defaultSortKey="profit"
             defaultSortDirection="desc"
-            emptyMessage="Nenhum dado de mercado disponível"
+            emptyMessage={t('analytics.tables.emptyMarket')}
           />
         </TabsContent>
 
@@ -505,7 +509,7 @@ export default function Analytics() {
             {/* Evolução Mensal - Lucro */}
             <Card>
               <CardHeader>
-                <CardTitle>Evolução Mensal - Lucro</CardTitle>
+                <CardTitle>{t('analytics.charts.monthlyProfitEvolution')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -515,14 +519,14 @@ export default function Analytics() {
                     <YAxis className="text-xs" />
                     <RechartsTooltip
                       formatter={(value: any) =>
-                        new Intl.NumberFormat('pt-BR', {
+                        new Intl.NumberFormat(language === 'pt-br' ? 'pt-BR' : 'en-US', {
                           style: 'currency',
-                          currency: 'BRL',
+                          currency: language === 'pt-br' ? 'BRL' : 'USD',
                         }).format(value)
                       }
                     />
                     <Legend />
-                    <Bar dataKey="profit" name="Lucro" fill="hsl(var(--primary))" />
+                    <Bar dataKey="profit" name={t('analytics.legend.profit')} fill="hsl(var(--primary))" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -531,7 +535,7 @@ export default function Analytics() {
             {/* Evolução Mensal - ROI */}
             <Card>
               <CardHeader>
-                <CardTitle>Evolução Mensal - ROI</CardTitle>
+                <CardTitle>{t('analytics.charts.monthlyRoiEvolution')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -541,7 +545,7 @@ export default function Analytics() {
                     <YAxis className="text-xs" />
                     <RechartsTooltip formatter={(value: any) => `${value.toFixed(2)}%`} />
                     <Legend />
-                    <Bar dataKey="roi" name="ROI %" fill="hsl(var(--chart-3))" />
+                    <Bar dataKey="roi" name={t('analytics.legend.roi')} fill="hsl(var(--chart-3))" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -550,7 +554,7 @@ export default function Analytics() {
             {/* Distribuição por Status */}
             <Card>
               <CardHeader>
-                <CardTitle>Distribuição por Status</CardTitle>
+                <CardTitle>{t('analytics.charts.statusDistribution')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -585,7 +589,7 @@ export default function Analytics() {
             {/* Performance por Faixa de Odds */}
             <Card>
               <CardHeader>
-                <CardTitle>Performance por Faixa de Odds</CardTitle>
+                <CardTitle>{t('analytics.charts.oddsPerformance')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -595,8 +599,8 @@ export default function Analytics() {
                     <YAxis className="text-xs" />
                     <RechartsTooltip formatter={(value: any) => `${value.toFixed(2)}%`} />
                     <Legend />
-                    <Bar dataKey="roi" name="ROI %" fill="hsl(var(--primary))" />
-                    <Bar dataKey="winRate" name="Taxa de Acerto %" fill="hsl(var(--chart-2))" />
+                    <Bar dataKey="roi" name={t('analytics.legend.roi')} fill="hsl(var(--primary))" />
+                    <Bar dataKey="winRate" name={t('analytics.legend.winRate')} fill="hsl(var(--chart-2))" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -605,18 +609,18 @@ export default function Analytics() {
 
           {/* Tabela de Performance por Faixa de Odds */}
           <PerformanceTable
-            title="Detalhamento por Faixa de Odds"
+            title={t('analytics.tables.oddsRangeDetails')}
             data={oddsDistribution}
             columns={[
-              { key: 'range', label: 'Faixa de Odds', sortable: true },
-              { key: 'bets', label: 'Apostas', format: 'number', sortable: true },
-              { key: 'profit', label: 'Lucro', format: 'currency', sortable: true, colorCode: true },
-              { key: 'roi', label: 'ROI', format: 'percentage', sortable: true, colorCode: true },
-              { key: 'winRate', label: 'Taxa de Acerto', format: 'percentage', sortable: true },
+              { key: 'range', label: t('analytics.tables.oddsRange'), sortable: true },
+              { key: 'bets', label: t('analytics.tables.bets'), format: 'number', sortable: true },
+              { key: 'profit', label: t('analytics.tables.profit'), format: 'currency', sortable: true, colorCode: true },
+              { key: 'roi', label: t('dashboard.roi'), format: 'percentage', sortable: true, colorCode: true },
+              { key: 'winRate', label: t('analytics.metrics.winRate'), format: 'percentage', sortable: true },
             ]}
             defaultSortKey="roi"
             defaultSortDirection="desc"
-            emptyMessage="Nenhum dado de faixa de odds disponível"
+            emptyMessage={t('analytics.tables.emptyOdds')}
           />
         </TabsContent>
 
@@ -626,24 +630,24 @@ export default function Analytics() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Stake Médio</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('analytics.risk.averageStakeLabel')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {currentBets.length > 0
-                    ? new Intl.NumberFormat('pt-BR', {
+                    ? new Intl.NumberFormat(language === 'pt-br' ? 'pt-BR' : 'en-US', {
                         style: 'currency',
-                        currency: 'BRL',
+                        currency: language === 'pt-br' ? 'BRL' : 'USD',
                       }).format(currentMetrics.totalStake / currentBets.length)
-                    : 'R$ 0,00'}
+                    : language === 'pt-br' ? 'R$ 0,00' : '$0.00'}
                 </div>
-                <p className="text-xs text-muted-foreground">Por aposta</p>
+                <p className="text-xs text-muted-foreground">{t('analytics.risk.perBet')}</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Odds Média</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('analytics.risk.averageOddsLabel')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -651,30 +655,30 @@ export default function Analytics() {
                     ? (currentBets.reduce((sum, b) => sum + b.odds, 0) / currentBets.length).toFixed(2)
                     : '0.00'}
                 </div>
-                <p className="text-xs text-muted-foreground">Média ponderada</p>
+                <p className="text-xs text-muted-foreground">{t('analytics.risk.weightedAverage')}</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Maior Aposta</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('analytics.risk.largestBetLabel')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {currentBets.length > 0
-                    ? new Intl.NumberFormat('pt-BR', {
+                    ? new Intl.NumberFormat(language === 'pt-br' ? 'pt-BR' : 'en-US', {
                         style: 'currency',
-                        currency: 'BRL',
+                        currency: language === 'pt-br' ? 'BRL' : 'USD',
                       }).format(Math.max(...currentBets.map(b => b.amount)))
-                    : 'R$ 0,00'}
+                    : language === 'pt-br' ? 'R$ 0,00' : '$0.00'}
                 </div>
-                <p className="text-xs text-muted-foreground">Stake máximo</p>
+                <p className="text-xs text-muted-foreground">{t('analytics.risk.maxStake')}</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">% da Banca</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('analytics.risk.bankrollPercentageLabel')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -682,7 +686,7 @@ export default function Analytics() {
                     ? ((currentMetrics.totalStake / currentBets.length / bankroll.currentBankroll) * 100).toFixed(2)
                     : '0.00'}%
                 </div>
-                <p className="text-xs text-muted-foreground">Stake médio / Banca</p>
+                <p className="text-xs text-muted-foreground">{t('analytics.risk.averageStakeVsBankroll')}</p>
               </CardContent>
             </Card>
           </div>
@@ -690,84 +694,84 @@ export default function Analytics() {
           {/* Projeção de Crescimento */}
           <Card>
             <CardHeader>
-              <CardTitle>Projeção de Crescimento da Banca</CardTitle>
+              <CardTitle>{t('analytics.risk.projectionTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Projeção Linear (1 mês)</p>
+                  <p className="text-sm font-medium">{t('analytics.risk.linearProjection1Month')}</p>
                   <p className="text-2xl font-bold text-primary">
                     {(() => {
                       const daysInPeriod = currentBets.length > 0 ? 30 : 1;
                       const dailyProfit = currentMetrics.totalProfit / daysInPeriod;
                       const projected = bankroll.currentBankroll + (dailyProfit * 30);
-                      return new Intl.NumberFormat('pt-BR', {
+                      return new Intl.NumberFormat(language === 'pt-br' ? 'pt-BR' : 'en-US', {
                         style: 'currency',
-                        currency: 'BRL',
+                        currency: language === 'pt-br' ? 'BRL' : 'USD',
                       }).format(projected);
                     })()}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Baseado no lucro diário médio
+                    {t('analytics.risk.basedOnDailyProfit')}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Projeção Linear (3 meses)</p>
+                  <p className="text-sm font-medium">{t('analytics.risk.linearProjection3Months')}</p>
                   <p className="text-2xl font-bold text-primary">
                     {(() => {
                       const daysInPeriod = currentBets.length > 0 ? 30 : 1;
                       const dailyProfit = currentMetrics.totalProfit / daysInPeriod;
                       const projected = bankroll.currentBankroll + (dailyProfit * 90);
-                      return new Intl.NumberFormat('pt-BR', {
+                      return new Intl.NumberFormat(language === 'pt-br' ? 'pt-BR' : 'en-US', {
                         style: 'currency',
-                        currency: 'BRL',
+                        currency: language === 'pt-br' ? 'BRL' : 'USD',
                       }).format(projected);
                     })()}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Crescimento linear mantendo o ritmo
+                    {t('analytics.risk.linearGrowth')}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Meta Necessária (Mensal)</p>
+                  <p className="text-sm font-medium">{t('analytics.risk.monthlyTarget')}</p>
                   <p className="text-2xl font-bold text-chart-3">
                     {(() => {
                       const monthlyTarget = bankroll.currentBankroll * 0.05; // 5% ao mês
-                      return new Intl.NumberFormat('pt-BR', {
+                      return new Intl.NumberFormat(language === 'pt-br' ? 'pt-BR' : 'en-US', {
                         style: 'currency',
-                        currency: 'BRL',
+                        currency: language === 'pt-br' ? 'BRL' : 'USD',
                       }).format(monthlyTarget);
                     })()}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Para crescimento de 5% ao mês
+                    {t('analytics.risk.fivePercentGrowth')}
                   </p>
                 </div>
               </div>
 
               <div className="rounded-lg bg-muted p-4">
-                <p className="text-sm font-medium mb-2">Análise de Risco</p>
+                <p className="text-sm font-medium mb-2">{t('analytics.risk.riskAnalysis')}</p>
                 <div className="space-y-1 text-sm text-muted-foreground">
                   <p>
-                    • Exposição atual: {' '}
+                    • {t('analytics.risk.currentExposure')}: {' '}
                     <span className="font-semibold text-foreground">
-                      {new Intl.NumberFormat('pt-BR', {
+                      {new Intl.NumberFormat(language === 'pt-br' ? 'pt-BR' : 'en-US', {
                         style: 'currency',
-                        currency: 'BRL',
+                        currency: language === 'pt-br' ? 'BRL' : 'USD',
                       }).format(currentMetrics.totalStake)}
                     </span>
-                    {' '}({((currentMetrics.totalStake / bankroll.currentBankroll) * 100).toFixed(1)}% da banca)
+                    {' '}({((currentMetrics.totalStake / bankroll.currentBankroll) * 100).toFixed(1)}% {t('analytics.risk.ofBankroll')})
                   </p>
                   <p>
-                    • ROI atual: {' '}
+                    • {t('analytics.risk.currentRoi')}: {' '}
                     <span className={`font-semibold ${currentMetrics.roi >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {currentMetrics.roi.toFixed(2)}%
                     </span>
                   </p>
                   <p>
-                    • Para manter crescimento sustentável, mantenha ROI acima de 3% e stake médio abaixo de 3% da banca.
+                    • {t('analytics.risk.sustainableGrowthTip')}
                   </p>
                 </div>
               </div>
@@ -777,7 +781,7 @@ export default function Analytics() {
           {/* Distribuição de Stakes */}
           <Card>
             <CardHeader>
-              <CardTitle>Distribuição de Stakes</CardTitle>
+              <CardTitle>{t('analytics.risk.stakesDistributionTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -819,7 +823,7 @@ export default function Analytics() {
                   <YAxis className="text-xs" />
                   <RechartsTooltip />
                   <Legend />
-                  <Bar dataKey="count" name="Número de Apostas" fill="hsl(var(--primary))" />
+                  <Bar dataKey="count" name={t('analytics.risk.numberOfBets')} fill="hsl(var(--primary))" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>

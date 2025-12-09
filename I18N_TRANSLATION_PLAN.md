@@ -42,12 +42,16 @@ Este documento é um guia completo para traduzir todas as páginas do aplicativo
 - [x] Persistência de idioma via `sessionStorage`
 - [x] TranslationProvider configurado no App.tsx
 
-### ✅ Páginas Já Traduzidas (3/17)
+### ✅ Páginas Já Traduzidas (7/17)
 1. **FAQ.tsx** - 100% traduzido ✅
 2. **Tips.tsx** - 100% traduzido ✅
 3. **Watchlist.tsx** - Parcialmente traduzido ✅
+4. **Dashboard.tsx** - 100% traduzido ✅
+5. **BetsList.tsx** - 100% traduzido ✅
+6. **AddBet.tsx** - 100% traduzido ✅
+7. **Analytics.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 08/12/2025)
 
-### ❌ Páginas Com Texto Hardcoded (14/17)
+### ❌ Páginas Com Texto Hardcoded (10/17)
 Precisam ser traduzidas (ver seção de prioridades abaixo)
 
 ---
@@ -202,9 +206,47 @@ Traduzir as páginas restantes
 
 ### Ordem de Execução Sugerida
 
-#### 1️⃣ **Dashboard.tsx** (PRIORIDADE MÁXIMA)
+#### ✅ **Analytics.tsx** - CONCLUÍDO (08/12/2025)
+**Tempo real**: ~2 horas
+**Status**: 100% traduzido e testado
+
+**O que foi feito**:
+- ✅ Adicionadas 89 novas chaves de tradução em `pt-br.json` e `en.json`
+- ✅ Importado hook `useTranslation`
+- ✅ Traduzidos todos os títulos e labels de abas
+- ✅ Traduzidos todos os cards de métricas
+- ✅ Traduzidos todos os gráficos (Lucro, ROI, Status, Odds)
+- ✅ Traduzidas todas as tabelas de performance
+- ✅ Traduzida seção de risco e projeções
+- ✅ Formatação de moeda e datas ajustada para PT-BR e EN
+- ✅ Labels de status dinâmicos (Ganhas, Perdidas, Pendentes, etc)
+
+**Chaves adicionadas**:
+```json
+"analytics": {
+  "title", "subtitle",
+  "tabs": { "overview", "performance", "trends", "risk" },
+  "metrics": { 8 chaves },
+  "charts": { 8 chaves },
+  "tables": { 11 chaves },
+  "status": { 5 chaves },
+  "risk": { 16 chaves },
+  "goalTracking": { 4 chaves },
+  "legend": { 3 chaves }
+}
+```
+
+**Arquivos modificados**:
+- `/client/src/pages/Analytics.tsx` (100% traduzido)
+- `/client/src/locales/pt-br.json` (89 novas chaves)
+- `/client/src/locales/en.json` (89 novas chaves)
+
+---
+
+#### 1️⃣ **Dashboard.tsx** (PRIORIDADE MÁXIMA) ✅ CONCLUÍDO
 **Tempo estimado**: 3-4 horas
 **Motivo**: Primeira tela que o usuário vê
+**Status**: ✅ 100% traduzido
 
 **Strings a traduzir**:
 - Títulos de seção
@@ -511,10 +553,10 @@ Traduzir as páginas restantes
 - [x] Watchlist.tsx (parcial)
 
 ### 🔥 Páginas Prioritárias (Fazer Primeiro)
-- [ ] 1. Dashboard.tsx
-- [ ] 2. AddBet.tsx
-- [ ] 3. BetsList.tsx
-- [ ] 4. Analytics.tsx
+- [x] 1. Dashboard.tsx ✅
+- [x] 2. AddBet.tsx ✅
+- [x] 3. BetsList.tsx ✅
+- [x] 4. Analytics.tsx ✅ (CONCLUÍDO em 08/12/2025)
 - [ ] 5. Import.tsx
 
 ### 📦 Páginas Secundárias
@@ -867,19 +909,28 @@ toast({
 
 ---
 
-## 📊 Progresso Estimado
+## 📊 Progresso Atual (Atualizado em 08/12/2025)
 
-| Dia | Páginas | Horas | Acumulado |
-|-----|---------|-------|-----------|
-| 1 | Dashboard | 3-4h | 3-4h |
-| 2 | AddBet | 4-5h | 7-9h |
-| 3 | BetsList | 3-4h | 10-13h |
-| 4 | Analytics | 4-5h | 14-18h |
-| 5 | Import | 2-3h | 16-21h |
-| 6-7 | Páginas secundárias | 10-15h | 26-36h |
-| 8 | Revisão e testes | 5-10h | 31-46h |
+| Status | Páginas | Percentual |
+|--------|---------|------------|
+| ✅ Concluídas | 7/17 | 41% |
+| 🔄 Em progresso | 0/17 | 0% |
+| ❌ Pendentes | 10/17 | 59% |
 
-**Total**: ~40 horas em 1-2 semanas (2-4h por dia)
+### Progresso por Prioridade
+
+**Alta Prioridade (4/4 concluídas - 100%)**:
+- ✅ Dashboard.tsx
+- ✅ AddBet.tsx
+- ✅ BetsList.tsx
+- ✅ Analytics.tsx
+
+**Próximas páginas**:
+1. Import.tsx (2-3h)
+2. BankrollSettings.tsx (3-4h)
+3. Reports.tsx (3-4h)
+
+**Tempo restante estimado**: 20-30 horas para completar 100%
 
 ---
 

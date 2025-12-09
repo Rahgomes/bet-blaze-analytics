@@ -397,5 +397,94 @@
     "hedge": "Hedge",
     "experimental": "Experimental",
     "followingTipster": "Following Tipster"
+  },
+  "analytics": {
+    "title": "Advanced Analytics",
+    "subtitle": "Detailed and comparative performance analysis",
+    "tabs": {
+      "overview": "Overview",
+      "performance": "Performance",
+      "trends": "Trends",
+      "risk": "Risk and Projections"
+    },
+    "metrics": {
+      "totalProfit": "Total Profit",
+      "totalStake": "Total Staked",
+      "winRate": "Win Rate",
+      "totalBets": "Total Bets",
+      "averageStake": "Average Stake",
+      "averageOdds": "Average Odds",
+      "largestBet": "Largest Bet",
+      "bankrollPercentage": "% of Bankroll"
+    },
+    "charts": {
+      "profitEvolution": "Accumulated Profit Evolution",
+      "yAxisProfit": "Profit ($)",
+      "monthlyProfitEvolution": "Monthly Evolution - Profit",
+      "monthlyRoiEvolution": "Monthly Evolution - ROI",
+      "statusDistribution": "Distribution by Status",
+      "oddsPerformance": "Performance by Odds Range",
+      "stakesDistribution": "Stakes Distribution",
+      "noData": "No data"
+    },
+    "tables": {
+      "performanceByBookmaker": "Performance by Bookmaker",
+      "performanceByLeague": "Performance by League/Competition",
+      "performanceByMarket": "Performance by Market",
+      "oddsRangeDetails": "Breakdown by Odds Range",
+      "bookmaker": "Bookmaker",
+      "league": "League",
+      "market": "Market",
+      "bets": "Bets",
+      "staked": "Staked",
+      "profit": "Profit",
+      "emptyBookmaker": "No bookmaker data available",
+      "emptyLeague": "No league data available",
+      "emptyMarket": "No market data available",
+      "emptyOdds": "No odds range data available",
+      "oddsRange": "Odds Range"
+    },
+    "status": {
+      "won": "Won",
+      "lost": "Lost",
+      "pending": "Pending",
+      "void": "Void",
+      "cashout": "Cashout"
+    },
+    "risk": {
+      "averageStakeLabel": "Average Stake",
+      "perBet": "Per bet",
+      "averageOddsLabel": "Average Odds",
+      "weightedAverage": "Weighted average",
+      "largestBetLabel": "Largest Bet",
+      "maxStake": "Max stake",
+      "bankrollPercentageLabel": "% of Bankroll",
+      "averageStakeVsBankroll": "Average stake / Bankroll",
+      "projectionTitle": "Bankroll Growth Projection",
+      "linearProjection1Month": "Linear Projection (1 month)",
+      "linearProjection3Months": "Linear Projection (3 months)",
+      "monthlyTarget": "Required Target (Monthly)",
+      "basedOnDailyProfit": "Based on average daily profit",
+      "linearGrowth": "Linear growth maintaining pace",
+      "fivePercentGrowth": "For 5% monthly growth",
+      "riskAnalysis": "Risk Analysis",
+      "currentExposure": "Current exposure",
+      "ofBankroll": "of bankroll",
+      "currentRoi": "Current ROI",
+      "sustainableGrowthTip": "To maintain sustainable growth, keep ROI above 3% and average stake below 3% of bankroll.",
+      "stakesDistributionTitle": "Stakes Distribution",
+      "numberOfBets": "Number of Bets"
+    },
+    "goalTracking": {
+      "currentValue": "Current Value",
+      "targetValue": "Target",
+      "targetDate": "Target Date",
+      "projection": "Projection"
+    },
+    "legend": {
+      "profit": "Profit",
+      "roi": "ROI %",
+      "winRate": "Win Rate %"
+    }
   }
 }

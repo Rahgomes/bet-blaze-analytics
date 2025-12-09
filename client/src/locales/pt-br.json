@@ -397,5 +397,94 @@
     "hedge": "Hedge",
     "experimental": "Experimental",
     "followingTipster": "Seguindo Tipster"
+  },
+  "analytics": {
+    "title": "Análise Avançada",
+    "subtitle": "Análise detalhada e comparativa de performance",
+    "tabs": {
+      "overview": "Visão Geral",
+      "performance": "Performance",
+      "trends": "Tendências",
+      "risk": "Risco e Projeções"
+    },
+    "metrics": {
+      "totalProfit": "Lucro Total",
+      "totalStake": "Valor Apostado",
+      "winRate": "Taxa de Acerto",
+      "totalBets": "Total de Apostas",
+      "averageStake": "Stake Médio",
+      "averageOdds": "Odds Média",
+      "largestBet": "Maior Aposta",
+      "bankrollPercentage": "% da Banca"
+    },
+    "charts": {
+      "profitEvolution": "Evolução do Lucro Acumulado",
+      "yAxisProfit": "Lucro (R$)",
+      "monthlyProfitEvolution": "Evolução Mensal - Lucro",
+      "monthlyRoiEvolution": "Evolução Mensal - ROI",
+      "statusDistribution": "Distribuição por Status",
+      "oddsPerformance": "Performance por Faixa de Odds",
+      "stakesDistribution": "Distribuição de Stakes",
+      "noData": "Sem dados"
+    },
+    "tables": {
+      "performanceByBookmaker": "Performance por Casa de Apostas",
+      "performanceByLeague": "Performance por Liga/Competição",
+      "performanceByMarket": "Performance por Mercado",
+      "oddsRangeDetails": "Detalhamento por Faixa de Odds",
+      "bookmaker": "Casa de Apostas",
+      "league": "Liga",
+      "market": "Mercado",
+      "bets": "Apostas",
+      "staked": "Valor Apostado",
+      "profit": "Lucro",
+      "emptyBookmaker": "Nenhum dado de casa de apostas disponível",
+      "emptyLeague": "Nenhum dado de liga disponível",
+      "emptyMarket": "Nenhum dado de mercado disponível",
+      "emptyOdds": "Nenhum dado de faixa de odds disponível",
+      "oddsRange": "Faixa de Odds"
+    },
+    "status": {
+      "won": "Ganhas",
+      "lost": "Perdidas",
+      "pending": "Pendentes",
+      "void": "Anuladas",
+      "cashout": "Cashout"
+    },
+    "risk": {
+      "averageStakeLabel": "Stake Médio",
+      "perBet": "Por aposta",
+      "averageOddsLabel": "Odds Média",
+      "weightedAverage": "Média ponderada",
+      "largestBetLabel": "Maior Aposta",
+      "maxStake": "Stake máximo",
+      "bankrollPercentageLabel": "% da Banca",
+      "averageStakeVsBankroll": "Stake médio / Banca",
+      "projectionTitle": "Projeção de Crescimento da Banca",
+      "linearProjection1Month": "Projeção Linear (1 mês)",
+      "linearProjection3Months": "Projeção Linear (3 meses)",
+      "monthlyTarget": "Meta Necessária (Mensal)",
+      "basedOnDailyProfit": "Baseado no lucro diário médio",
+      "linearGrowth": "Crescimento linear mantendo o ritmo",
+      "fivePercentGrowth": "Para crescimento de 5% ao mês",
+      "riskAnalysis": "Análise de Risco",
+      "currentExposure": "Exposição atual",
+      "ofBankroll": "da banca",
+      "currentRoi": "ROI atual",
+      "sustainableGrowthTip": "Para manter crescimento sustentável, mantenha ROI acima de 3% e stake médio abaixo de 3% da banca.",
+      "stakesDistributionTitle": "Distribuição de Stakes",
+      "numberOfBets": "Número de Apostas"
+    },
+    "goalTracking": {
+      "currentValue": "Valor Atual",
+      "targetValue": "Meta",
+      "targetDate": "Data Meta",
+      "projection": "Projeção"
+    },
+    "legend": {
+      "profit": "Lucro",
+      "roi": "ROI %",
+      "winRate": "Taxa de Acerto %"
+    }
   }
 }
