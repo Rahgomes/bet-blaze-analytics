@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useBettingStore } from '@/stores/betting';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,6 +67,7 @@ import { convertStopValue } from '@/utils/stopLossGainUtils';
 
 export default function BankrollSettings() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   // Dados e actions da betting store
   const bankroll = useBettingStore(state => state.bankroll);
@@ -321,8 +323,8 @@ export default function BankrollSettings() {
   }) => {
     if (withdrawal.amount > bankroll.currentBankroll) {
       toast({
-        title: 'Erro',
-        description: 'O valor do saque não pode exceder a banca disponível.',
+        title: t('bankrollSettings.error'),
+        description: t('bankrollSettings.withdrawals.errorExceedsBankroll'),
         variant: 'destructive',
       });
       return;
@@ -351,8 +353,8 @@ export default function BankrollSettings() {
 
     if (newAmount > availableBankroll) {
       toast({
-        title: 'Erro',
-        description: 'O valor do saque não pode exceder a banca disponível.',
+        title: t('bankrollSettings.error'),
+        description: t('bankrollSettings.withdrawals.errorExceedsBankroll'),
         variant: 'destructive',
       });
       return;
@@ -478,16 +480,16 @@ export default function BankrollSettings() {
     setAllowEditInitialBankroll(false);
 
     toast({
-      title: 'Sucesso',
-      description: 'Configurações da banca atualizadas com sucesso',
+      title: t('common.success'),
+      description: t('bankrollSettings.success'),
     });
   };
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Gestão Financeira</h1>
-        <p className="text-muted-foreground">Configure sua banca, aportes, metas e proteção de riscos</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('bankrollSettings.title')}</h1>
+        <p className="text-muted-foreground">{t('bankrollSettings.subtitle')}</p>
       </div>
 
       {/* Card de Resumo Geral */}
@@ -495,19 +497,19 @@ export default function BankrollSettings() {
         <CardContent className="pt-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
-              <p className="text-sm text-muted-foreground">Banca Atual</p>
+              <p className="text-sm text-muted-foreground">{t('dashboard.currentBankroll')}</p>
               <p className="text-2xl font-bold text-blue-600">R$ {bankroll.currentBankroll.toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Meta Mensal</p>
+              <p className="text-sm text-muted-foreground">{t('bankrollSettings.monthlyTarget')}</p>
               <p className="text-2xl font-bold text-green-600">+{formData.targetPercentage}%</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Stop Loss</p>
+              <p className="text-sm text-muted-foreground">{t('bankrollSettings.stopLoss')}</p>
               <p className="text-2xl font-bold text-red-600">R$ {formData.stopLossMonthly}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Aportes</p>
+              <p className="text-sm text-muted-foreground">{t('bankrollSettings.totalDeposits')}</p>
               <p className="text-2xl font-bold text-purple-600">R$ {totalDeposits.toFixed(2)}</p>
             </div>
           </div>
@@ -518,22 +520,22 @@ export default function BankrollSettings() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="bankroll" className="flex items-center gap-2">
             <Wallet className="h-4 w-4" />
-            Banca & Aportes
+            {t('bankrollSettings.tabs.bankroll')}
             {hasChanges() && <Badge variant="destructive" className="ml-1 h-2 w-2 p-0 rounded-full" />}
           </TabsTrigger>
           <TabsTrigger value="goals" className="flex items-center gap-2">
             <Target className="h-4 w-4" />
-            Metas & Objetivos
+            {t('bankrollSettings.tabs.goals')}
             {hasChanges() && <Badge variant="destructive" className="ml-1 h-2 w-2 p-0 rounded-full" />}
           </TabsTrigger>
           <TabsTrigger value="risk" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
-            Gestão de Risco
+            {t('bankrollSettings.tabs.risk')}
             {hasChanges() && <Badge variant="destructive" className="ml-1 h-2 w-2 p-0 rounded-full" />}
           </TabsTrigger>
           <TabsTrigger value="withdrawals" className="flex items-center gap-2">
             <CreditCard className="h-4 w-4" />
-            Saques
+            {t('bankrollSettings.tabs.withdrawals')}
             {hasChanges() && <Badge variant="destructive" className="ml-1 h-2 w-2 p-0 rounded-full" />}
           </TabsTrigger>
         </TabsList>
@@ -545,14 +547,14 @@ export default function BankrollSettings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5" />
-                Configuração da Banca
+                {t('bankrollSettings.bankrollConfig.title')}
               </CardTitle>
-              <CardDescription>Visualize e gerencie sua banca</CardDescription>
+              <CardDescription>{t('bankrollSettings.bankrollConfig.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Banca Inicial */}
               <div className="space-y-2">
-                <Label htmlFor="initialBankroll">Banca Inicial (R$)</Label>
+                <Label htmlFor="initialBankroll">{t('bankrollSettings.bankrollConfig.initialBankroll')}</Label>
                 <Input
                   id="initialBankroll"
                   type="number"
@@ -573,7 +575,7 @@ export default function BankrollSettings() {
                     htmlFor="allow-edit-bankroll"
                     className="text-sm font-normal cursor-pointer"
                   >
-                    {allowEditInitialBankroll ? 'Desabilitar edição da banca inicial' : 'Habilitar edição da banca inicial'}
+                    {allowEditInitialBankroll ? t('bankrollSettings.bankrollConfig.disableEdit') : t('bankrollSettings.bankrollConfig.allowEdit')}
                   </Label>
                 </div>
               </div>
@@ -582,29 +584,29 @@ export default function BankrollSettings() {
 
               {/* Banca Atual - Breakdown */}
               <div className="space-y-3">
-                <Label className="text-base">Banca Atual (calculada automaticamente)</Label>
+                <Label className="text-base">{t('bankrollSettings.bankrollConfig.currentBankroll')}</Label>
                 <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-4 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Banca Inicial:</span>
+                    <span className="text-muted-foreground">{t('bankrollSettings.bankrollConfig.breakdown.initialBankroll')}</span>
                     <span className="font-medium">R$ {parseFloat(formData.initialBankroll || '0').toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Aportes:</span>
+                    <span className="text-muted-foreground">{t('bankrollSettings.bankrollConfig.breakdown.deposits')}</span>
                     <span className="font-medium text-green-600">+R$ {totalDeposits.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Lucro/Prejuízo em Apostas:</span>
+                    <span className="text-muted-foreground">{t('bankrollSettings.bankrollConfig.breakdown.betProfit')}</span>
                     <span className={`font-medium ${totalBetProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {totalBetProfit >= 0 ? '+' : ''}R$ {totalBetProfit.toFixed(2)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Saques:</span>
+                    <span className="text-muted-foreground">{t('bankrollSettings.bankrollConfig.breakdown.withdrawals')}</span>
                     <span className="font-medium text-red-600">-R$ {totalWithdrawals.toFixed(2)}</span>
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between">
-                    <span className="font-semibold">Banca Atual:</span>
+                    <span className="font-semibold">{t('bankrollSettings.bankrollConfig.breakdown.currentBankroll')}</span>
                     <span className="text-xl font-bold text-blue-600">
                       R$ {bankroll.currentBankroll.toFixed(2)}
                     </span>
@@ -619,16 +621,16 @@ export default function BankrollSettings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
-                Histórico de Aportes Manuais
+                {t('bankrollSettings.deposits.title')}
               </CardTitle>
-              <CardDescription>Registre e acompanhe seus aportes à banca</CardDescription>
+              <CardDescription>{t('bankrollSettings.deposits.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {deposits.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    <p>Nenhum aporte registrado ainda</p>
-                    <p className="text-sm">Clique em "Registrar Aporte Manual" para adicionar</p>
+                    <p>{t('bankrollSettings.deposits.noDeposits')}</p>
+                    <p className="text-sm">{t('bankrollSettings.deposits.noDepositsHint')}</p>
                   </div>
                 ) : (
                   <>
@@ -642,7 +644,7 @@ export default function BankrollSettings() {
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
-                              <p className="font-semibold text-base">{deposit.title || 'Aporte Manual'}</p>
+                              <p className="font-semibold text-base">{deposit.title || t('bankrollSettings.deposits.manualDeposit')}</p>
                               <p className="text-sm text-green-700 font-bold mt-1">
                                 +R$ {deposit.amount.toFixed(2)} • {format(new Date(deposit.dateTime), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                               </p>
@@ -650,7 +652,7 @@ export default function BankrollSettings() {
                                 <p className="text-sm text-muted-foreground mt-1">{deposit.description}</p>
                               )}
                               <p className="text-xs text-muted-foreground mt-2">
-                                Banca após: R$ {deposit.balanceAfter.toFixed(2)}
+                                {t('bankrollSettings.deposits.balanceAfter').replace('{balance}', deposit.balanceAfter.toFixed(2))}
                               </p>
                             </div>
                             <div className="flex gap-2 ml-4">
@@ -684,7 +686,7 @@ export default function BankrollSettings() {
                         onClick={() => setVisibleDepositsCount(prev => prev + 3)}
                       >
                         <ChevronDown className="h-4 w-4 mr-2" />
-                        Carregar Mais ({deposits.length - visibleDepositsCount} restantes)
+                        {t('bankrollSettings.deposits.loadMore').replace('{count}', (deposits.length - visibleDepositsCount).toString())}
                       </Button>
                     )}
                   </>
@@ -697,14 +699,14 @@ export default function BankrollSettings() {
                     onClick={() => setShowAddDepositModal(true)}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Registrar Aporte Manual
+                    {t('bankrollSettings.deposits.registerDeposit')}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => setLocation('/settings/deposits-history')}
                   >
                     <History className="h-4 w-4 mr-2" />
-                    Visualizar Histórico Completo
+                    {t('bankrollSettings.deposits.viewFullHistory')}
                   </Button>
                 </div>
               </div>
@@ -719,31 +721,31 @@ export default function BankrollSettings() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5" />
-                  Meta Principal
+                  {t('bankrollSettings.goals.title')}
                 </CardTitle>
-                <CardDescription>Configure sua meta mensal e acompanhe o progresso</CardDescription>
+                <CardDescription>{t('bankrollSettings.goals.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
-                  <Label>Tipo de Meta</Label>
+                  <Label>{t('bankrollSettings.goals.targetType')}</Label>
                   <RadioGroup
                     value={formData.targetMode}
                     onValueChange={(value) => setFormData({ ...formData, targetMode: value as 'percentage' | 'fixed' })}
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="percentage" id="percentage" />
-                      <Label htmlFor="percentage">Meta Percentual</Label>
+                      <Label htmlFor="percentage">{t('bankrollSettings.goals.percentageTarget')}</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="fixed" id="fixed" />
-                      <Label htmlFor="fixed">Meta em Valor Fixo</Label>
+                      <Label htmlFor="fixed">{t('bankrollSettings.goals.fixedTarget')}</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
                 {formData.targetMode === 'percentage' ? (
                   <div className="space-y-2">
-                    <Label htmlFor="targetPercentage">Meta Mensal (%)</Label>
+                    <Label htmlFor="targetPercentage">{t('bankrollSettings.goals.monthlyTargetPercentage')}</Label>
                     <Input
                       id="targetPercentage"
                       type="number"
@@ -753,12 +755,12 @@ export default function BankrollSettings() {
                       onChange={(e) => setFormData({ ...formData, targetPercentage: e.target.value })}
                     />
                     <p className="text-sm text-muted-foreground">
-                      Valor alvo mensal: R$ {(parseFloat(formData.initialBankroll || '0') * (parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2)}
+                      {t('bankrollSettings.goals.monthlyTargetValue').replace('{value}', (parseFloat(formData.initialBankroll || '0') * (parseFloat(formData.targetPercentage || '0') / 100)).toFixed(2))}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Label htmlFor="targetAmount">Valor da Meta Mensal (R$)</Label>
+                    <Label htmlFor="targetAmount">{t('bankrollSettings.goals.monthlyTargetAmount')}</Label>
                     <Input
                       id="targetAmount"
                       type="number"
@@ -775,17 +777,17 @@ export default function BankrollSettings() {
                 {/* Modo de Projeção */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label>Modo de Projeção</Label>
+                    <Label>{t('bankrollSettings.goals.projectionMode')}</Label>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent className="max-w-xs">
-                          <p className="font-semibold mb-2">Linear vs Composto:</p>
+                          <p className="font-semibold mb-2">{t('bankrollSettings.goals.tooltipProjectionMode')}</p>
                           <ul className="space-y-1 text-xs">
-                            <li><strong>Linear:</strong> Multiplicação simples (5% × 6 = 30%)</li>
-                            <li><strong>Composto:</strong> Juros compostos ((1.05)^6 - 1 ≈ 34%)</li>
+                            <li><strong>{t('bankrollSettings.goals.linearMode')}:</strong> {t('bankrollSettings.goals.tooltipLinear')}</li>
+                            <li><strong>{t('bankrollSettings.goals.compoundMode')}:</strong> {t('bankrollSettings.goals.tooltipCompound')}</li>
                           </ul>
                         </TooltipContent>
                       </Tooltip>
@@ -797,11 +799,11 @@ export default function BankrollSettings() {
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="linear" id="linear" />
-                      <Label htmlFor="linear">Linear</Label>
+                      <Label htmlFor="linear">{t('bankrollSettings.goals.linearMode')}</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="compound" id="compound" />
-                      <Label htmlFor="compound">Composto</Label>
+                      <Label htmlFor="compound">{t('bankrollSettings.goals.compoundMode')}</Label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -810,25 +812,25 @@ export default function BankrollSettings() {
 
                 {/* Projeções */}
                 <div className="space-y-3">
-                  <Label>Projeções</Label>
+                  <Label>{t('bankrollSettings.goals.projections')}</Label>
                   <div className="grid gap-3">
                     {/* 6 Month Projection */}
                     <div className="p-3 border rounded-lg bg-slate-50">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-sm">6 Meses</span>
+                        <span className="font-medium text-sm">{t('bankrollSettings.goals.months6')}</span>
                         <Badge variant="outline">
                           {goalCalculations.projection6.percentage.toFixed(2)}%
                         </Badge>
                       </div>
                       <div className="space-y-1">
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Banca projetada:</span>
+                          <span className="text-muted-foreground">{t('bankrollSettings.goals.projectedBankroll')}</span>
                           <span className="font-semibold">
                             R$ {goalCalculations.projection6.bankroll.toFixed(2)}
                           </span>
                         </div>
                         <div className="flex justify-between text-sm text-green-600">
-                          <span>Lucro estimado:</span>
+                          <span>{t('bankrollSettings.goals.estimatedProfit')}</span>
                           <span className="font-semibold">
                             +R$ {goalCalculations.projection6.profit.toFixed(2)}
                           </span>
@@ -839,20 +841,20 @@ export default function BankrollSettings() {
                     {/* 12 Month Projection */}
                     <div className="p-3 border rounded-lg bg-slate-50">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-sm">12 Meses</span>
+                        <span className="font-medium text-sm">{t('bankrollSettings.goals.months12')}</span>
                         <Badge variant="outline">
                           {goalCalculations.projection12.percentage.toFixed(2)}%
                         </Badge>
                       </div>
                       <div className="space-y-1">
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Banca projetada:</span>
+                          <span className="text-muted-foreground">{t('bankrollSettings.goals.projectedBankroll')}</span>
                           <span className="font-semibold">
                             R$ {goalCalculations.projection12.bankroll.toFixed(2)}
                           </span>
                         </div>
                         <div className="flex justify-between text-sm text-green-600">
-                          <span>Lucro estimado:</span>
+                          <span>{t('bankrollSettings.goals.estimatedProfit')}</span>
                           <span className="font-semibold">
                             +R$ {goalCalculations.projection12.profit.toFixed(2)}
                           </span>
@@ -868,7 +870,7 @@ export default function BankrollSettings() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChart className="h-5 w-5" />
-                  Progresso & Análise
+                  {t('bankrollSettings.progress.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -879,8 +881,8 @@ export default function BankrollSettings() {
                     <div className="p-4 border rounded-lg bg-blue-50">
                       <div className="flex justify-between items-center mb-2">
                         <div>
-                          <p className="text-sm font-medium text-muted-foreground">ROI das Apostas</p>
-                          <p className="text-xs text-muted-foreground">Performance pura das apostas</p>
+                          <p className="text-sm font-medium text-muted-foreground">{t('bankrollSettings.progress.bettingROI')}</p>
+                          <p className="text-xs text-muted-foreground">{t('bankrollSettings.progress.bettingROIDescription')}</p>
                         </div>
                         <TooltipProvider>
                           <Tooltip>
@@ -888,7 +890,7 @@ export default function BankrollSettings() {
                               <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-xs">Lucro das apostas ÷ Total apostado</p>
+                              <p className="text-xs">{t('bankrollSettings.progress.bettingROITooltip')}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -900,7 +902,7 @@ export default function BankrollSettings() {
                         {goalCalculations.bettingROI.roiPercentage.toFixed(2)}%
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        R$ {goalCalculations.bettingROI.roi.toFixed(2)} de lucro
+                        {t('bankrollSettings.progress.bettingROIProfit').replace('{profit}', goalCalculations.bettingROI.roi.toFixed(2))}
                       </p>
                     </div>
 
@@ -908,8 +910,8 @@ export default function BankrollSettings() {
                     <div className="p-4 border rounded-lg bg-green-50">
                       <div className="flex justify-between items-center mb-2">
                         <div>
-                          <p className="text-sm font-medium text-muted-foreground">Crescimento Total da Banca</p>
-                          <p className="text-xs text-muted-foreground">Inclui depósitos e saques</p>
+                          <p className="text-sm font-medium text-muted-foreground">{t('bankrollSettings.progress.totalGrowth')}</p>
+                          <p className="text-xs text-muted-foreground">{t('bankrollSettings.progress.totalGrowthDescription')}</p>
                         </div>
                         <TooltipProvider>
                           <Tooltip>
@@ -917,7 +919,7 @@ export default function BankrollSettings() {
                               <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-xs">Crescimento considerando todas transações</p>
+                              <p className="text-xs">{t('bankrollSettings.progress.totalGrowthTooltip')}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -929,7 +931,7 @@ export default function BankrollSettings() {
                         {goalCalculations.totalGrowth.growthPercentage.toFixed(2)}%
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        R$ {goalCalculations.totalGrowth.growth.toFixed(2)} de crescimento
+                        {t('bankrollSettings.progress.totalGrowthValue').replace('{growth}', goalCalculations.totalGrowth.growth.toFixed(2))}
                       </p>
                     </div>
                   </div>
@@ -939,21 +941,21 @@ export default function BankrollSettings() {
                   {/* MONTHLY PROGRESS */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <Label className="text-sm font-medium">Progresso Mensal</Label>
+                      <Label className="text-sm font-medium">{t('bankrollSettings.progress.monthlyProgress')}</Label>
                       {goalCalculations.monthlyProgress.isOnTrack ? (
-                        <Badge className="bg-green-500">No Caminho Certo</Badge>
+                        <Badge className="bg-green-500">{t('bankrollSettings.progress.onTrack')}</Badge>
                       ) : (
-                        <Badge variant="destructive">Abaixo da Meta</Badge>
+                        <Badge variant="destructive">{t('bankrollSettings.progress.belowTarget')}</Badge>
                       )}
                     </div>
 
                     <div className="space-y-1">
                       <div className="flex justify-between text-sm">
-                        <span>Meta do mês:</span>
+                        <span>{t('bankrollSettings.progress.monthTarget')}</span>
                         <span className="font-bold">{parseFloat(formData.targetPercentage || '0').toFixed(1)}%</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>Progresso atual:</span>
+                        <span>{t('bankrollSettings.progress.currentProgress')}</span>
                         <span className={`font-bold ${
                           goalCalculations.monthlyProgress.currentProgressPercentage >= 0
                             ? 'text-green-600' : 'text-red-600'
@@ -982,8 +984,9 @@ export default function BankrollSettings() {
                     </div>
 
                     <p className="text-xs text-muted-foreground">
-                      Dia {goalCalculations.monthlyProgress.daysElapsed} de{' '}
-                      {goalCalculations.monthlyProgress.daysInMonth} do mês
+                      {t('bankrollSettings.progress.dayOfMonth')
+                        .replace('{elapsed}', goalCalculations.monthlyProgress.daysElapsed.toString())
+                        .replace('{total}', goalCalculations.monthlyProgress.daysInMonth.toString())}
                     </p>
                   </div>
                 </div>
@@ -1009,82 +1012,82 @@ export default function BankrollSettings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5" />
-                Stop Loss & Stop Gain
+                {t('bankrollSettings.risk.stopLossGainTitle')}
               </CardTitle>
               <CardDescription>
-                Defina limites de proteção por período. Alterne entre R$ e % conforme preferir.
+                {t('bankrollSettings.risk.stopLossGainSubtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Daily */}
               <div className="grid grid-cols-2 gap-4">
                 <StopLossGainField
-                  label="Stop Loss Diário"
+                  label={t('bankrollSettings.risk.dailyStopLoss')}
                   value={formData.stopLossGain.dailyLoss}
                   mode={formData.stopLossGain.dailyLossMode}
                   onValueChange={(v) => handleStopValueChange('dailyLoss', v)}
                   onModeChange={(m) => handleStopModeChange('dailyLossMode', m)}
                   currentBankroll={bankroll.currentBankroll}
                   type="loss"
-                  tooltip="Limite máximo de perda permitido em um único dia. Ao atingir, pare de apostar."
+                  tooltip={t('bankrollSettings.risk.tooltipDailyLoss')}
                 />
                 <StopLossGainField
-                  label="Stop Gain Diário"
+                  label={t('bankrollSettings.risk.dailyStopGain')}
                   value={formData.stopLossGain.dailyGain}
                   mode={formData.stopLossGain.dailyGainMode}
                   onValueChange={(v) => handleStopValueChange('dailyGain', v)}
                   onModeChange={(m) => handleStopModeChange('dailyGainMode', m)}
                   currentBankroll={bankroll.currentBankroll}
                   type="gain"
-                  tooltip="Meta de lucro diário. Ao atingir, considere parar para proteger ganhos."
+                  tooltip={t('bankrollSettings.risk.tooltipDailyGain')}
                 />
               </div>
 
               {/* Weekly */}
               <div className="grid grid-cols-2 gap-4">
                 <StopLossGainField
-                  label="Stop Loss Semanal"
+                  label={t('bankrollSettings.risk.weeklyStopLoss')}
                   value={formData.stopLossGain.weeklyLoss}
                   mode={formData.stopLossGain.weeklyLossMode}
                   onValueChange={(v) => handleStopValueChange('weeklyLoss', v)}
                   onModeChange={(m) => handleStopModeChange('weeklyLossMode', m)}
                   currentBankroll={bankroll.currentBankroll}
                   type="loss"
-                  tooltip="Limite máximo de perda permitido na semana. Protege contra sequências ruins."
+                  tooltip={t('bankrollSettings.risk.tooltipWeeklyLoss')}
                 />
                 <StopLossGainField
-                  label="Stop Gain Semanal"
+                  label={t('bankrollSettings.risk.weeklyStopGain')}
                   value={formData.stopLossGain.weeklyGain}
                   mode={formData.stopLossGain.weeklyGainMode}
                   onValueChange={(v) => handleStopValueChange('weeklyGain', v)}
                   onModeChange={(m) => handleStopModeChange('weeklyGainMode', m)}
                   currentBankroll={bankroll.currentBankroll}
                   type="gain"
-                  tooltip="Meta de lucro semanal. Considere sacar parte dos ganhos ao atingir."
+                  tooltip={t('bankrollSettings.risk.tooltipWeeklyGain')}
                 />
               </div>
 
               {/* Monthly */}
               <div className="grid grid-cols-2 gap-4">
                 <StopLossGainField
-                  label="Stop Loss Mensal"
+                  label={t('bankrollSettings.risk.monthlyStopLoss')}
                   value={formData.stopLossGain.monthlyLoss}
                   mode={formData.stopLossGain.monthlyLossMode}
                   onValueChange={(v) => handleStopValueChange('monthlyLoss', v)}
                   onModeChange={(m) => handleStopModeChange('monthlyLossMode', m)}
                   currentBankroll={bankroll.currentBankroll}
                   type="loss"
-                  tooltip="Limite máximo de perda no mês. Revise sua estratégia se atingir."
+                  tooltip={t('bankrollSettings.risk.tooltipMonthlyLoss')}
                 />
                 <StopLossGainField
-                  label="Stop Gain Mensal"
+                  label={t('bankrollSettings.risk.monthlyStopGain')}
                   value={formData.stopLossGain.monthlyGain}
                   mode={formData.stopLossGain.monthlyGainMode}
                   onValueChange={(v) => handleStopValueChange('monthlyGain', v)}
                   onModeChange={(m) => handleStopModeChange('monthlyGainMode', m)}
                   currentBankroll={bankroll.currentBankroll}
                   type="gain"
-                  tooltip="Meta de lucro mensal. Ao atingir, considere realizar lucros parciais."
+                  tooltip={t('bankrollSettings.risk.tooltipMonthlyGain')}
                 />
               </div>
             </CardContent>
@@ -1098,16 +1101,16 @@ export default function BankrollSettings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingDown className="h-5 w-5" />
-                Histórico de Saques Manuais
+                {t('bankrollSettings.withdrawals.title')}
               </CardTitle>
-              <CardDescription>Registre e acompanhe suas retiradas da banca</CardDescription>
+              <CardDescription>{t('bankrollSettings.withdrawals.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {withdrawals.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    <p>Nenhum saque registrado ainda</p>
-                    <p className="text-sm">Clique em "Registrar Saque Manual" para adicionar</p>
+                    <p>{t('bankrollSettings.withdrawals.noWithdrawals')}</p>
+                    <p className="text-sm">{t('bankrollSettings.withdrawals.noWithdrawalsHint')}</p>
                   </div>
                 ) : (
                   <>
@@ -1121,7 +1124,7 @@ export default function BankrollSettings() {
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
-                              <p className="font-semibold text-base">{withdrawal.title || 'Saque Manual'}</p>
+                              <p className="font-semibold text-base">{withdrawal.title || t('bankrollSettings.withdrawals.manualWithdrawal')}</p>
                               <p className="text-sm text-red-700 font-bold mt-1">
                                 -R$ {withdrawal.amount.toFixed(2)} • {format(new Date(withdrawal.dateTime), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                               </p>
@@ -1129,7 +1132,7 @@ export default function BankrollSettings() {
                                 <p className="text-sm text-muted-foreground mt-1">{withdrawal.description}</p>
                               )}
                               <p className="text-xs text-muted-foreground mt-2">
-                                Banca após: R$ {withdrawal.balanceAfter.toFixed(2)}
+                                {t('bankrollSettings.withdrawals.balanceAfter').replace('{balance}', withdrawal.balanceAfter.toFixed(2))}
                               </p>
                             </div>
                             <div className="flex gap-2 ml-4">
@@ -1162,7 +1165,7 @@ export default function BankrollSettings() {
                         onClick={() => setVisibleWithdrawalsCount(prev => prev + 3)}
                       >
                         <ChevronDown className="h-4 w-4 mr-2" />
-                        Carregar Mais ({withdrawals.length - visibleWithdrawalsCount} restantes)
+                        {t('bankrollSettings.withdrawals.loadMore').replace('{count}', (withdrawals.length - visibleWithdrawalsCount).toString())}
                       </Button>
                     )}
                   </>
@@ -1174,14 +1177,14 @@ export default function BankrollSettings() {
                     onClick={() => setShowAddWithdrawalModal(true)}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Registrar Saque Manual
+                    {t('bankrollSettings.withdrawals.registerWithdrawal')}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => setLocation('/settings/withdrawals-history')}
                   >
                     <History className="h-4 w-4 mr-2" />
-                    Visualizar Histórico Completo
+                    {t('bankrollSettings.withdrawals.viewFullHistory')}
                   </Button>
                 </div>
               </div>
@@ -1198,7 +1201,7 @@ export default function BankrollSettings() {
           disabled={!hasChanges()}
         >
           <Settings className="h-4 w-4 mr-2" />
-          Salvar Todas as Configurações
+          {t('bankrollSettings.saveButton')}
         </Button>
       </div>
 
@@ -1222,22 +1225,22 @@ export default function BankrollSettings() {
       <AlertDialog open={!!depositToDelete} onOpenChange={() => setDepositToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir aporte?</AlertDialogTitle>
+            <AlertDialogTitle>{t('bankrollSettings.dialogs.deleteDepositTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este aporte? Esta ação irá recalcular sua banca atual.
+              {t('bankrollSettings.dialogs.deleteDepositDescription')}
               <div className="mt-4 p-3 bg-muted rounded-lg">
-                <p className="font-medium">{depositToDelete?.title || 'Aporte Manual'}</p>
+                <p className="font-medium">{depositToDelete?.title || t('bankrollSettings.deposits.manualDeposit')}</p>
                 <p className="text-sm text-green-600">+R$ {depositToDelete?.amount.toFixed(2)}</p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => depositToDelete && handleDeleteDeposit(depositToDelete)}
               className="bg-red-600 hover:bg-red-700"
             >
-              Sim, Excluir
+              {t('bankrollSettings.dialogs.yesDelete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1263,22 +1266,22 @@ export default function BankrollSettings() {
       <AlertDialog open={!!withdrawalToDelete} onOpenChange={() => setWithdrawalToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir saque?</AlertDialogTitle>
+            <AlertDialogTitle>{t('bankrollSettings.dialogs.deleteWithdrawalTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este saque? Esta ação irá recalcular sua banca atual.
+              {t('bankrollSettings.dialogs.deleteWithdrawalDescription')}
               <div className="mt-4 p-3 bg-muted rounded-lg">
-                <p className="font-medium">{withdrawalToDelete?.title || 'Saque Manual'}</p>
+                <p className="font-medium">{withdrawalToDelete?.title || t('bankrollSettings.withdrawals.manualWithdrawal')}</p>
                 <p className="text-sm text-red-600">-R$ {withdrawalToDelete?.amount.toFixed(2)}</p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => withdrawalToDelete && handleDeleteWithdrawal(withdrawalToDelete)}
               className="bg-red-600 hover:bg-red-700"
             >
-              Sim, Excluir
+              {t('bankrollSettings.dialogs.yesDelete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1288,16 +1291,16 @@ export default function BankrollSettings() {
       <AlertDialog open={showEditBankrollDialog} onOpenChange={setShowEditBankrollDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>⚠️ Alterar Banca Inicial</AlertDialogTitle>
+            <AlertDialogTitle>{t('bankrollSettings.dialogs.editBankrollTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja alterar a banca inicial?
+              {t('bankrollSettings.dialogs.editBankrollDescription')}
               <div className="mt-4 space-y-2">
                 <p className="text-sm">
-                  <strong>Atenção:</strong> Esta alteração pode impactar seus cálculos de ROI, percentuais e metas.
+                  <strong>{t('common.error')}:</strong> {t('bankrollSettings.dialogs.editBankrollWarning')}
                 </p>
                 <div className="p-3 bg-muted rounded-lg">
                   <p className="text-sm">
-                    <span className="text-muted-foreground">Banca inicial atual:</span>{' '}
+                    <span className="text-muted-foreground">{t('bankrollSettings.dialogs.currentInitialBankroll')}</span>{' '}
                     <span className="font-semibold">R$ {parseFloat(formData.initialBankroll).toFixed(2)}</span>
                   </p>
                 </div>
@@ -1306,10 +1309,10 @@ export default function BankrollSettings() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setShowEditBankrollDialog(false)}>
-              Cancelar
+              {t('common.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmEditBankroll}>
-              Sim, Permitir Edição
+              {t('bankrollSettings.dialogs.confirmEdit')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

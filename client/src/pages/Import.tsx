@@ -13,8 +13,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Upload, FileSpreadsheet, History, Eye, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Import() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const getImportSessions = useBettingStore(state => state.getImportSessions);
   const importSessions = getImportSessions();
@@ -34,18 +36,18 @@ export default function Import() {
   const handleFileSelection = (selectedFile: File) => {
     // Validate file type
     if (!validateFileType(selectedFile)) {
-      toast.error('Tipo de arquivo inválido. Apenas CSV e Excel (.xlsx) são permitidos.');
+      toast.error(t('import.errors.invalidFileType'));
       return;
     }
 
     // Validate file size
     if (!validateFileSize(selectedFile)) {
-      toast.error('Arquivo muito grande. O tamanho máximo é 5MB.');
+      toast.error(t('import.errors.fileTooLarge'));
       return;
     }
 
     setFile(selectedFile);
-    toast.success(`Arquivo "${selectedFile.name}" selecionado`);
+    toast.success(t('import.uploadCard.fileSelected').replace('{name}', selectedFile.name));
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -71,7 +73,7 @@ export default function Import() {
 
   const handlePreview = async () => {
     if (!file) {
-      toast.error('Por favor, selecione um arquivo');
+      toast.error(t('import.errors.noFileSelected'));
       return;
     }
 
@@ -82,7 +84,7 @@ export default function Import() {
       const importRows = await parseImportFile(file);
 
       if (importRows.length === 0) {
-        toast.error('Arquivo vazio ou sem dados válidos');
+        toast.error(t('import.errors.emptyFile'));
         setUploading(false);
         return;
       }
@@ -112,7 +114,7 @@ export default function Import() {
     } catch (error) {
       console.error('Parse error:', error);
       toast.error(
-        error instanceof Error ? error.message : 'Erro ao processar arquivo. Verifique o formato.'
+        error instanceof Error ? error.message : t('import.errors.parseError')
       );
     } finally {
       setUploading(false);
@@ -125,9 +127,9 @@ export default function Import() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Importar Apostas</h1>
+        <h1 className="text-3xl font-bold">{t('import.title')}</h1>
         <p className="text-muted-foreground mt-1">
-          Importe suas apostas em massa usando arquivos CSV ou Excel
+          {t('import.subtitle')}
         </p>
       </div>
 
@@ -136,10 +138,10 @@ export default function Import() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Upload de Arquivo
+            {t('import.uploadCard.title')}
           </CardTitle>
           <CardDescription>
-            Selecione um arquivo CSV ou Excel (.xlsx) para importar
+            {t('import.uploadCard.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -165,12 +167,12 @@ export default function Import() {
             <div className="space-y-2">
               <Label htmlFor="file-upload" className="cursor-pointer">
                 <div className="text-lg font-medium text-foreground">
-                  {file ? file.name : 'Selecione um arquivo ou arraste aqui'}
+                  {file ? file.name : t('import.uploadCard.selectOrDrag')}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
                   {file
-                    ? `${(file.size / 1024).toFixed(2)} KB - Clique em "Visualizar Preview" para continuar`
-                    : 'CSV ou Excel (.xlsx) - Máximo 5MB'}
+                    ? t('import.uploadCard.fileSizeInfo').replace('{size}', (file.size / 1024).toFixed(2))
+                    : t('import.uploadCard.maxSize')}
                 </div>
               </Label>
               <Input
@@ -193,7 +195,7 @@ export default function Import() {
                     if (input) input.value = '';
                   }}
                 >
-                  Remover
+                  {t('import.uploadCard.removeFile')}
                 </Button>
               </div>
             )}
@@ -207,18 +209,18 @@ export default function Import() {
             size="lg"
           >
             <Eye className="mr-2 h-5 w-5" />
-            {uploading ? 'Processando...' : 'Visualizar Preview'}
+            {uploading ? t('import.preview.processing') : t('import.preview.button')}
           </Button>
 
           <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg text-sm">
             <p className="font-medium text-blue-900 dark:text-blue-100">
-              Próximos passos:
+              {t('import.steps.title')}
             </p>
             <ol className="list-decimal list-inside space-y-1 text-blue-800 dark:text-blue-200 mt-2">
-              <li>Selecione seu arquivo CSV ou Excel</li>
-              <li>Clique em "Visualizar Preview" para verificar os dados</li>
-              <li>Corrija erros se necessário na tela de preview</li>
-              <li>Confirme a importação</li>
+              <li>{t('import.steps.step1')}</li>
+              <li>{t('import.steps.step2')}</li>
+              <li>{t('import.steps.step3')}</li>
+              <li>{t('import.steps.step4')}</li>
             </ol>
           </div>
         </CardContent>
@@ -238,13 +240,13 @@ export default function Import() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <History className="h-5 w-5" />
-                  Últimas Importações
+                  {t('import.history.title')}
                 </CardTitle>
-                <CardDescription>Histórico recente de arquivos importados</CardDescription>
+                <CardDescription>{t('import.history.description')}</CardDescription>
               </div>
               <Button variant="outline" onClick={() => setLocation('/import/history')}>
                 <History className="h-4 w-4 mr-2" />
-                Ver Histórico Completo
+                {t('import.history.viewFullHistory')}
               </Button>
             </div>
           </CardHeader>
@@ -261,7 +263,7 @@ export default function Import() {
                   onClick={() => setVisibleImportsCount((prev) => prev + 3)}
                 >
                   <ChevronDown className="h-4 w-4 mr-2" />
-                  Carregar Mais ({importSessions.length - visibleImportsCount} restantes)
+                  {t('import.history.loadMore').replace('{count}', String(importSessions.length - visibleImportsCount))}
                 </Button>
               )}
             </div>

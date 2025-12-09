@@ -274,7 +274,8 @@
     "alerts": "Alertas"
   },
   "import": {
-    "title": "Importação em Massa",
+    "title": "Importar Apostas",
+    "subtitle": "Importe suas apostas em massa usando arquivos CSV ou Excel",
     "uploadFile": "Enviar Arquivo",
     "mapColumns": "Mapear Colunas",
     "preview": "Visualizar",
@@ -282,7 +283,72 @@
     "selectFile": "Selecione arquivo CSV ou Excel",
     "dragDrop": "ou arraste e solte aqui",
     "columnMapping": "Mapeamento de Colunas",
-    "importSuccess": "{count} apostas importadas com sucesso"
+    "importSuccess": "{count} apostas importadas com sucesso",
+    "uploadCard": {
+      "title": "Upload de Arquivo",
+      "description": "Selecione um arquivo CSV ou Excel (.xlsx) para importar",
+      "selectOrDrag": "Selecione um arquivo ou arraste aqui",
+      "maxSize": "CSV ou Excel (.xlsx) - Máximo 5MB",
+      "fileSelected": "{name}",
+      "fileSizeInfo": "{size} KB - Clique em \"Visualizar Preview\" para continuar",
+      "removeFile": "Remover"
+    },
+    "errors": {
+      "invalidFileType": "Tipo de arquivo inválido. Apenas CSV e Excel (.xlsx) são permitidos.",
+      "fileTooLarge": "Arquivo muito grande. O tamanho máximo é 5MB.",
+      "noFileSelected": "Por favor, selecione um arquivo",
+      "emptyFile": "Arquivo vazio ou sem dados válidos",
+      "parseError": "Erro ao processar arquivo. Verifique o formato."
+    },
+    "preview": {
+      "button": "Visualizar Preview",
+      "processing": "Processando..."
+    },
+    "steps": {
+      "title": "Próximos passos:",
+      "step1": "Selecione seu arquivo CSV ou Excel",
+      "step2": "Clique em \"Visualizar Preview\" para verificar os dados",
+      "step3": "Corrija erros se necessário na tela de preview",
+      "step4": "Confirme a importação"
+    },
+    "history": {
+      "title": "Últimas Importações",
+      "description": "Histórico recente de arquivos importados",
+      "viewFullHistory": "Ver Histórico Completo",
+      "loadMore": "Carregar Mais ({count} restantes)"
+    }
+  },
+  "importHistory": {
+    "title": "Histórico de Importações",
+    "subtitle": "Visualize todas as suas importações anteriores",
+    "back": "Voltar",
+    "summary": {
+      "totalImports": "Total de Importações",
+      "betsImported": "Apostas Importadas",
+      "linesProcessed": "Linhas Processadas",
+      "successRate": "Taxa de Sucesso"
+    },
+    "latestImport": "Última importação",
+    "latestImportAt": "{fileName} - {date}",
+    "search": {
+      "title": "Buscar Importações",
+      "fileNameLabel": "Nome do Arquivo",
+      "fileNamePlaceholder": "Digite o nome do arquivo..."
+    },
+    "allImports": {
+      "title": "Todas as Importações",
+      "count": "{count} importação(ões) encontrada(s)",
+      "filteredCount": "{filtered} de {total} importação(ões)"
+    },
+    "empty": {
+      "noResults": "Nenhuma importação encontrada com esse termo",
+      "noImports": "Nenhuma importação realizada ainda",
+      "firstImport": "Fazer Primeira Importação"
+    },
+    "betsSection": {
+      "title": "Apostas desta Importação ({count})",
+      "noBets": "Nenhuma aposta encontrada para esta importação"
+    }
   },
   "faq": {
     "title": "FAQ & Glossário",
@@ -304,6 +370,127 @@
     "language": "Idioma",
     "alerts": "Ativar Alertas",
     "save": "Salvar Configurações"
+  },
+  "bankrollSettings": {
+    "title": "Gestão Financeira",
+    "subtitle": "Configure sua banca, aportes, metas e proteção de riscos",
+    "monthlyTarget": "Meta Mensal",
+    "stopLoss": "Stop Loss",
+    "totalDeposits": "Total Aportes",
+    "tabs": {
+      "bankroll": "Banca & Aportes",
+      "goals": "Metas & Objetivos",
+      "risk": "Gestão de Risco",
+      "withdrawals": "Saques"
+    },
+    "bankrollConfig": {
+      "title": "Configuração da Banca",
+      "subtitle": "Visualize e gerencie sua banca",
+      "initialBankroll": "Banca Inicial (R$)",
+      "currentBankroll": "Banca Atual (calculada automaticamente)",
+      "allowEdit": "Habilitar edição da banca inicial",
+      "disableEdit": "Desabilitar edição da banca inicial",
+      "breakdown": {
+        "initialBankroll": "Banca Inicial:",
+        "deposits": "Aportes:",
+        "betProfit": "Lucro/Prejuízo em Apostas:",
+        "withdrawals": "Saques:",
+        "currentBankroll": "Banca Atual:"
+      }
+    },
+    "deposits": {
+      "title": "Histórico de Aportes Manuais",
+      "subtitle": "Registre e acompanhe seus aportes à banca",
+      "noDeposits": "Nenhum aporte registrado ainda",
+      "noDepositsHint": "Clique em \"Registrar Aporte Manual\" para adicionar",
+      "manualDeposit": "Aporte Manual",
+      "balanceAfter": "Banca após: R$ {balance}",
+      "registerDeposit": "Registrar Aporte Manual",
+      "viewFullHistory": "Visualizar Histórico Completo",
+      "loadMore": "Carregar Mais ({count} restantes)"
+    },
+    "withdrawals": {
+      "title": "Histórico de Saques Manuais",
+      "subtitle": "Registre e acompanhe suas retiradas da banca",
+      "noWithdrawals": "Nenhum saque registrado ainda",
+      "noWithdrawalsHint": "Clique em \"Registrar Saque Manual\" para adicionar",
+      "manualWithdrawal": "Saque Manual",
+      "balanceAfter": "Banca após: R$ {balance}",
+      "registerWithdrawal": "Registrar Saque Manual",
+      "viewFullHistory": "Visualizar Histórico Completo",
+      "loadMore": "Carregar Mais ({count} restantes)",
+      "errorExceedsBankroll": "O valor do saque não pode exceder a banca disponível."
+    },
+    "goals": {
+      "title": "Meta Principal",
+      "subtitle": "Configure sua meta mensal e acompanhe o progresso",
+      "targetType": "Tipo de Meta",
+      "percentageTarget": "Meta Percentual",
+      "fixedTarget": "Meta em Valor Fixo",
+      "monthlyTargetPercentage": "Meta Mensal (%)",
+      "monthlyTargetAmount": "Valor da Meta Mensal (R$)",
+      "monthlyTargetValue": "Valor alvo mensal: R$ {value}",
+      "projectionMode": "Modo de Projeção",
+      "linearMode": "Linear",
+      "compoundMode": "Composto",
+      "projections": "Projeções",
+      "months6": "6 Meses",
+      "months12": "12 Meses",
+      "projectedBankroll": "Banca projetada:",
+      "estimatedProfit": "Lucro estimado:",
+      "tooltipProjectionMode": "Linear vs Composto:",
+      "tooltipLinear": "Linear: Multiplicação simples (5% × 6 = 30%)",
+      "tooltipCompound": "Composto: Juros compostos ((1.05)^6 - 1 ≈ 34%)"
+    },
+    "progress": {
+      "title": "Progresso & Análise",
+      "bettingROI": "ROI das Apostas",
+      "bettingROIDescription": "Performance pura das apostas",
+      "bettingROITooltip": "Lucro das apostas ÷ Total apostado",
+      "bettingROIProfit": "R$ {profit} de lucro",
+      "totalGrowth": "Crescimento Total da Banca",
+      "totalGrowthDescription": "Inclui depósitos e saques",
+      "totalGrowthTooltip": "Crescimento considerando todas transações",
+      "totalGrowthValue": "R$ {growth} de crescimento",
+      "monthlyProgress": "Progresso Mensal",
+      "onTrack": "No Caminho Certo",
+      "belowTarget": "Abaixo da Meta",
+      "monthTarget": "Meta do mês:",
+      "currentProgress": "Progresso atual:",
+      "dayOfMonth": "Dia {elapsed} de {total} do mês"
+    },
+    "risk": {
+      "stopLossGainTitle": "Stop Loss & Stop Gain",
+      "stopLossGainSubtitle": "Defina limites de proteção por período. Alterne entre R$ e % conforme preferir.",
+      "dailyStopLoss": "Stop Loss Diário",
+      "dailyStopGain": "Stop Gain Diário",
+      "weeklyStopLoss": "Stop Loss Semanal",
+      "weeklyStopGain": "Stop Gain Semanal",
+      "monthlyStopLoss": "Stop Loss Mensal",
+      "monthlyStopGain": "Stop Gain Mensal",
+      "tooltipDailyLoss": "Limite máximo de perda permitido em um único dia. Ao atingir, pare de apostar.",
+      "tooltipDailyGain": "Meta de lucro diário. Ao atingir, considere parar para proteger ganhos.",
+      "tooltipWeeklyLoss": "Limite máximo de perda permitido na semana. Protege contra sequências ruins.",
+      "tooltipWeeklyGain": "Meta de lucro semanal. Considere sacar parte dos ganhos ao atingir.",
+      "tooltipMonthlyLoss": "Limite máximo de perda no mês. Revise sua estratégia se atingir.",
+      "tooltipMonthlyGain": "Meta de lucro mensal. Ao atingir, considere realizar lucros parciais."
+    },
+    "dialogs": {
+      "deleteDepositTitle": "Excluir aporte?",
+      "deleteDepositDescription": "Tem certeza que deseja excluir este aporte? Esta ação irá recalcular sua banca atual.",
+      "deleteWithdrawalTitle": "Excluir saque?",
+      "deleteWithdrawalDescription": "Tem certeza que deseja excluir este saque? Esta ação irá recalcular sua banca atual.",
+      "editBankrollTitle": "⚠️ Alterar Banca Inicial",
+      "editBankrollDescription": "Tem certeza que deseja alterar a banca inicial?",
+      "editBankrollWarning": "Atenção: Esta alteração pode impactar seus cálculos de ROI, percentuais e metas.",
+      "currentInitialBankroll": "Banca inicial atual:",
+      "confirmDelete": "Sim, Excluir",
+      "confirmEdit": "Sim, Permitir Edição",
+      "yesDelete": "Sim, Excluir"
+    },
+    "saveButton": "Salvar Todas as Configurações",
+    "success": "Configurações da banca atualizadas com sucesso",
+    "error": "Erro"
   },
   "common": {
     "save": "Salvar",

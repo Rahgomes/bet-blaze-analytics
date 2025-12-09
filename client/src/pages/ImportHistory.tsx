@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { ImportSession } from '@/types/import';
 import { useBettingStore } from '@/stores/betting';
+import { useTranslation } from '@/hooks/useTranslation';
 import { ImportHistoryCard } from '@/components/betting/ImportHistoryCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,10 +12,11 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, History, FileSpreadsheet, ChevronDown, ChevronUp } from 'lucide-react';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS } from 'date-fns/locale';
 
 export default function ImportHistory() {
   const [, setLocation] = useLocation();
+  const { t, language } = useTranslation();
   const getImportSessions = useBettingStore(state => state.getImportSessions);
   const bets = useBettingStore(state => state.bets);
   const sessions = getImportSessions();
@@ -57,19 +59,21 @@ export default function ImportHistory() {
     return bets.filter((bet) => bet.importSessionId === sessionId);
   };
 
+  const locale = language === 'pt-br' ? ptBR : enUS;
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Histórico de Importações</h1>
+          <h1 className="text-3xl font-bold">{t('importHistory.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Visualize todas as suas importações anteriores
+            {t('importHistory.subtitle')}
           </p>
         </div>
         <Button variant="outline" onClick={() => setLocation('/import')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar
+          {t('importHistory.back')}
         </Button>
       </div>
 
@@ -77,28 +81,28 @@ export default function ImportHistory() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Total de Importações</CardDescription>
+            <CardDescription>{t('importHistory.summary.totalImports')}</CardDescription>
             <CardTitle className="text-3xl">{stats.totalImports}</CardTitle>
           </CardHeader>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Apostas Importadas</CardDescription>
+            <CardDescription>{t('importHistory.summary.betsImported')}</CardDescription>
             <CardTitle className="text-3xl text-blue-600">{stats.totalBets}</CardTitle>
           </CardHeader>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Linhas Processadas</CardDescription>
+            <CardDescription>{t('importHistory.summary.linesProcessed')}</CardDescription>
             <CardTitle className="text-3xl text-purple-600">{stats.totalRows}</CardTitle>
           </CardHeader>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Taxa de Sucesso</CardDescription>
+            <CardDescription>{t('importHistory.summary.successRate')}</CardDescription>
             <CardTitle className="text-3xl text-green-600">
               {stats.totalRows > 0
                 ? `${((stats.totalSuccessful / stats.totalRows) * 100).toFixed(1)}%`
@@ -116,12 +120,13 @@ export default function ImportHistory() {
               <History className="h-5 w-5 text-blue-600" />
               <div>
                 <p className="font-medium text-blue-900 dark:text-blue-100">
-                  Última importação
+                  {t('importHistory.latestImport')}
                 </p>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
                   {stats.latestImport.fileName} -{' '}
-                  {format(new Date(stats.latestImport.importDate), "dd/MM/yyyy 'às' HH:mm", {
-                    locale: ptBR,
+                  {format(new Date(stats.latestImport.importDate),
+                    language === 'pt-br' ? "dd/MM/yyyy 'às' HH:mm" : "MM/dd/yyyy 'at' HH:mm", {
+                    locale,
                   })}
                 </p>
               </div>
@@ -133,14 +138,14 @@ export default function ImportHistory() {
       {/* Search */}
       <Card>
         <CardHeader>
-          <CardTitle>Buscar Importações</CardTitle>
+          <CardTitle>{t('importHistory.search.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="search">Nome do Arquivo</Label>
+            <Label htmlFor="search">{t('importHistory.search.fileNameLabel')}</Label>
             <Input
               id="search"
-              placeholder="Digite o nome do arquivo..."
+              placeholder={t('importHistory.search.fileNamePlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -151,11 +156,13 @@ export default function ImportHistory() {
       {/* Import Sessions List */}
       <Card>
         <CardHeader>
-          <CardTitle>Todas as Importações</CardTitle>
+          <CardTitle>{t('importHistory.allImports.title')}</CardTitle>
           <CardDescription>
             {filteredSessions.length === sessions.length
-              ? `${sessions.length} importação(ões) encontrada(s)`
-              : `${filteredSessions.length} de ${sessions.length} importação(ões)`}
+              ? t('importHistory.allImports.count').replace('{count}', sessions.length.toString())
+              : t('importHistory.allImports.filteredCount')
+                  .replace('{filtered}', filteredSessions.length.toString())
+                  .replace('{total}', sessions.length.toString())}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -164,8 +171,8 @@ export default function ImportHistory() {
               <FileSpreadsheet className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
                 {searchTerm
-                  ? 'Nenhuma importação encontrada com esse termo'
-                  : 'Nenhuma importação realizada ainda'}
+                  ? t('importHistory.empty.noResults')
+                  : t('importHistory.empty.noImports')}
               </p>
               {!searchTerm && (
                 <Button
@@ -173,7 +180,7 @@ export default function ImportHistory() {
                   className="mt-4"
                   onClick={() => setLocation('/import')}
                 >
-                  Fazer Primeira Importação
+                  {t('importHistory.empty.firstImport')}
                 </Button>
               )}
             </div>
@@ -193,13 +200,13 @@ export default function ImportHistory() {
                         <CardHeader className="pb-3">
                           <CardTitle className="text-sm flex items-center gap-2">
                             <ChevronDown className="h-4 w-4" />
-                            Apostas desta Importação ({sessionBets.length})
+                            {t('importHistory.betsSection.title').replace('{count}', sessionBets.length.toString())}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           {sessionBets.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
-                              Nenhuma aposta encontrada para esta importação
+                              {t('importHistory.betsSection.noBets')}
                             </p>
                           ) : (
                             <div className="space-y-2">
@@ -219,7 +226,8 @@ export default function ImportHistory() {
                                         <span>Odds {bet.odds.toFixed(2)}</span>
                                         <Separator orientation="vertical" className="h-3" />
                                         <span>
-                                          {format(new Date(bet.date), 'dd/MM/yyyy', { locale: ptBR })}
+                                          {format(new Date(bet.date),
+                                            language === 'pt-br' ? 'dd/MM/yyyy' : 'MM/dd/yyyy', { locale })}
                                         </span>
                                       </div>
                                     </div>
@@ -241,12 +249,12 @@ export default function ImportHistory() {
                                         }
                                       >
                                         {bet.status === 'won'
-                                          ? 'Ganha'
+                                          ? t('bets.status.won')
                                           : bet.status === 'lost'
-                                          ? 'Perdida'
+                                          ? t('bets.status.lost')
                                           : bet.status === 'void'
-                                          ? 'Anulada'
-                                          : 'Pendente'}
+                                          ? t('bets.status.void')
+                                          : t('bets.status.pending')}
                                       </Badge>
                                     </div>
                                   </div>

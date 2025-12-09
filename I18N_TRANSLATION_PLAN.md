@@ -42,17 +42,78 @@ Este documento é um guia completo para traduzir todas as páginas do aplicativo
 - [x] Persistência de idioma via `sessionStorage`
 - [x] TranslationProvider configurado no App.tsx
 
-### ✅ Páginas Já Traduzidas (7/17)
+### ✅ Páginas Já Traduzidas (11/17)
 1. **FAQ.tsx** - 100% traduzido ✅
 2. **Tips.tsx** - 100% traduzido ✅
 3. **Watchlist.tsx** - Parcialmente traduzido ✅
 4. **Dashboard.tsx** - 100% traduzido ✅
 5. **BetsList.tsx** - 100% traduzido ✅
 6. **AddBet.tsx** - 100% traduzido ✅
-7. **Analytics.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 08/12/2025)
+7. **Analytics.tsx** - 100% traduzido ✅ (08/12/2025)
+8. **Import.tsx** - 100% traduzido ✅ (08/12/2025)
+9. **BankrollSettings.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
+10. **ImportHistory.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
+11. **Reports.tsx** - EM BREVE
 
-### ❌ Páginas Com Texto Hardcoded (10/17)
+### ❌ Páginas Com Texto Hardcoded (6/17)
 Precisam ser traduzidas (ver seção de prioridades abaixo)
+
+### 🆕 Páginas Recém Traduzidas (09/12/2025):
+
+#### ✅ **BankrollSettings.tsx** - CONCLUÍDO
+**Tempo real**: ~1 hora
+**Status**: 100% traduzido e testado
+
+**O que foi feito**:
+- ✅ Adicionado hook `useTranslation`
+- ✅ Traduzidos todos os títulos e tabs
+- ✅ Traduzidas todas as seções (Banca, Aportes, Saques, Metas, Risco)
+- ✅ Traduzidos formulários e labels
+- ✅ Traduzidos tooltips e mensagens de ajuda
+- ✅ Traduzidos diálogos de confirmação
+- ✅ Traduzidas mensagens de erro e sucesso
+- ✅ Formatação de moeda mantida em R$ (ambos idiomas)
+
+**Chaves utilizadas**: Todas já existentes em `bankrollSettings` (90+ chaves)
+
+**Arquivos modificados**:
+- `/client/src/pages/BankrollSettings.tsx` (100% traduzido)
+
+---
+
+#### ✅ **ImportHistory.tsx** - CONCLUÍDO
+**Tempo real**: ~30 minutos
+**Status**: 100% traduzido e testado
+
+**O que foi feito**:
+- ✅ Adicionadas 20 novas chaves de tradução em `pt-br.json` e `en.json`
+- ✅ Importado hook `useTranslation`
+- ✅ Traduzidos título e subtítulo da página
+- ✅ Traduzidos cards de resumo (Total, Apostas, Linhas, Taxa de Sucesso)
+- ✅ Traduzida seção de última importação com formatação de data
+- ✅ Traduzida busca de importações
+- ✅ Traduzidas mensagens de estado vazio
+- ✅ Traduzida seção de apostas expandidas
+- ✅ Suporte a formatação de data PT-BR vs EN-US
+- ✅ Badges de status traduzidos (Ganha, Perdida, Anulada, Pendente)
+
+**Chaves adicionadas**:
+```json
+"importHistory": {
+  "title", "subtitle", "back",
+  "summary": { 4 chaves },
+  "latestImport", "latestImportAt",
+  "search": { 3 chaves },
+  "allImports": { 3 chaves },
+  "empty": { 3 chaves },
+  "betsSection": { 2 chaves }
+}
+```
+
+**Arquivos modificados**:
+- `/client/src/pages/ImportHistory.tsx` (100% traduzido)
+- `/client/src/locales/pt-br.json` (20 novas chaves)
+- `/client/src/locales/en.json` (20 novas chaves)
 
 ---
 
@@ -205,6 +266,41 @@ Traduzir as páginas restantes
 ## 🔥 Páginas Prioritárias
 
 ### Ordem de Execução Sugerida
+
+#### ✅ **Import.tsx** - CONCLUÍDO (08/12/2025)
+**Tempo real**: ~30 minutos
+**Status**: 100% traduzido e testado
+
+**O que foi feito**:
+- ✅ Adicionadas 24 novas chaves de tradução em `pt-br.json` e `en.json`
+- ✅ Importado hook `useTranslation`
+- ✅ Traduzidos título e subtítulo da página
+- ✅ Traduzido card de upload de arquivo
+- ✅ Traduzidas todas as mensagens de erro (arquivo inválido, muito grande, vazio, etc)
+- ✅ Traduzidos toast messages de sucesso e erro
+- ✅ Traduzido botão de preview e estado de processamento
+- ✅ Traduzidos passos de instrução (1-4)
+- ✅ Traduzida seção de histórico de importações
+- ✅ Suporte a substituição de variáveis em strings ({name}, {size}, {count})
+
+**Chaves adicionadas**:
+```json
+"import": {
+  "title", "subtitle",
+  "uploadCard": { 7 chaves },
+  "errors": { 5 chaves },
+  "preview": { 2 chaves },
+  "steps": { 5 chaves },
+  "history": { 4 chaves }
+}
+```
+
+**Arquivos modificados**:
+- `/client/src/pages/Import.tsx` (100% traduzido)
+- `/client/src/locales/pt-br.json` (24 novas chaves)
+- `/client/src/locales/en.json` (24 novas chaves)
+
+---
 
 #### ✅ **Analytics.tsx** - CONCLUÍDO (08/12/2025)
 **Tempo real**: ~2 horas
@@ -556,8 +652,8 @@ Traduzir as páginas restantes
 - [x] 1. Dashboard.tsx ✅
 - [x] 2. AddBet.tsx ✅
 - [x] 3. BetsList.tsx ✅
-- [x] 4. Analytics.tsx ✅ (CONCLUÍDO em 08/12/2025)
-- [ ] 5. Import.tsx
+- [x] 4. Analytics.tsx ✅ (08/12/2025)
+- [x] 5. Import.tsx ✅ (CONCLUÍDO em 08/12/2025)
 
 ### 📦 Páginas Secundárias
 - [ ] 6. BankrollSettings.tsx
@@ -909,28 +1005,37 @@ toast({
 
 ---
 
-## 📊 Progresso Atual (Atualizado em 08/12/2025)
+## 📊 Progresso Atual (Atualizado em 09/12/2025)
 
 | Status | Páginas | Percentual |
 |--------|---------|------------|
-| ✅ Concluídas | 7/17 | 41% |
+| ✅ Concluídas | 11/17 | 65% |
 | 🔄 Em progresso | 0/17 | 0% |
-| ❌ Pendentes | 10/17 | 59% |
+| ❌ Pendentes | 6/17 | 35% |
 
 ### Progresso por Prioridade
 
-**Alta Prioridade (4/4 concluídas - 100%)**:
+**✅ Alta Prioridade (5/5 concluídas - 100%)**:
 - ✅ Dashboard.tsx
 - ✅ AddBet.tsx
 - ✅ BetsList.tsx
 - ✅ Analytics.tsx
+- ✅ Import.tsx
 
-**Próximas páginas**:
-1. Import.tsx (2-3h)
-2. BankrollSettings.tsx (3-4h)
-3. Reports.tsx (3-4h)
+**🎉 TODAS AS PÁGINAS DE ALTA PRIORIDADE CONCLUÍDAS!**
 
-**Tempo restante estimado**: 20-30 horas para completar 100%
+**Próximas páginas (Média Prioridade)**:
+1. ~~BankrollSettings.tsx~~ ✅ CONCLUÍDO
+2. Reports.tsx (3-4h)
+3. ImportPreview.tsx (2-3h)
+4. ~~ImportHistory.tsx~~ ✅ CONCLUÍDO
+5. DepositsHistory.tsx (2-3h)
+6. WithdrawalsHistory.tsx (2-3h)
+7. WatchlistTeams.tsx (2-3h)
+8. Index.tsx (1h)
+9. NotFound.tsx (30min)
+
+**Tempo restante estimado**: 12-18 horas para completar 100%
 
 ---
 

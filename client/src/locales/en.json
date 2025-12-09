@@ -274,7 +274,8 @@
     "alerts": "Alerts"
   },
   "import": {
-    "title": "Bulk Import",
+    "title": "Import Bets",
+    "subtitle": "Import your bets in bulk using CSV or Excel files",
     "uploadFile": "Upload File",
     "mapColumns": "Map Columns",
     "preview": "Preview",
@@ -282,7 +283,72 @@
     "selectFile": "Select CSV or Excel file",
     "dragDrop": "or drag and drop here",
     "columnMapping": "Column Mapping",
-    "importSuccess": "Successfully imported {count} bets"
+    "importSuccess": "Successfully imported {count} bets",
+    "uploadCard": {
+      "title": "File Upload",
+      "description": "Select a CSV or Excel (.xlsx) file to import",
+      "selectOrDrag": "Select a file or drag here",
+      "maxSize": "CSV or Excel (.xlsx) - Maximum 5MB",
+      "fileSelected": "{name}",
+      "fileSizeInfo": "{size} KB - Click \"Preview\" to continue",
+      "removeFile": "Remove"
+    },
+    "errors": {
+      "invalidFileType": "Invalid file type. Only CSV and Excel (.xlsx) are allowed.",
+      "fileTooLarge": "File too large. Maximum size is 5MB.",
+      "noFileSelected": "Please select a file",
+      "emptyFile": "Empty file or no valid data",
+      "parseError": "Error processing file. Check the format."
+    },
+    "preview": {
+      "button": "Preview",
+      "processing": "Processing..."
+    },
+    "steps": {
+      "title": "Next steps:",
+      "step1": "Select your CSV or Excel file",
+      "step2": "Click \"Preview\" to verify the data",
+      "step3": "Fix errors if necessary in the preview screen",
+      "step4": "Confirm the import"
+    },
+    "history": {
+      "title": "Recent Imports",
+      "description": "Recent history of imported files",
+      "viewFullHistory": "View Full History",
+      "loadMore": "Load More ({count} remaining)"
+    }
+  },
+  "importHistory": {
+    "title": "Import History",
+    "subtitle": "View all your previous imports",
+    "back": "Back",
+    "summary": {
+      "totalImports": "Total Imports",
+      "betsImported": "Imported Bets",
+      "linesProcessed": "Lines Processed",
+      "successRate": "Success Rate"
+    },
+    "latestImport": "Latest import",
+    "latestImportAt": "{fileName} - {date}",
+    "search": {
+      "title": "Search Imports",
+      "fileNameLabel": "File Name",
+      "fileNamePlaceholder": "Type the file name..."
+    },
+    "allImports": {
+      "title": "All Imports",
+      "count": "{count} import(s) found",
+      "filteredCount": "{filtered} of {total} import(s)"
+    },
+    "empty": {
+      "noResults": "No imports found with this term",
+      "noImports": "No imports made yet",
+      "firstImport": "Make First Import"
+    },
+    "betsSection": {
+      "title": "Bets from this Import ({count})",
+      "noBets": "No bets found for this import"
+    }
   },
   "faq": {
     "title": "FAQ & Glossary",
@@ -304,6 +370,127 @@
     "language": "Language",
     "alerts": "Enable Alerts",
     "save": "Save Settings"
+  },
+  "bankrollSettings": {
+    "title": "Financial Management",
+    "subtitle": "Configure your bankroll, deposits, goals and risk protection",
+    "monthlyTarget": "Monthly Target",
+    "stopLoss": "Stop Loss",
+    "totalDeposits": "Total Deposits",
+    "tabs": {
+      "bankroll": "Bankroll & Deposits",
+      "goals": "Goals & Objectives",
+      "risk": "Risk Management",
+      "withdrawals": "Withdrawals"
+    },
+    "bankrollConfig": {
+      "title": "Bankroll Configuration",
+      "subtitle": "View and manage your bankroll",
+      "initialBankroll": "Initial Bankroll (R$)",
+      "currentBankroll": "Current Bankroll (automatically calculated)",
+      "allowEdit": "Allow editing initial bankroll",
+      "disableEdit": "Disable editing initial bankroll",
+      "breakdown": {
+        "initialBankroll": "Initial Bankroll:",
+        "deposits": "Deposits:",
+        "betProfit": "Betting Profit/Loss:",
+        "withdrawals": "Withdrawals:",
+        "currentBankroll": "Current Bankroll:"
+      }
+    },
+    "deposits": {
+      "title": "Manual Deposits History",
+      "subtitle": "Record and track your deposits to the bankroll",
+      "noDeposits": "No deposits registered yet",
+      "noDepositsHint": "Click \"Register Manual Deposit\" to add",
+      "manualDeposit": "Manual Deposit",
+      "balanceAfter": "Balance after: R$ {balance}",
+      "registerDeposit": "Register Manual Deposit",
+      "viewFullHistory": "View Full History",
+      "loadMore": "Load More ({count} remaining)"
+    },
+    "withdrawals": {
+      "title": "Manual Withdrawals History",
+      "subtitle": "Record and track your withdrawals from the bankroll",
+      "noWithdrawals": "No withdrawals registered yet",
+      "noWithdrawalsHint": "Click \"Register Manual Withdrawal\" to add",
+      "manualWithdrawal": "Manual Withdrawal",
+      "balanceAfter": "Balance after: R$ {balance}",
+      "registerWithdrawal": "Register Manual Withdrawal",
+      "viewFullHistory": "View Full History",
+      "loadMore": "Load More ({count} remaining)",
+      "errorExceedsBankroll": "Withdrawal amount cannot exceed available bankroll."
+    },
+    "goals": {
+      "title": "Main Goal",
+      "subtitle": "Configure your monthly goal and track progress",
+      "targetType": "Target Type",
+      "percentageTarget": "Percentage Target",
+      "fixedTarget": "Fixed Amount Target",
+      "monthlyTargetPercentage": "Monthly Target (%)",
+      "monthlyTargetAmount": "Monthly Target Amount (R$)",
+      "monthlyTargetValue": "Monthly target value: R$ {value}",
+      "projectionMode": "Projection Mode",
+      "linearMode": "Linear",
+      "compoundMode": "Compound",
+      "projections": "Projections",
+      "months6": "6 Months",
+      "months12": "12 Months",
+      "projectedBankroll": "Projected bankroll:",
+      "estimatedProfit": "Estimated profit:",
+      "tooltipProjectionMode": "Linear vs Compound:",
+      "tooltipLinear": "Linear: Simple multiplication (5% × 6 = 30%)",
+      "tooltipCompound": "Compound: Compound interest ((1.05)^6 - 1 ≈ 34%)"
+    },
+    "progress": {
+      "title": "Progress & Analysis",
+      "bettingROI": "Betting ROI",
+      "bettingROIDescription": "Pure betting performance",
+      "bettingROITooltip": "Betting profit ÷ Total staked",
+      "bettingROIProfit": "R$ {profit} profit",
+      "totalGrowth": "Total Bankroll Growth",
+      "totalGrowthDescription": "Includes deposits and withdrawals",
+      "totalGrowthTooltip": "Growth considering all transactions",
+      "totalGrowthValue": "R$ {growth} growth",
+      "monthlyProgress": "Monthly Progress",
+      "onTrack": "On Track",
+      "belowTarget": "Below Target",
+      "monthTarget": "Month target:",
+      "currentProgress": "Current progress:",
+      "dayOfMonth": "Day {elapsed} of {total} of the month"
+    },
+    "risk": {
+      "stopLossGainTitle": "Stop Loss & Stop Gain",
+      "stopLossGainSubtitle": "Set protection limits by period. Toggle between R$ and % as you prefer.",
+      "dailyStopLoss": "Daily Stop Loss",
+      "dailyStopGain": "Daily Stop Gain",
+      "weeklyStopLoss": "Weekly Stop Loss",
+      "weeklyStopGain": "Weekly Stop Gain",
+      "monthlyStopLoss": "Monthly Stop Loss",
+      "monthlyStopGain": "Monthly Stop Gain",
+      "tooltipDailyLoss": "Maximum loss allowed in a single day. When reached, stop betting.",
+      "tooltipDailyGain": "Daily profit target. When reached, consider stopping to protect gains.",
+      "tooltipWeeklyLoss": "Maximum loss allowed in the week. Protects against bad streaks.",
+      "tooltipWeeklyGain": "Weekly profit target. Consider cashing out part of the gains when reached.",
+      "tooltipMonthlyLoss": "Maximum loss allowed in the month. Review your strategy if reached.",
+      "tooltipMonthlyGain": "Monthly profit target. When reached, consider taking partial profits."
+    },
+    "dialogs": {
+      "deleteDepositTitle": "Delete deposit?",
+      "deleteDepositDescription": "Are you sure you want to delete this deposit? This action will recalculate your current bankroll.",
+      "deleteWithdrawalTitle": "Delete withdrawal?",
+      "deleteWithdrawalDescription": "Are you sure you want to delete this withdrawal? This action will recalculate your current bankroll.",
+      "editBankrollTitle": "⚠️ Change Initial Bankroll",
+      "editBankrollDescription": "Are you sure you want to change the initial bankroll?",
+      "editBankrollWarning": "Warning: This change may impact your ROI calculations, percentages and goals.",
+      "currentInitialBankroll": "Current initial bankroll:",
+      "confirmDelete": "Yes, Delete",
+      "confirmEdit": "Yes, Allow Editing",
+      "yesDelete": "Yes, Delete"
+    },
+    "saveButton": "Save All Settings",
+    "success": "Bankroll settings updated successfully",
+    "error": "Error"
   },
   "common": {
     "save": "Save",
