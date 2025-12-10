@@ -54,8 +54,11 @@ Este documento é um guia completo para traduzir todas as páginas do aplicativo
 9. **BankrollSettings.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
 10. **ImportHistory.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
 11. **Reports.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
+12. **ImportPreview.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
+13. **Index.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
+14. **NotFound.tsx** - 100% traduzido ✅ (RECÉM CONCLUÍDO - 09/12/2025)
 
-### ❌ Páginas Com Texto Hardcoded (5/17)
+### ❌ Páginas Com Texto Hardcoded (2/17)
 Precisam ser traduzidas (ver seção de prioridades abaixo)
 
 ### 🆕 Páginas Recém Traduzidas (09/12/2025):
@@ -154,6 +157,73 @@ Precisam ser traduzidas (ver seção de prioridades abaixo)
 - `/client/src/pages/Reports.tsx` (100% traduzido)
 - `/client/src/locales/pt-br.json` (50 novas chaves)
 - `/client/src/locales/en.json` (50 novas chaves)
+
+---
+
+#### ✅ **ImportPreview.tsx** - CONCLUÍDO (09/12/2025)
+**Tempo real**: ~1 hora
+**Status**: 100% traduzido e testado
+
+**O que foi feito**:
+- ✅ Adicionadas 40+ novas chaves de tradução em `pt-br.json` e `en.json`
+- ✅ Importado hook `useTranslation`
+- ✅ Traduzidos título e informações do arquivo
+- ✅ Traduzidos cards de estatísticas (Total, Válidas, Erros, Avisos)
+- ✅ Traduzido alerta de erros com contador dinâmico
+- ✅ Traduzida seção de filtros completa (busca, checkboxes)
+- ✅ Traduzida tabela de preview com contador dinâmico de linhas
+- ✅ Traduzidos botões de ação (Cancelar Tudo, Importar)
+- ✅ Traduzidos 2 diálogos de confirmação (Importação e Cancelamento)
+- ✅ Traduzidas todas as mensagens toast (6 mensagens)
+- ✅ Suporte a substituição de múltiplas variáveis em strings ({count}, {filtered}, {total})
+
+**Chaves adicionadas**:
+```json
+"importPreview": {
+  "title", "fileLabel", "backButton",
+  "stats": { 4 chaves },
+  "errorAlert": { 2 chaves },
+  "filters": { 5 chaves },
+  "table": { 3 chaves },
+  "actions": { 3 chaves },
+  "confirmDialog": { 8 chaves },
+  "cancelDialog": { 3 chaves },
+  "toasts": { 6 chaves }
+}
+```
+
+**Arquivos modificados**:
+- `/client/src/pages/ImportPreview.tsx` (100% traduzido)
+- `/client/src/locales/pt-br.json` (40+ novas chaves)
+- `/client/src/locales/en.json` (40+ novas chaves)
+
+---
+
+#### ✅ **Index.tsx + NotFound.tsx** - CONCLUÍDO (09/12/2025)
+**Tempo real**: ~15 minutos
+**Status**: 100% traduzido e testado (2 páginas)
+
+**O que foi feito**:
+- ✅ Adicionadas 6 novas chaves de tradução em `pt-br.json` e `en.json`
+- ✅ Importado hook `useTranslation` em ambos os arquivos
+- ✅ **Index.tsx**: Traduzidos título e subtítulo da página inicial
+- ✅ **NotFound.tsx**: Traduzidos título 404, mensagem de erro e link de retorno
+
+**Chaves adicionadas**:
+```json
+"index": {
+  "title", "subtitle"
+},
+"notFound": {
+  "title", "subtitle", "returnHome"
+}
+```
+
+**Arquivos modificados**:
+- `/client/src/pages/Index.tsx` (100% traduzido)
+- `/client/src/pages/NotFound.tsx` (100% traduzido)
+- `/client/src/locales/pt-br.json` (6 novas chaves)
+- `/client/src/locales/en.json` (6 novas chaves)
 
 ---
 
@@ -699,12 +769,11 @@ Traduzir as páginas restantes
 - [x] 6. BankrollSettings.tsx ✅ (CONCLUÍDO em 09/12/2025)
 - [x] 7. Reports.tsx ✅ (CONCLUÍDO em 09/12/2025)
 - [x] 8. ImportHistory.tsx ✅ (CONCLUÍDO em 09/12/2025)
-- [ ] 9. ImportPreview.tsx
-- [ ] 10. DepositsHistory.tsx
-- [ ] 11. WithdrawalsHistory.tsx
-- [ ] 12. WatchlistTeams.tsx
-- [ ] 13. Index.tsx
-- [ ] 14. NotFound.tsx
+- [x] 9. ImportPreview.tsx ✅ (CONCLUÍDO em 09/12/2025)
+- [x] 10. Index.tsx ✅ (CONCLUÍDO em 09/12/2025)
+- [x] 11. NotFound.tsx ✅ (CONCLUÍDO em 09/12/2025)
+- [ ] 12. DepositsHistory.tsx
+- [ ] 13. WithdrawalsHistory.tsx
 
 ---
 
@@ -1049,9 +1118,9 @@ toast({
 
 | Status | Páginas | Percentual |
 |--------|---------|------------|
-| ✅ Concluídas | 12/17 | 71% |
+| ✅ Concluídas | 15/17 | 88% |
 | 🔄 Em progresso | 0/17 | 0% |
-| ❌ Pendentes | 5/17 | 29% |
+| ❌ Pendentes | 2/17 | 12% |
 
 ### Progresso por Prioridade
 
@@ -1067,15 +1136,16 @@ toast({
 **Próximas páginas (Média Prioridade)**:
 1. ~~BankrollSettings.tsx~~ ✅ CONCLUÍDO
 2. ~~Reports.tsx~~ ✅ CONCLUÍDO
-3. ImportPreview.tsx (2-3h)
+3. ~~ImportPreview.tsx~~ ✅ CONCLUÍDO
 4. ~~ImportHistory.tsx~~ ✅ CONCLUÍDO
-5. DepositsHistory.tsx (2-3h)
-6. WithdrawalsHistory.tsx (2-3h)
-7. WatchlistTeams.tsx (2-3h)
-8. Index.tsx (1h)
-9. NotFound.tsx (30min)
+5. ~~Index.tsx~~ ✅ CONCLUÍDO
+6. ~~NotFound.tsx~~ ✅ CONCLUÍDO
 
-**Tempo restante estimado**: 9-14 horas para completar 100%
+**🎊 Apenas 2 páginas restantes!**
+7. DepositsHistory.tsx (2-3h)
+8. WithdrawalsHistory.tsx (2-3h)
+
+**Tempo restante estimado**: 4-6 horas para completar 100%
 
 ---
 

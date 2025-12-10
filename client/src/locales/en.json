@@ -733,5 +733,71 @@
       "status": "Status",
       "profit": "Profit"
     }
+  },
+  "importPreview": {
+    "title": "Import Preview",
+    "fileLabel": "File:",
+    "backButton": "Back",
+    "stats": {
+      "totalRows": "Total Rows",
+      "validRows": "Valid Rows",
+      "withErrors": "With Errors",
+      "warnings": "Warnings"
+    },
+    "errorAlert": {
+      "title": "{count} row(s) with error(s)",
+      "description": "Fix all errors before importing. Use filters or click \"Edit\" on rows highlighted in red."
+    },
+    "filters": {
+      "title": "Filters",
+      "search": "Search",
+      "searchPlaceholder": "Bookmaker, description, operation...",
+      "onlyErrors": "Only with errors",
+      "onlyValid": "Only valid"
+    },
+    "table": {
+      "title": "Rows to Import",
+      "showing": "Showing {filtered} of {total} row(s)",
+      "addRow": "Add Row"
+    },
+    "actions": {
+      "cancelAll": "Cancel All",
+      "import": "Import {count} Bet(s)",
+      "importing": "Importing..."
+    },
+    "confirmDialog": {
+      "title": "Confirm Import",
+      "description": "You are about to import {count} bet(s).",
+      "file": "File:",
+      "totalLines": "Total rows:",
+      "valid": "Valid:",
+      "warnings": "Warnings:",
+      "finalWarning": "This action will create the bets and update your bankroll. Do you want to continue?",
+      "cancel": "Cancel",
+      "confirm": "Yes, Import"
+    },
+    "cancelDialog": {
+      "title": "Cancel Import?",
+      "description": "All preview data will be lost and you will return to the import page. Do you really want to cancel?",
+      "continue": "No, Continue Editing",
+      "confirm": "Yes, Cancel All"
+    },
+    "toasts": {
+      "noPreview": "No preview available",
+      "rowUpdated": "Row updated successfully",
+      "rowDeleted": "Row removed",
+      "fixErrors": "Fix all errors before importing",
+      "importSuccess": "Import completed! {count} bet(s) imported.",
+      "importError": "Error importing bets"
+    }
+  },
+  "index": {
+    "title": "Welcome to Your App",
+    "subtitle": "Start building your amazing project here!"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Oops! Page not found",
+    "returnHome": "Return to Home"
   }
 }

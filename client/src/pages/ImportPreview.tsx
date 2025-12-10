@@ -23,8 +23,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { ArrowLeft, Upload, X, Plus, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ImportPreview() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const addBet = useBettingStore(state => state.addBet);
   const bookmakers = useBettingStore(state => state.bookmakers);
@@ -57,10 +59,10 @@ export default function ImportPreview() {
   // Redirect if no preview data
   useEffect(() => {
     if (!previewState) {
-      toast.error('Nenhum preview disponível');
+      toast.error(t('importPreview.toasts.noPreview'));
       setLocation('/import');
     }
-  }, [previewState, setLocation]);
+  }, [previewState, setLocation, t]);
 
   // Save state to sessionStorage whenever it changes
   useEffect(() => {
@@ -121,7 +123,7 @@ export default function ImportPreview() {
     const validatedRows = validateImportRows(updatedRows);
 
     setPreviewState({ ...previewState, rows: validatedRows });
-    toast.success('Linha atualizada com sucesso');
+    toast.success(t('importPreview.toasts.rowUpdated'));
   };
 
   const handleDelete = (rowId: string) => {
@@ -129,7 +131,7 @@ export default function ImportPreview() {
 
     const updatedRows = previewState.rows.filter((row) => row.id !== rowId);
     setPreviewState({ ...previewState, rows: updatedRows });
-    toast.success('Linha removida');
+    toast.success(t('importPreview.toasts.rowDeleted'));
   };
 
   const handleAddRow = () => {
@@ -189,7 +191,7 @@ export default function ImportPreview() {
     if (!previewState || !stats) return;
 
     if (stats.invalidRows > 0) {
-      toast.error('Corrija todos os erros antes de importar');
+      toast.error(t('importPreview.toasts.fixErrors'));
       return;
     }
 
@@ -275,13 +277,13 @@ export default function ImportPreview() {
       sessionStorage.removeItem('import_preview_state');
 
       toast.success(
-        `Importação concluída! ${importSession.successfulRows} aposta(s) importada(s).`
+        t('importPreview.toasts.importSuccess').replace('{count}', importSession.successfulRows.toString())
       );
 
       setLocation('/import');
     } catch (error) {
       console.error('Import error:', error);
-      toast.error('Erro ao importar apostas');
+      toast.error(t('importPreview.toasts.importError'));
     } finally {
       setImporting(false);
     }
@@ -301,14 +303,14 @@ export default function ImportPreview() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Preview de Importação</h1>
+          <h1 className="text-3xl font-bold">{t('importPreview.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Arquivo: <span className="font-medium">{previewState.fileName}</span>
+            {t('importPreview.fileLabel')} <span className="font-medium">{previewState.fileName}</span>
           </p>
         </div>
         <Button variant="outline" onClick={() => setShowCancelDialog(true)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar
+          {t('importPreview.backButton')}
         </Button>
       </div>
 
@@ -316,7 +318,7 @@ export default function ImportPreview() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Total de Linhas</CardDescription>
+            <CardDescription>{t('importPreview.stats.totalRows')}</CardDescription>
             <CardTitle className="text-3xl">{stats.totalRows}</CardTitle>
           </CardHeader>
         </Card>
@@ -324,7 +326,7 @@ export default function ImportPreview() {
         <Card className="border-green-200 bg-green-50 dark:bg-green-950/20">
           <CardHeader className="pb-3">
             <CardDescription className="text-green-700 dark:text-green-300">
-              Linhas Válidas
+              {t('importPreview.stats.validRows')}
             </CardDescription>
             <CardTitle className="text-3xl text-green-600">{stats.validRows}</CardTitle>
           </CardHeader>
@@ -333,7 +335,7 @@ export default function ImportPreview() {
         <Card className="border-red-200 bg-red-50 dark:bg-red-950/20">
           <CardHeader className="pb-3">
             <CardDescription className="text-red-700 dark:text-red-300">
-              Com Erros
+              {t('importPreview.stats.withErrors')}
             </CardDescription>
             <CardTitle className="text-3xl text-red-600">{stats.invalidRows}</CardTitle>
           </CardHeader>
@@ -342,7 +344,7 @@ export default function ImportPreview() {
         <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
           <CardHeader className="pb-3">
             <CardDescription className="text-yellow-700 dark:text-yellow-300">
-              Avisos
+              {t('importPreview.stats.warnings')}
             </CardDescription>
             <CardTitle className="text-3xl text-yellow-600">{stats.warningCount}</CardTitle>
           </CardHeader>
@@ -357,10 +359,10 @@ export default function ImportPreview() {
               <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
               <div>
                 <p className="font-medium text-red-900 dark:text-red-100">
-                  {stats.invalidRows} linha(s) com erro(s)
+                  {t('importPreview.errorAlert.title').replace('{count}', stats.invalidRows.toString())}
                 </p>
                 <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                  Corrija todos os erros antes de importar. Use os filtros ou clique em "Editar" nas linhas destacadas em vermelho.
+                  {t('importPreview.errorAlert.description')}
                 </p>
               </div>
             </div>
@@ -371,15 +373,15 @@ export default function ImportPreview() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Filtros</CardTitle>
+          <CardTitle>{t('importPreview.filters.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="search">Buscar</Label>
+              <Label htmlFor="search">{t('importPreview.filters.search')}</Label>
               <Input
                 id="search"
-                placeholder="Casa, descrição, operação..."
+                placeholder={t('importPreview.filters.searchPlaceholder')}
                 value={filters.searchTerm}
                 onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
               />
@@ -395,7 +397,7 @@ export default function ImportPreview() {
                   }
                 />
                 <Label htmlFor="showOnlyErrors" className="cursor-pointer">
-                  Apenas com erros
+                  {t('importPreview.filters.onlyErrors')}
                 </Label>
               </div>
 
@@ -408,7 +410,7 @@ export default function ImportPreview() {
                   }
                 />
                 <Label htmlFor="showOnlyValid" className="cursor-pointer">
-                  Apenas válidas
+                  {t('importPreview.filters.onlyValid')}
                 </Label>
               </div>
             </div>
@@ -421,14 +423,16 @@ export default function ImportPreview() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Linhas para Importação</CardTitle>
+              <CardTitle>{t('importPreview.table.title')}</CardTitle>
               <CardDescription>
-                Mostrando {filteredRows.length} de {previewState.rows.length} linha(s)
+                {t('importPreview.table.showing')
+                  .replace('{filtered}', filteredRows.length.toString())
+                  .replace('{total}', previewState.rows.length.toString())}
               </CardDescription>
             </div>
             <Button variant="outline" onClick={handleAddRow}>
               <Plus className="h-4 w-4 mr-2" />
-              Adicionar Linha
+              {t('importPreview.table.addRow')}
             </Button>
           </div>
         </CardHeader>
@@ -449,7 +453,7 @@ export default function ImportPreview() {
           onClick={() => setShowCancelDialog(true)}
         >
           <X className="h-5 w-5 mr-2" />
-          Cancelar Tudo
+          {t('importPreview.actions.cancelAll')}
         </Button>
 
         <Button
@@ -458,7 +462,7 @@ export default function ImportPreview() {
           disabled={stats.invalidRows > 0 || importing}
         >
           <Upload className="h-5 w-5 mr-2" />
-          {importing ? 'Importando...' : `Importar ${stats.validRows} Aposta(s)`}
+          {importing ? t('importPreview.actions.importing') : t('importPreview.actions.import').replace('{count}', stats.validRows.toString())}
         </Button>
       </div>
 
@@ -478,26 +482,26 @@ export default function ImportPreview() {
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Importação</AlertDialogTitle>
+            <AlertDialogTitle>{t('importPreview.confirmDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Você está prestes a importar {stats.validRows} aposta(s).
+              {t('importPreview.confirmDialog.description').replace('{count}', stats.validRows.toString())}
               <div className="mt-4 p-3 bg-muted rounded-lg space-y-1 text-sm">
-                <p><strong>Arquivo:</strong> {previewState.fileName}</p>
-                <p><strong>Total de linhas:</strong> {stats.totalRows}</p>
-                <p className="text-green-600"><strong>Válidas:</strong> {stats.validRows}</p>
+                <p><strong>{t('importPreview.confirmDialog.file')}</strong> {previewState.fileName}</p>
+                <p><strong>{t('importPreview.confirmDialog.totalLines')}</strong> {stats.totalRows}</p>
+                <p className="text-green-600"><strong>{t('importPreview.confirmDialog.valid')}</strong> {stats.validRows}</p>
                 {stats.warningCount > 0 && (
-                  <p className="text-yellow-600"><strong>Avisos:</strong> {stats.warningCount}</p>
+                  <p className="text-yellow-600"><strong>{t('importPreview.confirmDialog.warnings')}</strong> {stats.warningCount}</p>
                 )}
               </div>
               <p className="mt-3 font-medium">
-                Esta ação criará as apostas e atualizará sua banca. Deseja continuar?
+                {t('importPreview.confirmDialog.finalWarning')}
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('importPreview.confirmDialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmImport}>
-              Sim, Importar
+              {t('importPreview.confirmDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -507,16 +511,15 @@ export default function ImportPreview() {
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancelar Importação?</AlertDialogTitle>
+            <AlertDialogTitle>{t('importPreview.cancelDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Todos os dados do preview serão perdidos e você retornará à página de importação.
-              Deseja realmente cancelar?
+              {t('importPreview.cancelDialog.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Não, Continuar Editando</AlertDialogCancel>
+            <AlertDialogCancel>{t('importPreview.cancelDialog.continue')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleCancel} className="bg-red-600 hover:bg-red-700">
-              Sim, Cancelar Tudo
+              {t('importPreview.cancelDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

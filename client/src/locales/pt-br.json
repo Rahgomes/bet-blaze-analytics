@@ -733,5 +733,71 @@
       "status": "Status",
       "profit": "Lucro"
     }
+  },
+  "importPreview": {
+    "title": "Preview de Importação",
+    "fileLabel": "Arquivo:",
+    "backButton": "Voltar",
+    "stats": {
+      "totalRows": "Total de Linhas",
+      "validRows": "Linhas Válidas",
+      "withErrors": "Com Erros",
+      "warnings": "Avisos"
+    },
+    "errorAlert": {
+      "title": "{count} linha(s) com erro(s)",
+      "description": "Corrija todos os erros antes de importar. Use os filtros ou clique em \"Editar\" nas linhas destacadas em vermelho."
+    },
+    "filters": {
+      "title": "Filtros",
+      "search": "Buscar",
+      "searchPlaceholder": "Casa, descrição, operação...",
+      "onlyErrors": "Apenas com erros",
+      "onlyValid": "Apenas válidas"
+    },
+    "table": {
+      "title": "Linhas para Importação",
+      "showing": "Mostrando {filtered} de {total} linha(s)",
+      "addRow": "Adicionar Linha"
+    },
+    "actions": {
+      "cancelAll": "Cancelar Tudo",
+      "import": "Importar {count} Aposta(s)",
+      "importing": "Importando..."
+    },
+    "confirmDialog": {
+      "title": "Confirmar Importação",
+      "description": "Você está prestes a importar {count} aposta(s).",
+      "file": "Arquivo:",
+      "totalLines": "Total de linhas:",
+      "valid": "Válidas:",
+      "warnings": "Avisos:",
+      "finalWarning": "Esta ação criará as apostas e atualizará sua banca. Deseja continuar?",
+      "cancel": "Cancelar",
+      "confirm": "Sim, Importar"
+    },
+    "cancelDialog": {
+      "title": "Cancelar Importação?",
+      "description": "Todos os dados do preview serão perdidos e você retornará à página de importação. Deseja realmente cancelar?",
+      "continue": "Não, Continuar Editando",
+      "confirm": "Sim, Cancelar Tudo"
+    },
+    "toasts": {
+      "noPreview": "Nenhum preview disponível",
+      "rowUpdated": "Linha atualizada com sucesso",
+      "rowDeleted": "Linha removida",
+      "fixErrors": "Corrija todos os erros antes de importar",
+      "importSuccess": "Importação concluída! {count} aposta(s) importada(s).",
+      "importError": "Erro ao importar apostas"
+    }
+  },
+  "index": {
+    "title": "Bem-vindo ao Seu App",
+    "subtitle": "Comece a construir seu projeto incrível aqui!"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Ops! Página não encontrada",
+    "returnHome": "Voltar para Início"
   }
 }
