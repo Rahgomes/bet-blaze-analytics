@@ -799,5 +799,89 @@
     "title": "404",
     "subtitle": "Ops! Página não encontrada",
     "returnHome": "Voltar para Início"
+  },
+  "depositsHistory": {
+    "title": "Histórico Completo de Aportes",
+    "subtitle": "Visualize, filtre e gerencie todos os seus aportes",
+    "back": "Voltar",
+    "summary": {
+      "totalDeposits": "Total de Aportes",
+      "totalValue": "Valor Total",
+      "largestDeposit": "Maior Aporte",
+      "latestDeposit": "Último Aporte"
+    },
+    "filters": {
+      "searchLabel": "🔍 Buscar por título ou descrição",
+      "searchPlaceholder": "Digite para buscar...",
+      "periodLabel": "📅 Período",
+      "dateFrom": "De",
+      "dateTo": "Até",
+      "valueRangeLabel": "💰 Faixa de Valor",
+      "valueMin": "Mínimo",
+      "valueMax": "Máximo",
+      "sortByLabel": "📊 Ordenar por",
+      "sortRecent": "Mais Recente",
+      "sortOldest": "Mais Antigo",
+      "sortHighest": "Maior Valor",
+      "sortLowest": "Menor Valor",
+      "clearFilters": "Limpar Filtros"
+    },
+    "table": {
+      "title": "Aportes Encontrados",
+      "showing": "Mostrando {start}-{end} de {total} aportes",
+      "headers": {
+        "title": "Título",
+        "value": "Valor",
+        "dateTime": "Data/Hora",
+        "description": "Descrição",
+        "balanceAfter": "Banca Após",
+        "actions": "Ações"
+      },
+      "defaultTitle": "Aporte Manual",
+      "noDescription": "-",
+      "itemsPerPage": "itens por página",
+      "previous": "Anterior",
+      "next": "Próxima"
+    },
+    "empty": {
+      "title": "Nenhum aporte encontrado",
+      "subtitle": "Tente ajustar os filtros ou adicionar novos aportes"
+    },
+    "editModal": {
+      "title": "Editar Aporte Manual",
+      "description": "Atualize as informações do aporte",
+      "titleLabel": "Título/Nome do Aporte",
+      "titlePlaceholder": "Ex: Aporte extra - bônus trabalho",
+      "amountLabel": "Valor do Aporte",
+      "amountPlaceholder": "0,00",
+      "previewTitle": "Preview",
+      "previewCurrentBankroll": "Banca atual:",
+      "previewDifference": "Diferença:",
+      "previewAfterEdit": "Após edição:",
+      "dateLabel": "Data",
+      "dateSelect": "Selecione",
+      "timeLabel": "Hora",
+      "descriptionLabel": "Descrição (opcional)",
+      "descriptionPlaceholder": "Ex: Recebi bônus do projeto X",
+      "cancel": "Cancelar",
+      "save": "Salvar Alterações"
+    },
+    "deleteDialog": {
+      "title": "Excluir aporte?",
+      "description": "Tem certeza que deseja excluir este aporte? Esta ação irá recalcular sua banca atual.",
+      "cancel": "Cancelar",
+      "confirm": "Sim, Excluir"
+    },
+    "toasts": {
+      "depositUpdated": "Aporte atualizado",
+      "depositUpdatedDescription": "O aporte foi atualizado com sucesso.",
+      "depositDeleted": "Aporte excluído",
+      "depositDeletedDescription": "O aporte foi removido com sucesso.",
+      "errorTitle": "Erro",
+      "errorTitleRequired": "Por favor, insira um título para o aporte.",
+      "errorAmountRequired": "Por favor, insira um valor válido para o aporte.",
+      "depositEditSuccess": "Aporte atualizado",
+      "depositEditSuccessDescription": "O aporte manual foi atualizado com sucesso."
+    }
   }
 }

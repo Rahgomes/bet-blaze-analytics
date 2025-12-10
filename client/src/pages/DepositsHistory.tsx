@@ -19,6 +19,7 @@ import { DepositsTable } from '@/components/betting/DepositsTable';
 import { EditManualDepositModal } from '@/components/betting/EditManualDepositModal';
 import { Transaction } from '@/types/betting';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function DepositsHistory() {
   const [, setLocation] = useLocation();
@@ -27,6 +28,7 @@ export default function DepositsHistory() {
   const updateTransaction = useBettingStore(state => state.updateTransaction);
   const deleteTransaction = useBettingStore(state => state.deleteTransaction);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Get all deposits
   const allDeposits = transactions.filter((t) => t.type === 'deposit');
@@ -145,8 +147,8 @@ export default function DepositsHistory() {
     }
 
     toast({
-      title: 'Aporte atualizado',
-      description: 'O aporte foi atualizado com sucesso.',
+      title: t('depositsHistory.toasts.depositUpdated'),
+      description: t('depositsHistory.toasts.depositUpdatedDescription'),
     });
   };
 
@@ -161,8 +163,8 @@ export default function DepositsHistory() {
     setDepositToDelete(null);
 
     toast({
-      title: 'Aporte excluído',
-      description: 'O aporte foi removido com sucesso.',
+      title: t('depositsHistory.toasts.depositDeleted'),
+      description: t('depositsHistory.toasts.depositDeletedDescription'),
     });
   };
 
@@ -177,10 +179,10 @@ export default function DepositsHistory() {
             className="mb-2"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
+            {t('depositsHistory.back')}
           </Button>
-          <h1 className="text-3xl font-bold tracking-tight">Histórico Completo de Aportes</h1>
-          <p className="text-muted-foreground">Visualize, filtre e gerencie todos os seus aportes</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('depositsHistory.title')}</h1>
+          <p className="text-muted-foreground">{t('depositsHistory.subtitle')}</p>
         </div>
       </div>
 
@@ -193,7 +195,7 @@ export default function DepositsHistory() {
                 <Coins className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total de Aportes</p>
+                <p className="text-sm text-muted-foreground">{t('depositsHistory.summary.totalDeposits')}</p>
                 <p className="text-2xl font-bold">{allDeposits.length}</p>
               </div>
             </div>
@@ -207,7 +209,7 @@ export default function DepositsHistory() {
                 <DollarSign className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Valor Total</p>
+                <p className="text-sm text-muted-foreground">{t('depositsHistory.summary.totalValue')}</p>
                 <p className="text-2xl font-bold text-green-600">R$ {totalDeposits.toFixed(2)}</p>
               </div>
             </div>
@@ -221,7 +223,7 @@ export default function DepositsHistory() {
                 <TrendingUp className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Maior Aporte</p>
+                <p className="text-sm text-muted-foreground">{t('depositsHistory.summary.largestDeposit')}</p>
                 <p className="text-2xl font-bold text-purple-600">R$ {largestDeposit.toFixed(2)}</p>
               </div>
             </div>
@@ -235,7 +237,7 @@ export default function DepositsHistory() {
                 <Calendar className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Último Aporte</p>
+                <p className="text-sm text-muted-foreground">{t('depositsHistory.summary.latestDeposit')}</p>
                 <p className="text-xl font-bold text-orange-600">
                   {latestDeposit ? `R$ ${latestDeposit.amount.toFixed(2)}` : '-'}
                 </p>
@@ -282,22 +284,22 @@ export default function DepositsHistory() {
       <AlertDialog open={!!depositToDelete} onOpenChange={() => setDepositToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir aporte?</AlertDialogTitle>
+            <AlertDialogTitle>{t('depositsHistory.deleteDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este aporte? Esta ação irá recalcular sua banca atual.
+              {t('depositsHistory.deleteDialog.description')}
               <div className="mt-4 p-3 bg-muted rounded-lg">
-                <p className="font-medium">{depositToDelete?.title || 'Aporte Manual'}</p>
+                <p className="font-medium">{depositToDelete?.title || t('depositsHistory.table.defaultTitle')}</p>
                 <p className="text-sm text-green-600">+R$ {depositToDelete?.amount.toFixed(2)}</p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('depositsHistory.deleteDialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
               className="bg-red-600 hover:bg-red-700"
             >
-              Sim, Excluir
+              {t('depositsHistory.deleteDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

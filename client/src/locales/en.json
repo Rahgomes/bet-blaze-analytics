@@ -799,5 +799,89 @@
     "title": "404",
     "subtitle": "Oops! Page not found",
     "returnHome": "Return to Home"
+  },
+  "depositsHistory": {
+    "title": "Complete Deposits History",
+    "subtitle": "View, filter and manage all your deposits",
+    "back": "Back",
+    "summary": {
+      "totalDeposits": "Total Deposits",
+      "totalValue": "Total Value",
+      "largestDeposit": "Largest Deposit",
+      "latestDeposit": "Latest Deposit"
+    },
+    "filters": {
+      "searchLabel": "🔍 Search by title or description",
+      "searchPlaceholder": "Type to search...",
+      "periodLabel": "📅 Period",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "valueRangeLabel": "💰 Value Range",
+      "valueMin": "Minimum",
+      "valueMax": "Maximum",
+      "sortByLabel": "📊 Sort by",
+      "sortRecent": "Most Recent",
+      "sortOldest": "Oldest",
+      "sortHighest": "Highest Value",
+      "sortLowest": "Lowest Value",
+      "clearFilters": "Clear Filters"
+    },
+    "table": {
+      "title": "Deposits Found",
+      "showing": "Showing {start}-{end} of {total} deposits",
+      "headers": {
+        "title": "Title",
+        "value": "Value",
+        "dateTime": "Date/Time",
+        "description": "Description",
+        "balanceAfter": "Balance After",
+        "actions": "Actions"
+      },
+      "defaultTitle": "Manual Deposit",
+      "noDescription": "-",
+      "itemsPerPage": "items per page",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "empty": {
+      "title": "No deposits found",
+      "subtitle": "Try adjusting the filters or adding new deposits"
+    },
+    "editModal": {
+      "title": "Edit Manual Deposit",
+      "description": "Update deposit information",
+      "titleLabel": "Deposit Title/Name",
+      "titlePlaceholder": "Ex: Extra deposit - work bonus",
+      "amountLabel": "Deposit Amount",
+      "amountPlaceholder": "0.00",
+      "previewTitle": "Preview",
+      "previewCurrentBankroll": "Current bankroll:",
+      "previewDifference": "Difference:",
+      "previewAfterEdit": "After editing:",
+      "dateLabel": "Date",
+      "dateSelect": "Select",
+      "timeLabel": "Time",
+      "descriptionLabel": "Description (optional)",
+      "descriptionPlaceholder": "Ex: Received bonus from project X",
+      "cancel": "Cancel",
+      "save": "Save Changes"
+    },
+    "deleteDialog": {
+      "title": "Delete deposit?",
+      "description": "Are you sure you want to delete this deposit? This action will recalculate your current bankroll.",
+      "cancel": "Cancel",
+      "confirm": "Yes, Delete"
+    },
+    "toasts": {
+      "depositUpdated": "Deposit updated",
+      "depositUpdatedDescription": "The deposit was successfully updated.",
+      "depositDeleted": "Deposit deleted",
+      "depositDeletedDescription": "The deposit was successfully removed.",
+      "errorTitle": "Error",
+      "errorTitleRequired": "Please enter a title for the deposit.",
+      "errorAmountRequired": "Please enter a valid amount for the deposit.",
+      "depositEditSuccess": "Deposit updated",
+      "depositEditSuccessDescription": "The manual deposit was successfully updated."
+    }
   }
 }

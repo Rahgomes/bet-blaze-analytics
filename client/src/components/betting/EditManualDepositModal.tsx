@@ -7,11 +7,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Transaction } from '@/types/betting';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface EditManualDepositModalProps {
   open: boolean;
@@ -34,6 +35,8 @@ export function EditManualDepositModal({
   onUpdateDeposit,
 }: EditManualDepositModalProps) {
   const { toast } = useToast();
+  const { t, language } = useTranslation();
+  const locale = language === 'pt-br' ? ptBR : enUS;
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState<Date>(new Date());
@@ -62,8 +65,8 @@ export function EditManualDepositModal({
 
     if (!title.trim()) {
       toast({
-        title: 'Erro',
-        description: 'Por favor, insira um título para o aporte.',
+        title: t('depositsHistory.toasts.errorTitle'),
+        description: t('depositsHistory.toasts.errorTitleRequired'),
         variant: 'destructive',
       });
       return;
@@ -71,8 +74,8 @@ export function EditManualDepositModal({
 
     if (amountNumber <= 0) {
       toast({
-        title: 'Erro',
-        description: 'Por favor, insira um valor válido para o aporte.',
+        title: t('depositsHistory.toasts.errorTitle'),
+        description: t('depositsHistory.toasts.errorAmountRequired'),
         variant: 'destructive',
       });
       return;
@@ -92,8 +95,8 @@ export function EditManualDepositModal({
     onOpenChange(false);
 
     toast({
-      title: 'Aporte atualizado',
-      description: 'O aporte manual foi atualizado com sucesso.',
+      title: t('depositsHistory.toasts.depositEditSuccess'),
+      description: t('depositsHistory.toasts.depositEditSuccessDescription'),
     });
   };
 
@@ -103,19 +106,19 @@ export function EditManualDepositModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Editar Aporte Manual</DialogTitle>
+          <DialogTitle>{t('depositsHistory.editModal.title')}</DialogTitle>
           <DialogDescription>
-            Atualize as informações do aporte
+            {t('depositsHistory.editModal.description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {/* Título/Nome do Aporte */}
           <div className="space-y-2">
-            <Label htmlFor="edit-title">Título/Nome do Aporte</Label>
+            <Label htmlFor="edit-title">{t('depositsHistory.editModal.titleLabel')}</Label>
             <Input
               id="edit-title"
-              placeholder="Ex: Aporte extra - bônus trabalho"
+              placeholder={t('depositsHistory.editModal.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -123,7 +126,7 @@ export function EditManualDepositModal({
 
           {/* Valor do Aporte */}
           <div className="space-y-2">
-            <Label htmlFor="edit-amount">Valor do Aporte</Label>
+            <Label htmlFor="edit-amount">{t('depositsHistory.editModal.amountLabel')}</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 R$
@@ -133,7 +136,7 @@ export function EditManualDepositModal({
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="0,00"
+                placeholder={t('depositsHistory.editModal.amountPlaceholder')}
                 className="pl-10"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -146,15 +149,15 @@ export function EditManualDepositModal({
             <div className="rounded-lg bg-muted p-4 space-y-1">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <span>💰</span>
-                <span>Preview</span>
+                <span>{t('depositsHistory.editModal.previewTitle')}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Banca atual:</span>
+                <span className="text-muted-foreground">{t('depositsHistory.editModal.previewCurrentBankroll')}</span>
                 <span className="font-medium">R$ {currentBankroll.toFixed(2)}</span>
               </div>
               {amountDiff !== 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Diferença:</span>
+                  <span className="text-muted-foreground">{t('depositsHistory.editModal.previewDifference')}</span>
                   <span className={cn(
                     "font-medium",
                     amountDiff > 0 ? "text-green-600" : "text-red-600"
@@ -164,7 +167,7 @@ export function EditManualDepositModal({
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Após edição:</span>
+                <span className="text-muted-foreground">{t('depositsHistory.editModal.previewAfterEdit')}</span>
                 <span className="font-semibold text-green-600">
                   R$ {newBankroll.toFixed(2)}
                 </span>
@@ -175,7 +178,7 @@ export function EditManualDepositModal({
           {/* Data/Hora */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Data</Label>
+              <Label>{t('depositsHistory.editModal.dateLabel')}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -186,7 +189,7 @@ export function EditManualDepositModal({
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, 'dd/MM/yyyy', { locale: ptBR }) : 'Selecione'}
+                    {date ? format(date, 'dd/MM/yyyy', { locale }) : t('depositsHistory.editModal.dateSelect')}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -195,14 +198,14 @@ export function EditManualDepositModal({
                     selected={date}
                     onSelect={(newDate) => newDate && setDate(newDate)}
                     initialFocus
-                    locale={ptBR}
+                    locale={locale}
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-time">Hora</Label>
+              <Label htmlFor="edit-time">{t('depositsHistory.editModal.timeLabel')}</Label>
               <Input
                 id="edit-time"
                 type="time"
@@ -214,10 +217,10 @@ export function EditManualDepositModal({
 
           {/* Descrição (opcional) */}
           <div className="space-y-2">
-            <Label htmlFor="edit-description">Descrição (opcional)</Label>
+            <Label htmlFor="edit-description">{t('depositsHistory.editModal.descriptionLabel')}</Label>
             <Textarea
               id="edit-description"
-              placeholder="Ex: Recebi bônus do projeto X"
+              placeholder={t('depositsHistory.editModal.descriptionPlaceholder')}
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -227,9 +230,9 @@ export function EditManualDepositModal({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {t('depositsHistory.editModal.cancel')}
           </Button>
-          <Button onClick={handleSubmit}>Salvar Alterações</Button>
+          <Button onClick={handleSubmit}>{t('depositsHistory.editModal.save')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
