@@ -271,11 +271,11 @@ export default function AddBet() {
       // Exceeds all configured stakes
       const maxStake = sortedStakes[sortedStakes.length - 1];
       if (maxStake) {
-        riskLevel = `ACIMA DE ${maxStake.label}`;
+        riskLevel = t('addBet.validation.aboveMaxStake').replace('{label}', maxStake.label);
         riskColor = '#991b1b'; // critical red
         riskEmoji = '🚨';
       } else {
-        riskLevel = 'Não classificado';
+        riskLevel = t('addBet.validation.unclassified');
         riskColor = '#64748b';
         riskEmoji = '❓';
       }
@@ -285,7 +285,7 @@ export default function AddBet() {
     let oddsAlert = null;
     let amountAlert = null;
     let roiWarning = null;
-    let stakeSuggestion = 'Preencha os valores para ver sugestões';
+    let stakeSuggestion = t('addBet.validation.fillValues');
 
     if (totalAmount > 0) {
       // Alerta de odds baseado no risco
@@ -387,8 +387,8 @@ export default function AddBet() {
     }
 
     toast({
-      title: 'Sucesso',
-      description: 'Aposta adicionada com sucesso',
+      title: t('addBet.toasts.successTitle'),
+      description: t('addBet.toasts.successDescription'),
     });
 
     setLocation('/bets');
@@ -412,15 +412,15 @@ export default function AddBet() {
                   <Card>
                     <AccordionTrigger className="px-6 pt-6 pb-0 hover:no-underline">
                       <CardHeader className="p-0">
-                        <CardTitle>Identificação da Aposta</CardTitle>
-                        <CardDescription>Dados básicos da operação</CardDescription>
+                        <CardTitle>{t('addBet.sections.identification')}</CardTitle>
+                        <CardDescription>{t('addBet.sections.identificationDesc')}</CardDescription>
                       </CardHeader>
                     </AccordionTrigger>
                     <AccordionContent>
                       <CardContent className="pt-6 space-y-6">
                         <div className="grid gap-4 md:grid-cols-3">
                           <div className="space-y-2">
-                            <Label htmlFor="operationNumber">Número da Operação</Label>
+                            <Label htmlFor="operationNumber">{t('addBet.fields.operationNumberLabel')}</Label>
                             <Controller
                               name="operationNumber"
                               control={control}
@@ -431,14 +431,14 @@ export default function AddBet() {
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="bookmaker">Casa de Apostas *</Label>
+                            <Label htmlFor="bookmaker">{t('addBet.fields.bookmakerLabel')}</Label>
                             <Controller
                               name="bookmaker"
                               control={control}
                               render={({ field }) => (
                                 <Select value={field.value} onValueChange={field.onChange}>
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Selecionar casa de apostas" />
+                                    <SelectValue placeholder={t('addBet.placeholders.selectBookmaker')} />
                                   </SelectTrigger>
                                   <SelectContent>
                                     {bookmakers.map((bm) => (
@@ -451,7 +451,7 @@ export default function AddBet() {
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="date">Data da Aposta *</Label>
+                            <Label htmlFor="date">{t('addBet.fields.dateLabel')}</Label>
                             <Controller
                               name="date"
                               control={control}
@@ -462,7 +462,7 @@ export default function AddBet() {
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="betType">Tipo de Aposta *</Label>
+                            <Label htmlFor="betType">{t('addBet.fields.betTypeLabel')}</Label>
                             <Controller
                               name="betType"
                               control={control}
@@ -478,8 +478,8 @@ export default function AddBet() {
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="simple">Simples</SelectItem>
-                                    <SelectItem value="multiple">Múltipla</SelectItem>
+                                    <SelectItem value="simple">{t('addBet.betTypes.simple')}</SelectItem>
+                                    <SelectItem value="multiple">{t('addBet.betTypes.multiple')}</SelectItem>
                                   </SelectContent>
                                 </Select>
                               )}
@@ -487,7 +487,7 @@ export default function AddBet() {
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="multipleQuantity">Quantidade de Stakes</Label>
+                            <Label htmlFor="multipleQuantity">{t('addBet.fields.stakeQuantityLabel')}</Label>
                             <Controller
                               name="multipleQuantity"
                               control={control}
@@ -502,13 +502,13 @@ export default function AddBet() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     {betType === 'simple' && <SelectItem value="1">1</SelectItem>}
-                                    <SelectItem value="2">Dupla (2)</SelectItem>
-                                    <SelectItem value="3">Tripla (3)</SelectItem>
-                                    <SelectItem value="4">4</SelectItem>
-                                    <SelectItem value="5">5</SelectItem>
-                                    <SelectItem value="6">6</SelectItem>
-                                    <SelectItem value="7">7</SelectItem>
-                                    <SelectItem value="8">8</SelectItem>
+                                    <SelectItem value="2">{t('addBet.betTypes.double')}</SelectItem>
+                                    <SelectItem value="3">{t('addBet.betTypes.triple')}</SelectItem>
+                                    <SelectItem value="4">{t('addBet.betTypes.quadruple')}</SelectItem>
+                                    <SelectItem value="5">{t('addBet.betTypes.quintuple')}</SelectItem>
+                                    <SelectItem value="6">{t('addBet.betTypes.sextuple')}</SelectItem>
+                                    <SelectItem value="7">{t('addBet.betTypes.septuple')}</SelectItem>
+                                    <SelectItem value="8">{t('addBet.betTypes.octuple')}</SelectItem>
                                     <SelectItem value="9">9</SelectItem>
                                     <SelectItem value="10">10</SelectItem>
                                     <SelectItem value="11">11</SelectItem>
@@ -528,12 +528,12 @@ export default function AddBet() {
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {betType === 'simple' ? 'Detalhes da Aposta' : 'Detalhes das Legs'}
+                    {betType === 'simple' ? t('addBet.sections.details') : t('addBet.sections.detailsLegs')}
                   </CardTitle>
                   <CardDescription>
                     {betType === 'simple'
-                      ? 'Informações completas da aposta simples'
-                      : `Configure cada uma das ${fields.length} legs da múltipla`
+                      ? t('addBet.sections.detailsSimple')
+                      : t('addBet.sections.detailsMultiple').replace('{count}', fields.length.toString())
                     }
                   </CardDescription>
                 </CardHeader>
@@ -559,14 +559,14 @@ export default function AddBet() {
                   <Card>
                     <AccordionTrigger className="px-6 pt-6 pb-0 hover:no-underline">
                       <CardHeader className="p-0">
-                        <CardTitle>Informações Complementares</CardTitle>
-                        <CardDescription>Resumo financeiro, descrição e tags</CardDescription>
+                        <CardTitle>{t('addBet.sections.complementary')}</CardTitle>
+                        <CardDescription>{t('addBet.sections.complementaryDesc')}</CardDescription>
                       </CardHeader>
                     </AccordionTrigger>
                     <AccordionContent>
                       <CardContent className="pt-6 space-y-6">
                         <div className="space-y-2">
-                          <Label htmlFor="description">Descrição Detalhada *</Label>
+                          <Label htmlFor="description">{t('addBet.fields.descriptionLabel')}</Label>
                           <Controller
                             name="description"
                             control={control}
@@ -574,7 +574,7 @@ export default function AddBet() {
                               <Textarea
                                 {...field}
                                 id="description"
-                                placeholder="ex: Múltipla com 3 jogos do Brasileirão. Análise baseada em estatísticas recentes..."
+                                placeholder={t('addBet.placeholders.descriptionExample')}
                                 rows={4}
                               />
                             )}
@@ -582,7 +582,7 @@ export default function AddBet() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="stakeLogic">Lógica do Stake</Label>
+                          <Label htmlFor="stakeLogic">{t('addBet.fields.stakeLogicLabel')}</Label>
                           <Controller
                             name="stakeLogic"
                             control={control}
@@ -590,7 +590,7 @@ export default function AddBet() {
                               <Textarea
                                 {...field}
                                 id="stakeLogic"
-                                placeholder="Justificativa para o valor apostado, análise de risco, % da banca utilizada..."
+                                placeholder={t('addBet.placeholders.stakeLogicExample')}
                                 rows={3}
                               />
                             )}
@@ -598,8 +598,8 @@ export default function AddBet() {
                         </div>
 
                         <div className="space-y-3">
-                          <Label>Tags da Aposta</Label>
-                          <p className="text-sm text-muted-foreground">Selecione até 5 tags para categorizar esta aposta</p>
+                          <Label>{t('addBet.fields.tagsLabel')}</Label>
+                          <p className="text-sm text-muted-foreground">{t('addBet.fields.tagsDescription')}</p>
                           <Controller
                             name="tags"
                             control={control}
@@ -615,8 +615,8 @@ export default function AddBet() {
                                 }}
                                 className="react-select-container"
                                 classNamePrefix="react-select"
-                                placeholder="Selecione até 5 tags..."
-                                noOptionsMessage={() => "Nenhuma opção disponível"}
+                                placeholder={t('addBet.placeholders.selectTags')}
+                                noOptionsMessage={() => t('addBet.placeholders.noTags')}
                                 isOptionDisabled={() => field.value.length >= 5}
                                 menuPlacement="top"
                                 menuPosition="fixed"
@@ -626,7 +626,7 @@ export default function AddBet() {
 
                           {watchedData.tags && watchedData.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-3 p-3 bg-gray-50 rounded-lg">
-                              <span className="text-xs text-muted-foreground mr-2">Tags selecionadas:</span>
+                              <span className="text-xs text-muted-foreground mr-2">{t('addBet.tagsSelected')}</span>
                               {watchedData.tags.map((tag) => (
                                 <Badge key={tag} variant="secondary" className="text-xs">
                                   {tag}
@@ -647,19 +647,19 @@ export default function AddBet() {
                   className="flex-1 h-12 text-lg"
                   disabled={!formState.isValid || formState.isSubmitting}
                 >
-                  {formState.isSubmitting ? 'Adicionando...' : 'Adicionar Aposta'}
+                  {formState.isSubmitting ? t('addBet.buttons.adding') : t('addBet.buttons.addBet')}
                 </Button>
                 <Button
                   type="button"
                   variant="destructive"
                   className="h-12"
                   onClick={() => {
-                    if (confirm('Tem certeza que deseja limpar todos os campos do formulário?')) {
+                    if (confirm(t('addBet.buttons.confirmClear'))) {
                       reset();
                     }
                   }}
                 >
-                  Limpar Aposta
+                  {t('addBet.buttons.clear')}
                 </Button>
               </div>
             </form>

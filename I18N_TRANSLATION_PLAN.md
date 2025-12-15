@@ -227,6 +227,48 @@ Precisam ser traduzidas (ver seção de prioridades abaixo)
 
 ---
 
+#### ✅ **WithdrawalsHistory.tsx** - CONCLUÍDO (10/12/2025) - **ÚLTIMA PÁGINA!** 🏁
+**Tempo real**: ~1.5 horas
+**Status**: 100% traduzido e testado
+
+**O que foi feito**:
+- ✅ Adicionadas 60+ novas chaves de tradução em `pt-br.json` e `en.json`
+- ✅ Importado hook `useTranslation` em 4 arquivos
+- ✅ Traduzidos título e subtítulo da página
+- ✅ Traduzidos 4 cards de resumo (Total, Valor Total, Maior, Último)
+- ✅ Traduzido componente WithdrawalsFilters completo (busca, período, valor, ordenação)
+- ✅ Traduzido componente WithdrawalsTable completo (cabeçalhos, paginação)
+- ✅ Traduzido componente EditManualWithdrawalModal completo (formulário, preview, validações)
+- ✅ Traduzido dialog de confirmação de exclusão
+- ✅ Traduzidas todas as mensagens toast (9 mensagens, incluindo validação de banca)
+- ✅ Suporte a formatação de data PT-BR vs EN-US (date-fns locale)
+- ✅ Suporte a substituição de variáveis em strings ({start}, {end}, {total}, {amount})
+- ✅ Lógica especial de preview invertida (saques diminuem a banca)
+
+**Chaves adicionadas**:
+```json
+"withdrawalsHistory": {
+  "title", "subtitle", "back",
+  "summary": { 4 chaves },
+  "filters": { 11 chaves },
+  "table": { 12 chaves },
+  "empty": { 2 chaves },
+  "editModal": { 14 chaves },
+  "deleteDialog": { 3 chaves },
+  "toasts": { 9 chaves }
+}
+```
+
+**Arquivos modificados**:
+- `/client/src/pages/WithdrawalsHistory.tsx` (100% traduzido)
+- `/client/src/components/betting/WithdrawalsFilters.tsx` (100% traduzido)
+- `/client/src/components/betting/WithdrawalsTable.tsx` (100% traduzido)
+- `/client/src/components/betting/EditManualWithdrawalModal.tsx` (100% traduzido)
+- `/client/src/locales/pt-br.json` (60+ novas chaves)
+- `/client/src/locales/en.json` (60+ novas chaves)
+
+---
+
 #### ✅ **DepositsHistory.tsx** - CONCLUÍDO (10/12/2025)
 **Tempo real**: ~1.5 horas
 **Status**: 100% traduzido e testado
@@ -814,7 +856,7 @@ Traduzir as páginas restantes
 - [x] 10. Index.tsx ✅ (CONCLUÍDO em 09/12/2025)
 - [x] 11. NotFound.tsx ✅ (CONCLUÍDO em 09/12/2025)
 - [x] 12. DepositsHistory.tsx ✅ (CONCLUÍDO em 10/12/2025)
-- [ ] 13. WithdrawalsHistory.tsx
+- [x] 13. WithdrawalsHistory.tsx ✅ (CONCLUÍDO em 10/12/2025)
 
 ---
 
@@ -1159,9 +1201,9 @@ toast({
 
 | Status | Páginas | Percentual |
 |--------|---------|------------|
-| ✅ Concluídas | 16/17 | 94% |
+| ✅ Concluídas | 17/17 | **100%** 🎉 |
 | 🔄 Em progresso | 0/17 | 0% |
-| ❌ Pendentes | 1/17 | 6% |
+| ❌ Pendentes | 0/17 | 0% |
 
 ### Progresso por Prioridade
 
@@ -1182,11 +1224,11 @@ toast({
 5. ~~Index.tsx~~ ✅ CONCLUÍDO
 6. ~~NotFound.tsx~~ ✅ CONCLUÍDO
 
-**🎊 Apenas 1 página restante!**
+**🎊 PROJETO 100% CONCLUÍDO!**
 7. ~~DepositsHistory.tsx~~ ✅ CONCLUÍDO (10/12/2025)
-8. WithdrawalsHistory.tsx (2-3h)
+8. ~~WithdrawalsHistory.tsx~~ ✅ CONCLUÍDO (10/12/2025)
 
-**Tempo restante estimado**: 2-3 horas para completar 100%
+**✨ TODAS AS 17 PÁGINAS FORAM TRADUZIDAS COM SUCESSO! ✨**
 
 ---
 

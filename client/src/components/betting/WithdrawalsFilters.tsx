@@ -7,9 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS } from 'date-fns/locale';
 import { CalendarIcon, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export type SortOption = 'recent' | 'oldest' | 'highest' | 'lowest';
 
@@ -44,18 +45,21 @@ export function WithdrawalsFilters({
   onSortByChange,
   onClearFilters,
 }: WithdrawalsFiltersProps) {
+  const { t, language } = useTranslation();
+  const locale = language === 'pt-br' ? ptBR : enUS;
+
   return (
     <Card>
       <CardContent className="pt-6">
         <div className="space-y-4">
           {/* Busca */}
           <div className="space-y-2">
-            <Label htmlFor="search">🔍 Buscar por título ou descrição</Label>
+            <Label htmlFor="search">{t('withdrawalsHistory.filters.searchLabel')}</Label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="search"
-                placeholder="Digite para buscar..."
+                placeholder={t('withdrawalsHistory.filters.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
                 className="pl-10"
@@ -66,7 +70,7 @@ export function WithdrawalsFilters({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Período */}
             <div className="space-y-2">
-              <Label>📅 Período</Label>
+              <Label>{t('withdrawalsHistory.filters.periodLabel')}</Label>
               <div className="grid grid-cols-2 gap-2">
                 <Popover>
                   <PopoverTrigger asChild>
@@ -78,7 +82,7 @@ export function WithdrawalsFilters({
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateFrom ? format(dateFrom, 'dd/MM/yyyy', { locale: ptBR }) : 'De'}
+                      {dateFrom ? format(dateFrom, 'dd/MM/yyyy', { locale }) : t('withdrawalsHistory.filters.dateFrom')}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -87,7 +91,7 @@ export function WithdrawalsFilters({
                       selected={dateFrom}
                       onSelect={onDateFromChange}
                       initialFocus
-                      locale={ptBR}
+                      locale={locale}
                     />
                   </PopoverContent>
                 </Popover>
@@ -102,7 +106,7 @@ export function WithdrawalsFilters({
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateTo ? format(dateTo, 'dd/MM/yyyy', { locale: ptBR }) : 'Até'}
+                      {dateTo ? format(dateTo, 'dd/MM/yyyy', { locale }) : t('withdrawalsHistory.filters.dateTo')}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -111,7 +115,7 @@ export function WithdrawalsFilters({
                       selected={dateTo}
                       onSelect={onDateToChange}
                       initialFocus
-                      locale={ptBR}
+                      locale={locale}
                     />
                   </PopoverContent>
                 </Popover>
@@ -120,7 +124,7 @@ export function WithdrawalsFilters({
 
             {/* Faixa de Valor */}
             <div className="space-y-2">
-              <Label>💰 Faixa de Valor</Label>
+              <Label>{t('withdrawalsHistory.filters.valueRangeLabel')}</Label>
               <div className="grid grid-cols-2 gap-2">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -130,7 +134,7 @@ export function WithdrawalsFilters({
                     type="number"
                     step="0.01"
                     min="0"
-                    placeholder="Mínimo"
+                    placeholder={t('withdrawalsHistory.filters.valueMin')}
                     value={valueMin}
                     onChange={(e) => onValueMinChange(e.target.value)}
                     className="pl-10"
@@ -144,7 +148,7 @@ export function WithdrawalsFilters({
                     type="number"
                     step="0.01"
                     min="0"
-                    placeholder="Máximo"
+                    placeholder={t('withdrawalsHistory.filters.valueMax')}
                     value={valueMax}
                     onChange={(e) => onValueMaxChange(e.target.value)}
                     className="pl-10"
@@ -157,16 +161,16 @@ export function WithdrawalsFilters({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             {/* Ordenação */}
             <div className="space-y-2">
-              <Label htmlFor="sortBy">📊 Ordenar por</Label>
+              <Label htmlFor="sortBy">{t('withdrawalsHistory.filters.sortByLabel')}</Label>
               <Select value={sortBy} onValueChange={(value) => onSortByChange(value as SortOption)}>
                 <SelectTrigger id="sortBy">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recent">Mais Recente</SelectItem>
-                  <SelectItem value="oldest">Mais Antigo</SelectItem>
-                  <SelectItem value="highest">Maior Valor</SelectItem>
-                  <SelectItem value="lowest">Menor Valor</SelectItem>
+                  <SelectItem value="recent">{t('withdrawalsHistory.filters.sortRecent')}</SelectItem>
+                  <SelectItem value="oldest">{t('withdrawalsHistory.filters.sortOldest')}</SelectItem>
+                  <SelectItem value="highest">{t('withdrawalsHistory.filters.sortHighest')}</SelectItem>
+                  <SelectItem value="lowest">{t('withdrawalsHistory.filters.sortLowest')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -174,7 +178,7 @@ export function WithdrawalsFilters({
             {/* Botão Limpar Filtros */}
             <Button variant="outline" onClick={onClearFilters} className="w-full">
               <X className="h-4 w-4 mr-2" />
-              Limpar Filtros
+              {t('withdrawalsHistory.filters.clearFilters')}
             </Button>
           </div>
         </div>

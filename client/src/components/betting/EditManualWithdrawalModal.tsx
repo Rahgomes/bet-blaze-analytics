@@ -7,11 +7,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, AlertTriangle } from 'lucide-react';
+import { ptBR, enUS } from 'date-fns/locale';
+import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Transaction } from '@/types/betting';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface EditManualWithdrawalModalProps {
   open: boolean;
@@ -34,6 +35,8 @@ export function EditManualWithdrawalModal({
   onUpdateWithdrawal,
 }: EditManualWithdrawalModalProps) {
   const { toast } = useToast();
+  const { t, language } = useTranslation();
+  const locale = language === 'pt-br' ? ptBR : enUS;
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState<Date>(new Date());
@@ -55,20 +58,16 @@ export function EditManualWithdrawalModal({
   const amountNumber = parseFloat(amount) || 0;
   const originalAmount = withdrawal?.amount || 0;
   const amountDiff = amountNumber - originalAmount;
-
-  // For withdrawals: available = current bankroll + original withdrawal amount
-  // This is because the original withdrawal was already subtracted
-  const availableBankroll = currentBankroll + originalAmount;
+  // For withdrawals, amount diff is subtracted from bankroll (inverted)
   const newBankroll = currentBankroll - amountDiff;
-  const exceedsAvailable = amountNumber > availableBankroll;
 
   const handleSubmit = () => {
     if (!withdrawal) return;
 
     if (!title.trim()) {
       toast({
-        title: 'Erro',
-        description: 'Por favor, insira um título para o saque.',
+        title: t('withdrawalsHistory.toasts.errorTitle'),
+        description: t('withdrawalsHistory.toasts.errorTitleRequired'),
         variant: 'destructive',
       });
       return;
@@ -76,17 +75,8 @@ export function EditManualWithdrawalModal({
 
     if (amountNumber <= 0) {
       toast({
-        title: 'Erro',
-        description: 'Por favor, insira um valor válido para o saque.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (exceedsAvailable) {
-      toast({
-        title: 'Erro',
-        description: `O valor do saque não pode exceder R$ ${availableBankroll.toFixed(2)} (banca disponível).`,
+        title: t('withdrawalsHistory.toasts.errorTitle'),
+        description: t('withdrawalsHistory.toasts.errorAmountRequired'),
         variant: 'destructive',
       });
       return;
@@ -106,8 +96,8 @@ export function EditManualWithdrawalModal({
     onOpenChange(false);
 
     toast({
-      title: 'Saque atualizado',
-      description: 'O saque manual foi atualizado com sucesso.',
+      title: t('withdrawalsHistory.toasts.withdrawalEditSuccess'),
+      description: t('withdrawalsHistory.toasts.withdrawalEditSuccessDescription'),
     });
   };
 
@@ -117,19 +107,19 @@ export function EditManualWithdrawalModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Editar Saque Manual</DialogTitle>
+          <DialogTitle>{t('withdrawalsHistory.editModal.title')}</DialogTitle>
           <DialogDescription>
-            Atualize as informações do saque
+            {t('withdrawalsHistory.editModal.description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {/* Título/Nome do Saque */}
           <div className="space-y-2">
-            <Label htmlFor="edit-title">Título/Nome do Saque</Label>
+            <Label htmlFor="edit-title">{t('withdrawalsHistory.editModal.titleLabel')}</Label>
             <Input
               id="edit-title"
-              placeholder="Ex: Saque para investimento"
+              placeholder={t('withdrawalsHistory.editModal.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -137,7 +127,7 @@ export function EditManualWithdrawalModal({
 
           {/* Valor do Saque */}
           <div className="space-y-2">
-            <Label htmlFor="edit-amount">Valor do Saque</Label>
+            <Label htmlFor="edit-amount">{t('withdrawalsHistory.editModal.amountLabel')}</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 R$
@@ -147,35 +137,28 @@ export function EditManualWithdrawalModal({
                 type="number"
                 step="0.01"
                 min="0"
-                max={availableBankroll}
-                placeholder="0,00"
+                placeholder={t('withdrawalsHistory.editModal.amountPlaceholder')}
                 className="pl-10"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
               />
             </div>
-            {exceedsAvailable && (
-              <p className="text-sm text-red-600 flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3" />
-                Valor excede o disponível: R$ {availableBankroll.toFixed(2)}
-              </p>
-            )}
           </div>
 
           {/* Preview da Banca */}
-          {amountNumber > 0 && !exceedsAvailable && (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-4 space-y-1">
+          {amountNumber > 0 && (
+            <div className="rounded-lg bg-muted p-4 space-y-1">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <span>💰</span>
-                <span>Preview</span>
+                <span>{t('withdrawalsHistory.editModal.previewTitle')}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Banca atual:</span>
+                <span className="text-muted-foreground">{t('withdrawalsHistory.editModal.previewCurrentBankroll')}</span>
                 <span className="font-medium">R$ {currentBankroll.toFixed(2)}</span>
               </div>
               {amountDiff !== 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Diferença:</span>
+                  <span className="text-muted-foreground">{t('withdrawalsHistory.editModal.previewDifference')}</span>
                   <span className={cn(
                     "font-medium",
                     amountDiff > 0 ? "text-red-600" : "text-green-600"
@@ -185,13 +168,10 @@ export function EditManualWithdrawalModal({
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Após edição:</span>
-                <span className="font-semibold text-red-600">
+                <span className="text-muted-foreground">{t('withdrawalsHistory.editModal.previewAfterEdit')}</span>
+                <span className="font-semibold text-blue-600">
                   R$ {newBankroll.toFixed(2)}
                 </span>
-              </div>
-              <div className="text-xs text-muted-foreground pt-2 border-t border-red-300">
-                Disponível para edição: R$ {availableBankroll.toFixed(2)}
               </div>
             </div>
           )}
@@ -199,7 +179,7 @@ export function EditManualWithdrawalModal({
           {/* Data/Hora */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Data</Label>
+              <Label>{t('withdrawalsHistory.editModal.dateLabel')}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -210,7 +190,7 @@ export function EditManualWithdrawalModal({
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, 'dd/MM/yyyy', { locale: ptBR }) : 'Selecione'}
+                    {date ? format(date, 'dd/MM/yyyy', { locale }) : t('withdrawalsHistory.editModal.dateSelect')}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -219,14 +199,14 @@ export function EditManualWithdrawalModal({
                     selected={date}
                     onSelect={(newDate) => newDate && setDate(newDate)}
                     initialFocus
-                    locale={ptBR}
+                    locale={locale}
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-time">Hora</Label>
+              <Label htmlFor="edit-time">{t('withdrawalsHistory.editModal.timeLabel')}</Label>
               <Input
                 id="edit-time"
                 type="time"
@@ -238,10 +218,10 @@ export function EditManualWithdrawalModal({
 
           {/* Descrição (opcional) */}
           <div className="space-y-2">
-            <Label htmlFor="edit-description">Descrição (opcional)</Label>
+            <Label htmlFor="edit-description">{t('withdrawalsHistory.editModal.descriptionLabel')}</Label>
             <Textarea
               id="edit-description"
-              placeholder="Ex: Retirada para despesas pessoais"
+              placeholder={t('withdrawalsHistory.editModal.descriptionPlaceholder')}
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -251,11 +231,9 @@ export function EditManualWithdrawalModal({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {t('withdrawalsHistory.editModal.cancel')}
           </Button>
-          <Button onClick={handleSubmit} className="bg-red-600 hover:bg-red-700">
-            Salvar Alterações
-          </Button>
+          <Button onClick={handleSubmit}>{t('withdrawalsHistory.editModal.save')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

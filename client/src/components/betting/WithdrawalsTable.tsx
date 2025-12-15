@@ -5,8 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Edit2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS } from 'date-fns/locale';
 import { Transaction } from '@/types/betting';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface WithdrawalsTableProps {
   withdrawals: Transaction[];
@@ -17,6 +18,8 @@ interface WithdrawalsTableProps {
 export function WithdrawalsTable({ withdrawals, onEdit, onDelete }: WithdrawalsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const { t, language } = useTranslation();
+  const locale = language === 'pt-br' ? ptBR : enUS;
 
   // Calculate pagination
   const totalItems = withdrawals.length;
@@ -77,8 +80,8 @@ export function WithdrawalsTable({ withdrawals, onEdit, onDelete }: WithdrawalsT
       <Card>
         <CardContent className="pt-6">
           <div className="text-center py-12 text-muted-foreground">
-            <p className="text-lg font-medium">Nenhum saque encontrado</p>
-            <p className="text-sm">Tente ajustar os filtros ou adicionar novos saques</p>
+            <p className="text-lg font-medium">{t('withdrawalsHistory.empty.title')}</p>
+            <p className="text-sm">{t('withdrawalsHistory.empty.subtitle')}</p>
           </div>
         </CardContent>
       </Card>
@@ -89,9 +92,12 @@ export function WithdrawalsTable({ withdrawals, onEdit, onDelete }: WithdrawalsT
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Saques Encontrados</CardTitle>
+          <CardTitle>{t('withdrawalsHistory.table.title')}</CardTitle>
           <div className="text-sm text-muted-foreground">
-            Mostrando {startIndex + 1}-{endIndex} de {totalItems} saques
+            {t('withdrawalsHistory.table.showing')
+              .replace('{start}', String(startIndex + 1))
+              .replace('{end}', String(endIndex))
+              .replace('{total}', String(totalItems))}
           </div>
         </div>
       </CardHeader>
@@ -102,28 +108,28 @@ export function WithdrawalsTable({ withdrawals, onEdit, onDelete }: WithdrawalsT
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Título</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead>Data/Hora</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead>Banca Após</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <TableHead>{t('withdrawalsHistory.table.headers.title')}</TableHead>
+                  <TableHead>{t('withdrawalsHistory.table.headers.value')}</TableHead>
+                  <TableHead>{t('withdrawalsHistory.table.headers.dateTime')}</TableHead>
+                  <TableHead>{t('withdrawalsHistory.table.headers.description')}</TableHead>
+                  <TableHead>{t('withdrawalsHistory.table.headers.balanceAfter')}</TableHead>
+                  <TableHead className="text-right">{t('withdrawalsHistory.table.headers.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {currentWithdrawals.map((withdrawal) => (
                   <TableRow key={withdrawal.id}>
                     <TableCell className="font-medium">
-                      {withdrawal.title || 'Saque Manual'}
+                      {withdrawal.title || t('withdrawalsHistory.table.defaultTitle')}
                     </TableCell>
                     <TableCell className="font-semibold text-red-600">
                       -R$ {withdrawal.amount.toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      {format(new Date(withdrawal.dateTime), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                      {format(new Date(withdrawal.dateTime), "dd/MM/yyyy HH:mm", { locale })}
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
-                      {withdrawal.description || '-'}
+                      {withdrawal.description || t('withdrawalsHistory.table.noDescription')}
                     </TableCell>
                     <TableCell className="font-medium">
                       R$ {withdrawal.balanceAfter.toFixed(2)}
@@ -172,7 +178,7 @@ export function WithdrawalsTable({ withdrawals, onEdit, onDelete }: WithdrawalsT
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-sm text-muted-foreground">itens por página</span>
+              <span className="text-sm text-muted-foreground">{t('withdrawalsHistory.table.itemsPerPage')}</span>
             </div>
 
             {/* Page navigation */}
@@ -184,7 +190,7 @@ export function WithdrawalsTable({ withdrawals, onEdit, onDelete }: WithdrawalsT
                 disabled={currentPage === 1}
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
-                Anterior
+                {t('withdrawalsHistory.table.previous')}
               </Button>
 
               <div className="flex items-center gap-1">
@@ -213,7 +219,7 @@ export function WithdrawalsTable({ withdrawals, onEdit, onDelete }: WithdrawalsT
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Próxima
+                {t('withdrawalsHistory.table.next')}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>

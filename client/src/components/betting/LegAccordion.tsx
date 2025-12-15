@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { BetFormData } from '@/lib/schemas/betFormSchema';
 
 interface LegAccordionProps {
@@ -25,10 +26,11 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
   leagues,
   protectionTypes
 }) => {
+  const { t } = useTranslation();
   const { control, watch, setValue } = useFormContext<BetFormData>();
 
   const leg = watch(`legs.${index}`);
-  const legLabel = betType === 'simple' ? 'Detalhes da Aposta' : `Leg ${index + 1}`;
+  const legLabel = betType === 'simple' ? t('addBet.sections.details') : `${t('addBet.leg.title')} ${index + 1}`;
 
   const protectionOptions = protectionTypes.map(type => ({ value: type, label: type }));
 
@@ -46,11 +48,11 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
         <div className="space-y-6 pt-4">
           <div className="space-y-4">
             <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-              Valores e Odds
+              {t('addBet.leg.valuesAndOdds')}
             </h4>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor={`amount-${index}`}>Valor Apostado (R$) *</Label>
+                <Label htmlFor={`amount-${index}`}>{t('addBet.leg.betAmount')}</Label>
                 <Controller
                   name={`legs.${index}.amount`}
                   control={control}
@@ -67,7 +69,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor={`odds-${index}`}>Odd *</Label>
+                <Label htmlFor={`odds-${index}`}>{t('addBet.leg.oddsLabel')}</Label>
                 <Controller
                   name={`legs.${index}.odds`}
                   control={control}
@@ -88,12 +90,12 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
 
           <div className="space-y-4">
             <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-              Detalhes do Jogo
+              {t('addBet.leg.gameDetails')}
             </h4>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor={`homeTeam-${index}`}>Time de Casa *</Label>
+                <Label htmlFor={`homeTeam-${index}`}>{t('addBet.leg.homeTeam')}</Label>
                 <Controller
                   name={`legs.${index}.homeTeam`}
                   control={control}
@@ -103,7 +105,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor={`awayTeam-${index}`}>Time de Fora *</Label>
+                <Label htmlFor={`awayTeam-${index}`}>{t('addBet.leg.awayTeam')}</Label>
                 <Controller
                   name={`legs.${index}.awayTeam`}
                   control={control}
@@ -116,7 +118,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
 
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor={`sport-${index}`}>Esporte *</Label>
+                <Label htmlFor={`sport-${index}`}>{t('addBet.leg.sport')}</Label>
                 <Controller
                   name={`legs.${index}.sport`}
                   control={control}
@@ -142,14 +144,14 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor={`market-${index}`}>Mercado *</Label>
+                <Label htmlFor={`market-${index}`}>{t('addBet.leg.market')}</Label>
                 <Controller
                   name={`legs.${index}.market`}
                   control={control}
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o mercado" />
+                        <SelectValue placeholder={t('addBet.leg.selectMarket')} />
                       </SelectTrigger>
                       <SelectContent>
                         {sportMarkets[leg?.sport as keyof typeof sportMarkets]?.map((market) => (
@@ -162,14 +164,14 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor={`league-${index}`}>Liga / Competição</Label>
+                <Label htmlFor={`league-${index}`}>{t('addBet.leg.league')}</Label>
                 <Controller
                   name={`legs.${index}.league`}
                   control={control}
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione a liga" />
+                        <SelectValue placeholder={t('addBet.leg.selectLeague')} />
                       </SelectTrigger>
                       <SelectContent>
                         {leagues.map((league) => (
@@ -184,7 +186,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor={`matchTime-${index}`}>Data e Hora do Jogo</Label>
+                <Label htmlFor={`matchTime-${index}`}>{t('addBet.leg.matchDateTime')}</Label>
                 <Controller
                   name={`legs.${index}.matchTime`}
                   control={control}
@@ -195,14 +197,14 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor={`strategy-${index}`}>Estratégia</Label>
+                <Label htmlFor={`strategy-${index}`}>{t('addBet.leg.strategy')}</Label>
                 <Controller
                   name={`legs.${index}.strategy`}
                   control={control}
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione a estratégia" />
+                        <SelectValue placeholder={t('addBet.leg.selectStrategy')} />
                       </SelectTrigger>
                       <SelectContent>
                         {strategies.map((strategy) => (
@@ -217,8 +219,8 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
 
             <div className="flex items-center justify-between pt-2">
               <div className="space-y-0.5">
-                <Label htmlFor={`isLive-${index}`}>Aposta Ao Vivo</Label>
-                <p className="text-xs text-muted-foreground">Feita durante o jogo</p>
+                <Label htmlFor={`isLive-${index}`}>{t('addBet.leg.liveBet')}</Label>
+                <p className="text-xs text-muted-foreground">{t('addBet.leg.liveBetDesc')}</p>
               </div>
               <Controller
                 name={`legs.${index}.isLive`}
@@ -236,15 +238,15 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
 
           <div className="space-y-4">
             <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-              Funcionalidades Especiais
+              {t('addBet.leg.specialFeatures')}
             </h4>
 
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor={`hasBoost-${index}`}>Aposta com Boost/Aumento</Label>
-                    <p className="text-sm text-muted-foreground">Odds foi aumentada pela casa</p>
+                    <Label htmlFor={`hasBoost-${index}`}>{t('addBet.leg.hasBoost')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('addBet.leg.hasBoostDesc')}</p>
                   </div>
                   <Controller
                     name={`legs.${index}.hasBoost`}
@@ -262,7 +264,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                 {leg?.hasBoost && (
                   <div className="grid gap-4 md:grid-cols-2 pl-6 border-l-2 border-blue-200 bg-blue-50/30 p-4 rounded-lg">
                     <div className="space-y-2">
-                      <Label htmlFor={`originalOdds-${index}`}>Odds Original</Label>
+                      <Label htmlFor={`originalOdds-${index}`}>{t('addBet.leg.originalOdds')}</Label>
                       <Controller
                         name={`legs.${index}.originalOdds`}
                         control={control}
@@ -272,7 +274,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`boostPercentage-${index}`}>Percentual de Aumento (%)</Label>
+                      <Label htmlFor={`boostPercentage-${index}`}>{t('addBet.leg.boostPercentage')}</Label>
                       <Controller
                         name={`legs.${index}.boostPercentage`}
                         control={control}
@@ -288,8 +290,8 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor={`usedCredits-${index}`}>Feita com Créditos</Label>
-                    <p className="text-sm text-muted-foreground">Aposta feita com créditos da casa</p>
+                    <Label htmlFor={`usedCredits-${index}`}>{t('addBet.leg.usedCredits')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('addBet.leg.usedCreditsDesc')}</p>
                   </div>
                   <Controller
                     name={`legs.${index}.usedCredits`}
@@ -307,7 +309,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                 {leg?.usedCredits && (
                   <div className="pl-4 border-l-2 border-purple-200 bg-purple-50/20 p-3 rounded">
                     <div className="space-y-2">
-                      <Label htmlFor={`creditsAmount-${index}`}>Valor em Créditos (R$)</Label>
+                      <Label htmlFor={`creditsAmount-${index}`}>{t('addBet.leg.creditsAmount')}</Label>
                       <Controller
                         name={`legs.${index}.creditsAmount`}
                         control={control}
@@ -323,8 +325,8 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor={`hasCashout-${index}`}>Cashout Disponível/Usado</Label>
-                    <p className="text-sm text-muted-foreground">Encerramento antecipado</p>
+                    <Label htmlFor={`hasCashout-${index}`}>{t('addBet.leg.hasCashout')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('addBet.leg.hasCashoutDesc')}</p>
                   </div>
                   <Controller
                     name={`legs.${index}.hasCashout`}
@@ -342,7 +344,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                 {leg?.hasCashout && (
                   <div className="grid gap-3 pl-4 border-l-2 border-blue-200 bg-blue-50/20 p-3 rounded">
                     <div className="space-y-2">
-                      <Label htmlFor={`cashoutValue-${index}`}>Valor do Cashout (R$)</Label>
+                      <Label htmlFor={`cashoutValue-${index}`}>{t('addBet.leg.cashoutValue')}</Label>
                       <Controller
                         name={`legs.${index}.cashoutValue`}
                         control={control}
@@ -352,7 +354,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`cashoutTime-${index}`}>Momento do Cashout</Label>
+                      <Label htmlFor={`cashoutTime-${index}`}>{t('addBet.leg.cashoutMoment')}</Label>
                       <Controller
                         name={`legs.${index}.cashoutTime`}
                         control={control}
@@ -367,8 +369,8 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor={`hasEarlyPayout-${index}`}>Pagamento Antecipado</Label>
-                  <p className="text-sm text-muted-foreground">Pagamento recebido antes do fim</p>
+                  <Label htmlFor={`hasEarlyPayout-${index}`}>{t('addBet.leg.hasEarlyPayout')}</Label>
+                  <p className="text-sm text-muted-foreground">{t('addBet.leg.hasEarlyPayoutDesc')}</p>
                 </div>
                 <Controller
                   name={`legs.${index}.hasEarlyPayout`}
@@ -386,8 +388,8 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor={`isRiskFree-${index}`}>Aposta Sem Risco/Protegida</Label>
-                    <p className="text-sm text-muted-foreground">Valor protegido pela casa</p>
+                    <Label htmlFor={`isRiskFree-${index}`}>{t('addBet.leg.isRiskFree')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('addBet.leg.isRiskFreeDesc')}</p>
                   </div>
                   <Controller
                     name={`legs.${index}.isRiskFree`}
@@ -405,7 +407,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                 {leg?.isRiskFree && (
                   <div className="pl-4 border-l-2 border-green-200 bg-green-50/20 p-3 rounded">
                     <div className="space-y-2">
-                      <Label htmlFor={`riskFreeAmount-${index}`}>Valor Protegido (R$)</Label>
+                      <Label htmlFor={`riskFreeAmount-${index}`}>{t('addBet.leg.riskFreeAmount')}</Label>
                       <Controller
                         name={`legs.${index}.riskFreeAmount`}
                         control={control}
@@ -420,8 +422,8 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
             </div>
 
             <div className="space-y-3">
-              <Label>Tipos de Proteção Tradicionais</Label>
-              <p className="text-sm text-muted-foreground">Selecione uma ou mais proteções que se aplicam</p>
+              <Label>{t('addBet.leg.protectionTypes')}</Label>
+              <p className="text-sm text-muted-foreground">{t('addBet.leg.protectionTypesDesc')}</p>
               <Controller
                 name={`legs.${index}.protectionTypes`}
                 control={control}
@@ -433,8 +435,8 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                     onChange={(selected) => field.onChange(selected.map(s => s.value))}
                     className="react-select-container"
                     classNamePrefix="react-select"
-                    placeholder="Selecione as proteções..."
-                    noOptionsMessage={() => "Nenhuma opção disponível"}
+                    placeholder={t('addBet.leg.selectProtections')}
+                    noOptionsMessage={() => t('addBet.placeholders.noTags')}
                   />
                 )}
               />
@@ -443,12 +445,12 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
 
           <div className="space-y-4">
             <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-              Status e Resultado
+              {t('addBet.leg.statusAndResult')}
             </h4>
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor={`status-${index}`}>Status *</Label>
+                <Label htmlFor={`status-${index}`}>{t('addBet.leg.statusLabel')}</Label>
                 <Controller
                   name={`legs.${index}.status`}
                   control={control}
@@ -458,10 +460,10 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pending">Pendente</SelectItem>
-                        <SelectItem value="won">Ganha</SelectItem>
-                        <SelectItem value="lost">Perdida</SelectItem>
-                        <SelectItem value="void">Anulada</SelectItem>
+                        <SelectItem value="pending">{t('addBet.leg.pending')}</SelectItem>
+                        <SelectItem value="won">{t('addBet.leg.won')}</SelectItem>
+                        <SelectItem value="lost">{t('addBet.leg.lost')}</SelectItem>
+                        <SelectItem value="void">{t('addBet.leg.void')}</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -471,7 +473,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
               {(leg?.status === 'won' || leg?.status === 'lost') && (
                 <div className="grid gap-4 md:grid-cols-2 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
                   <div className="space-y-2">
-                    <Label htmlFor={`finalScore-${index}`}>Placar Final</Label>
+                    <Label htmlFor={`finalScore-${index}`}>{t('addBet.leg.finalScore')}</Label>
                     <Controller
                       name={`legs.${index}.finalScore`}
                       control={control}
@@ -481,7 +483,7 @@ export const LegAccordion = React.memo<LegAccordionProps>(({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor={`resultTime-${index}`}>Tempo de Resultado</Label>
+                    <Label htmlFor={`resultTime-${index}`}>{t('addBet.leg.resultTime')}</Label>
                     <Controller
                       name={`legs.${index}.resultTime`}
                       control={control}

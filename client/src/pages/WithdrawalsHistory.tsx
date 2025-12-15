@@ -19,6 +19,7 @@ import { WithdrawalsTable } from '@/components/betting/WithdrawalsTable';
 import { EditManualWithdrawalModal } from '@/components/betting/EditManualWithdrawalModal';
 import { Transaction } from '@/types/betting';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function WithdrawalsHistory() {
   const [, setLocation] = useLocation();
@@ -27,6 +28,7 @@ export default function WithdrawalsHistory() {
   const updateTransaction = useBettingStore(state => state.updateTransaction);
   const deleteTransaction = useBettingStore(state => state.deleteTransaction);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Get all withdrawals
   const allWithdrawals = transactions.filter((t) => t.type === 'withdrawal');
@@ -139,8 +141,8 @@ export default function WithdrawalsHistory() {
 
     if (newAmount > availableBankroll) {
       toast({
-        title: 'Erro',
-        description: `O valor do saque não pode exceder R$ ${availableBankroll.toFixed(2)} (banca disponível).`,
+        title: t('withdrawalsHistory.toasts.errorTitle'),
+        description: t('withdrawalsHistory.toasts.errorAmountExceedsBankroll').replace('{amount}', availableBankroll.toFixed(2)),
         variant: 'destructive',
       });
       return;
@@ -158,8 +160,8 @@ export default function WithdrawalsHistory() {
     }
 
     toast({
-      title: 'Saque atualizado',
-      description: 'O saque foi atualizado com sucesso.',
+      title: t('withdrawalsHistory.toasts.withdrawalUpdated'),
+      description: t('withdrawalsHistory.toasts.withdrawalUpdatedDescription'),
     });
   };
 
@@ -174,8 +176,8 @@ export default function WithdrawalsHistory() {
     setWithdrawalToDelete(null);
 
     toast({
-      title: 'Saque excluído',
-      description: 'O saque foi removido e a banca foi recalculada.',
+      title: t('withdrawalsHistory.toasts.withdrawalDeleted'),
+      description: t('withdrawalsHistory.toasts.withdrawalDeletedDescription'),
     });
   };
 
@@ -190,10 +192,10 @@ export default function WithdrawalsHistory() {
             className="mb-2"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
+            {t('withdrawalsHistory.back')}
           </Button>
-          <h1 className="text-3xl font-bold tracking-tight">Histórico Completo de Saques</h1>
-          <p className="text-muted-foreground">Visualize, filtre e gerencie todos os seus saques</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('withdrawalsHistory.title')}</h1>
+          <p className="text-muted-foreground">{t('withdrawalsHistory.subtitle')}</p>
         </div>
       </div>
 
@@ -206,7 +208,7 @@ export default function WithdrawalsHistory() {
                 <Coins className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total de Saques</p>
+                <p className="text-sm text-muted-foreground">{t('withdrawalsHistory.summary.totalWithdrawals')}</p>
                 <p className="text-2xl font-bold">{allWithdrawals.length}</p>
               </div>
             </div>
@@ -220,7 +222,7 @@ export default function WithdrawalsHistory() {
                 <DollarSign className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Valor Total</p>
+                <p className="text-sm text-muted-foreground">{t('withdrawalsHistory.summary.totalValue')}</p>
                 <p className="text-2xl font-bold text-red-600">R$ {totalWithdrawals.toFixed(2)}</p>
               </div>
             </div>
@@ -234,7 +236,7 @@ export default function WithdrawalsHistory() {
                 <TrendingDown className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Maior Saque</p>
+                <p className="text-sm text-muted-foreground">{t('withdrawalsHistory.summary.largestWithdrawal')}</p>
                 <p className="text-2xl font-bold text-purple-600">R$ {largestWithdrawal.toFixed(2)}</p>
               </div>
             </div>
@@ -248,7 +250,7 @@ export default function WithdrawalsHistory() {
                 <Calendar className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Último Saque</p>
+                <p className="text-sm text-muted-foreground">{t('withdrawalsHistory.summary.latestWithdrawal')}</p>
                 <p className="text-xl font-bold text-orange-600">
                   {latestWithdrawal ? `R$ ${latestWithdrawal.amount.toFixed(2)}` : '-'}
                 </p>
@@ -295,22 +297,22 @@ export default function WithdrawalsHistory() {
       <AlertDialog open={!!withdrawalToDelete} onOpenChange={() => setWithdrawalToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir saque?</AlertDialogTitle>
+            <AlertDialogTitle>{t('withdrawalsHistory.deleteDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este saque? Esta ação irá recalcular sua banca atual.
+              {t('withdrawalsHistory.deleteDialog.description')}
               <div className="mt-4 p-3 bg-muted rounded-lg">
-                <p className="font-medium">{withdrawalToDelete?.title || 'Saque Manual'}</p>
+                <p className="font-medium">{withdrawalToDelete?.title || t('withdrawalsHistory.table.defaultTitle')}</p>
                 <p className="text-sm text-red-600">-R$ {withdrawalToDelete?.amount.toFixed(2)}</p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('withdrawalsHistory.deleteDialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
               className="bg-red-600 hover:bg-red-700"
             >
-              Sim, Excluir
+              {t('withdrawalsHistory.deleteDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

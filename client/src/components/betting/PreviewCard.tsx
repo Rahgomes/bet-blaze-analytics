@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface PreviewCardProps {
   calculations: {
@@ -23,36 +24,39 @@ export const PreviewCard = ({
   calculations,
   aggregatedBadges,
   validations
-}: PreviewCardProps) => (
+}: PreviewCardProps) => {
+  const { t } = useTranslation();
+
+  return (
   <Card className="sticky top-20">
     <CardHeader>
-      <CardTitle>Preview da Aposta</CardTitle>
-      <CardDescription>Acompanhe os cálculos em tempo real</CardDescription>
+      <CardTitle>{t('addBet.preview.title')}</CardTitle>
+      <CardDescription>{t('addBet.preview.subtitle')}</CardDescription>
     </CardHeader>
     <CardContent>
       <div className="space-y-3">
         <div className="flex justify-between">
-          <span className="text-sm text-muted-foreground">Valor Total Apostado:</span>
+          <span className="text-sm text-muted-foreground">{t('addBet.preview.totalStaked')}</span>
           <span className="font-bold">R$ {calculations.totalAmount}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-sm text-muted-foreground">Odd Final:</span>
+          <span className="text-sm text-muted-foreground">{t('addBet.preview.finalOdds')}</span>
           <span className="font-bold">{calculations.finalOdds}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-sm text-muted-foreground">Retorno Potencial:</span>
+          <span className="text-sm text-muted-foreground">{t('addBet.preview.potentialReturn')}</span>
           <span className="font-bold text-green-600">
             R$ {calculations.potentialReturn}
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-sm text-muted-foreground">Lucro Potencial:</span>
+          <span className="text-sm text-muted-foreground">{t('addBet.preview.potentialProfit')}</span>
           <span className="font-bold text-blue-600">
             R$ {calculations.potentialProfit}
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-sm text-muted-foreground">ROI:</span>
+          <span className="text-sm text-muted-foreground">{t('addBet.preview.roi')}</span>
           <span className="font-bold text-purple-600">
             {calculations.roi}%
           </span>
@@ -144,4 +148,5 @@ export const PreviewCard = ({
       </div>
     </CardContent>
   </Card>
-);
+  );
+};
