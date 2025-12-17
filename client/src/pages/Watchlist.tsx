@@ -157,12 +157,13 @@ const generateMockBets = (): Bet[] => {
 };
 
 // Mock teams data para demonstração com dados de performance
-const generateMockTeams = () => [
+// Note: This function needs to be called inside the component to access translations
+const generateMockTeamsData = (t: any) => [
   {
     id: 'mock-team-1',
     name: 'Bayern Munich',
     competition: 'Bundesliga',
-    notes: 'Forte jogando em casa',
+    notes: t('watchlist.mockNotes.bayernMunich'),
     isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 12,
@@ -175,7 +176,7 @@ const generateMockTeams = () => [
     id: 'mock-team-2',
     name: 'Real Madrid',
     competition: 'La Liga',
-    notes: 'Favorito na Champions League',
+    notes: t('watchlist.mockNotes.realMadrid'),
     isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 15,
@@ -188,7 +189,7 @@ const generateMockTeams = () => [
     id: 'mock-team-3',
     name: 'Paris Saint-Germain',
     competition: 'Ligue 1',
-    notes: 'Jogos com muitos gols',
+    notes: t('watchlist.mockNotes.psg'),
     isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 8,
@@ -201,7 +202,7 @@ const generateMockTeams = () => [
     id: 'mock-team-4',
     name: 'Manchester City',
     competition: 'Premier League',
-    notes: 'Excelente desempenho fora de casa',
+    notes: t('watchlist.mockNotes.manchesterCity'),
     isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 18,
@@ -214,7 +215,7 @@ const generateMockTeams = () => [
     id: 'mock-team-5',
     name: 'Barcelona',
     competition: 'La Liga',
-    notes: 'Bom valor em clássicos',
+    notes: t('watchlist.mockNotes.barcelona'),
     isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 6,
@@ -227,7 +228,7 @@ const generateMockTeams = () => [
     id: 'mock-team-6',
     name: 'Liverpool',
     competition: 'Premier League',
-    notes: 'Forte jogando em Anfield',
+    notes: t('watchlist.mockNotes.liverpool'),
     isWatched: true,
     createdAt: new Date().toISOString(),
     totalBets: 20,
@@ -339,7 +340,7 @@ export default function Watchlist() {
 
   // Merge real teams with mock teams for demonstration
   const allTeams = useMemo(() => {
-    const mockTeams = generateMockTeams();
+    const mockTeams = generateMockTeamsData(t);
 
     const enrichedTeams = mockTeams.map(team => {
       const teamName = team.name.toLowerCase().replace(/\s+/g, ' ');
@@ -353,7 +354,7 @@ export default function Watchlist() {
     });
 
     return [...realTeams, ...enrichedTeams];
-  }, [realTeams, teamPerformanceMetrics]);
+  }, [realTeams, teamPerformanceMetrics, t]);
 
   // Calcular ratings automáticos
   const teamsWithRatings = useMemo(() => {
@@ -363,13 +364,19 @@ export default function Watchlist() {
       const rating = calculateRating(winRate, avgROI, team.totalBets || 0);
       const riskLevel = getRiskLevel(rating, team.totalStake || 0);
 
+      // Profitability will be translated in the component
+      let profitabilityKey = 'poor';
+      if (avgROI > 15) profitabilityKey = 'excellent';
+      else if (avgROI > 5) profitabilityKey = 'good';
+      else if (avgROI > 0) profitabilityKey = 'regular';
+
       return {
         ...team,
         winRate,
         avgROI,
         rating,
         riskLevel,
-        profitability: avgROI > 15 ? 'Excelente' : avgROI > 5 ? 'Boa' : avgROI > 0 ? 'Regular' : 'Ruim'
+        profitabilityKey
       };
     }).sort((a, b) => {
       const ratingOrder = { 'A++': 5, 'A+': 4, 'A': 3, 'B': 2, 'C': 1 };
@@ -456,12 +463,12 @@ export default function Watchlist() {
 
   const handleDelete = (id: string) => {
     if (id.startsWith('mock-team-')) {
-      toast.error('Não é possível excluir dados de demonstração. Adicione times reais para gerenciá-los.');
+      toast.error(t('watchlist.cannotDeleteDemo'));
       return;
     }
-    if (window.confirm('Tem certeza que deseja remover este time do monitoramento?')) {
+    if (window.confirm(t('watchlist.confirmRemoveTeam'))) {
       deleteTeam(id);
-      toast.success('Time removido com sucesso');
+      toast.success(t('watchlist.teamRemovedSuccess'));
     }
   };
 
@@ -473,7 +480,7 @@ export default function Watchlist() {
   const handleViewTeamHistory = (teamName: string) => {
     // Salvar origem no sessionStorage para exibir botão "Voltar"
     sessionStorage.setItem('betsReturnPath', '/watchlist');
-    sessionStorage.setItem('betsReturnLabel', 'Voltar ao Monitoramento');
+    sessionStorage.setItem('betsReturnLabel', t('watchlist.returnToMonitoring'));
 
     // Navegar para /bets com query param
     setLocation(`/bets?team=${encodeURIComponent(teamName)}`);
@@ -525,23 +532,23 @@ export default function Watchlist() {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">{team.winRate.toFixed(1)}%</div>
-            <div className="text-xs text-muted-foreground">Taxa de Acerto</div>
+            <div className="text-xs text-muted-foreground">{t('watchlist.winRateLabel')}</div>
           </div>
           <div className="text-center">
             <div className={`text-2xl font-bold ${team.avgROI >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {team.avgROI >= 0 ? '+' : ''}{team.avgROI.toFixed(1)}%
             </div>
-            <div className="text-xs text-muted-foreground">ROI Médio</div>
+            <div className="text-xs text-muted-foreground">{t('watchlist.avgRoiLabel')}</div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-muted-foreground">Total de Apostas:</span>
+            <span className="text-muted-foreground">{t('watchlist.totalBetsLabel')}:</span>
             <span className="font-medium ml-1">{team.totalBets || 0}</span>
           </div>
           <div>
-            <span className="text-muted-foreground">Lucro Total:</span>
+            <span className="text-muted-foreground">{t('watchlist.totalProfitLabel')}:</span>
             <span className={`font-medium ml-1 ${(team.totalProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               R$ {(team.totalProfit || 0).toFixed(2)}
             </span>
@@ -550,7 +557,7 @@ export default function Watchlist() {
 
         {team.notes && (
           <div className="mt-3 p-2 bg-blue-50 rounded text-xs">
-            <strong>Notas:</strong> {team.notes}
+            <strong>{t('watchlist.notesLabel')}:</strong> {team.notes}
           </div>
         )}
 
@@ -562,7 +569,7 @@ export default function Watchlist() {
             onClick={() => handleViewTeamHistory(team.name)}
           >
             <Eye className="h-3 w-3 mr-1" />
-            Histórico
+            {t('watchlist.historyButton')}
           </Button>
         </div>
       </CardContent>
@@ -572,19 +579,19 @@ export default function Watchlist() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Central de Monitoramento</h1>
-        <p className="text-muted-foreground">Análise inteligente de performance e exposição</p>
+        <h1 className="text-3xl font-bold text-foreground">{t('watchlist.monitoringCenter')}</h1>
+        <p className="text-muted-foreground">{t('watchlist.intelligentAnalysis')}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="exposure" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
-            Exposição Ativa
+            {t('watchlist.activeExposure')}
           </TabsTrigger>
           <TabsTrigger value="ratings" className="flex items-center gap-2">
             <Star className="h-4 w-4" />
-            Rank de Times
+            {t('watchlist.teamRanking')}
           </TabsTrigger>
         </TabsList>
 
@@ -603,27 +610,27 @@ export default function Watchlist() {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                      Jogos ao Vivo
+                      {t('watchlist.liveGames')}
                     </CardTitle>
-                    <CardDescription>Apostas em jogos que estão acontecendo agora</CardDescription>
+                    <CardDescription>{t('watchlist.liveGamesDesc')}</CardDescription>
                   </div>
                   {activeExposure.usingMockData && (
                     <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
-                      Dados Demo
+                      {t('watchlist.demoData')}
                     </Badge>
                   )}
                 </div>
                 {activeExposure.liveGames.length > 0 && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3" />
-                    Atualizado: {lastUpdate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                    {t('watchlist.updatedAt')}: {lastUpdate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 )}
               </div>
             </CardHeader>
             <CardContent>
               {activeExposure.liveGames.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">Nenhum jogo ao vivo no momento</p>
+                <p className="text-center text-muted-foreground py-8">{t('watchlist.noLiveGames')}</p>
               ) : (
                 <div className="max-h-[500px] overflow-y-auto space-y-4 pr-2">
                   {activeExposure.liveGames.map((game) => (
@@ -643,12 +650,12 @@ export default function Watchlist() {
             <CardHeader>
               <div className="flex items-center gap-3">
                 <div>
-                  <CardTitle>Jogos Pendentes Hoje</CardTitle>
-                  <CardDescription>Apostas para jogos que ainda vão começar</CardDescription>
+                  <CardTitle>{t('watchlist.pendingGamesToday')}</CardTitle>
+                  <CardDescription>{t('watchlist.pendingGamesDesc')}</CardDescription>
                 </div>
                 {activeExposure.usingMockData && (
                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
-                    Dados Demo
+                    {t('watchlist.demoData')}
                   </Badge>
                 )}
               </div>
@@ -678,7 +685,7 @@ export default function Watchlist() {
           {/* Filtros */}
           <Card>
             <CardHeader>
-              <CardTitle>Filtros</CardTitle>
+              <CardTitle>{t('watchlist.filters')}</CardTitle>
             </CardHeader>
             <CardContent>
               <TeamRatingFilters
@@ -695,12 +702,12 @@ export default function Watchlist() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Sistema de Rank Automático</CardTitle>
+              <CardTitle>{t('watchlist.automaticRankingSystem')}</CardTitle>
               <CardDescription>
-                Classificação baseada em taxa de acerto e ROI médio do seu histórico
+                {t('watchlist.rankingBasedOnHistory')}
                 {filteredTeams.length !== teamsWithRatings.length && (
                   <span className="ml-2 text-blue-600">
-                    ({filteredTeams.length} de {teamsWithRatings.length} times)
+                    {t('watchlist.teamsOfTotal', { count: filteredTeams.length, total: teamsWithRatings.length })}
                   </span>
                 )}
               </CardDescription>
@@ -709,13 +716,13 @@ export default function Watchlist() {
               {filteredTeams.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Star className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                  <p>Nenhum time encontrado com os filtros aplicados.</p>
+                  <p>{t('watchlist.noTeamsFound')}</p>
                   <Button
                     variant="outline"
                     className="mt-4"
                     onClick={handleClearFilters}
                   >
-                    Limpar Filtros
+                    {t('watchlist.clearFilters')}
                   </Button>
                 </div>
               ) : (
@@ -733,7 +740,7 @@ export default function Watchlist() {
                         variant="outline"
                         onClick={() => setVisibleTeams(prev => prev + 3)}
                       >
-                        Carregar Mais Times ({filteredTeams.length - visibleTeams} restantes)
+                        {t('watchlist.loadMoreTeams', { count: filteredTeams.length - visibleTeams })}
                       </Button>
                     )}
 
@@ -741,7 +748,7 @@ export default function Watchlist() {
                       onClick={() => setLocation('/watchlist/teams')}
                     >
                       <Table className="h-4 w-4 mr-2" />
-                      Visualizar Monitoramento Completo
+                      {t('watchlist.viewFullMonitoring')}
                     </Button>
                   </div>
                 </>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Bet } from '@/types/betting';
 import { LiveGame } from '@/utils/exposureCalculations';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,6 +13,7 @@ interface LiveGameCardProps {
 }
 
 export default function LiveGameCard({ game, onViewBet }: LiveGameCardProps) {
+  const { t, tm } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -38,17 +40,17 @@ export default function LiveGameCard({ game, onViewBet }: LiveGameCardProps) {
         {/* Quick metrics */}
         <div className="grid grid-cols-3 gap-3">
           <div className="text-center p-2 bg-white rounded border">
-            <div className="text-xs text-muted-foreground">Apostas</div>
+            <div className="text-xs text-muted-foreground">{t('watchlist.components.liveGameCard.bets')}</div>
             <div className="text-lg font-bold">{game.totalBets}</div>
           </div>
           <div className="text-center p-2 bg-white rounded border">
-            <div className="text-xs text-muted-foreground">Em Risco</div>
+            <div className="text-xs text-muted-foreground">{t('watchlist.components.liveGameCard.atRisk')}</div>
             <div className="text-lg font-bold text-orange-600">
               R$ {game.totalStake.toFixed(2)}
             </div>
           </div>
           <div className="text-center p-2 bg-white rounded border">
-            <div className="text-xs text-muted-foreground">Retorno</div>
+            <div className="text-xs text-muted-foreground">{t('watchlist.components.liveGameCard.return')}</div>
             <div className="text-lg font-bold text-green-600">
               R$ {game.potentialReturn.toFixed(2)}
             </div>
@@ -60,7 +62,7 @@ export default function LiveGameCard({ game, onViewBet }: LiveGameCardProps) {
           <div className="flex flex-wrap gap-1">
             {game.markets.map((market, i) => (
               <Badge key={i} variant="outline" className="text-xs">
-                {market}
+                {tm(market)}
               </Badge>
             ))}
           </div>
@@ -69,11 +71,11 @@ export default function LiveGameCard({ game, onViewBet }: LiveGameCardProps) {
         {/* Expandable section */}
         {expanded && (
           <div className="pt-3 border-t space-y-2">
-            <h5 className="text-sm font-medium">Detalhes das Apostas:</h5>
+            <h5 className="text-sm font-medium">{t('watchlist.components.liveGameCard.betDetails')}</h5>
             {game.bets.map((bet, i) => (
               <div key={i} className="p-2 bg-white rounded border text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">{bet.market || 'Mercado não especificado'}</span>
+                  <span className="font-medium">{bet.market ? tm(bet.market) : t('watchlist.components.liveGameCard.marketNotSpecified')}</span>
                   <span className="text-xs text-muted-foreground">
                     @{bet.odds.toFixed(2)}
                   </span>
@@ -89,7 +91,7 @@ export default function LiveGameCard({ game, onViewBet }: LiveGameCardProps) {
                     onClick={() => onViewBet(bet)}
                   >
                     <Eye className="h-3 w-3 mr-1" />
-                    Ver detalhes
+                    {t('watchlist.components.liveGameCard.viewDetails')}
                   </Button>
                 </div>
               </div>
@@ -108,12 +110,14 @@ export default function LiveGameCard({ game, onViewBet }: LiveGameCardProps) {
             {expanded ? (
               <>
                 <ChevronUp className="h-3 w-3 mr-1" />
-                Ocultar
+                {t('watchlist.components.liveGameCard.hide')}
               </>
             ) : (
               <>
                 <ChevronDown className="h-3 w-3 mr-1" />
-                Ver {game.totalBets} aposta{game.totalBets > 1 ? 's' : ''}
+                {game.totalBets > 1
+                  ? t('watchlist.components.liveGameCard.viewBetsPlural', { count: game.totalBets })
+                  : t('watchlist.components.liveGameCard.viewBets', { count: game.totalBets })}
               </>
             )}
           </Button>
@@ -121,7 +125,7 @@ export default function LiveGameCard({ game, onViewBet }: LiveGameCardProps) {
             size="sm"
             variant="outline"
             onClick={() => onViewBet(game.bets[0])}
-            title="Abrir detalhes completos"
+            title={t('watchlist.components.liveGameCard.openFullDetails')}
           >
             <ExternalLink className="h-3 w-3" />
           </Button>

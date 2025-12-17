@@ -615,10 +615,10 @@ export default function BetsList() {
                               <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700">💰 +5%</Badge>
                             )}
                             {bet.id.includes('2') && (
-                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">🏦 Cashout</Badge>
+                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">🏦 {t('bets.cashout')}</Badge>
                             )}
                             {bet.id.includes('3') && (
-                              <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700">💳 Créditos</Badge>
+                              <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700">💳 {t('bets.credits')}</Badge>
                             )}
                           </div>
                           <div className="text-right">
@@ -861,29 +861,29 @@ export default function BetsList() {
                 <div className="grid grid-cols-2 gap-4">
                   {selectedBet.matchTime && (
                     <div>
-                      <Label className="text-muted-foreground">Data/Hora do Jogo</Label>
-                      <p className="font-medium">{new Date(selectedBet.matchTime).toLocaleString('pt-BR')}</p>
+                      <Label className="text-muted-foreground">{t('bets.gameDateTime')}</Label>
+                      <p className="font-medium">{new Date(selectedBet.matchTime).toLocaleString(language === 'pt-br' ? 'pt-BR' : 'en-US')}</p>
                     </div>
                   )}
                   {selectedBet.league && (
                     <div>
-                      <Label className="text-muted-foreground">Liga/Competição</Label>
+                      <Label className="text-muted-foreground">{t('bets.leagueCompetition')}</Label>
                       <p className="font-medium">{selectedBet.league}</p>
                     </div>
                   )}
                   {selectedBet.market && (
                     <div>
-                      <Label className="text-muted-foreground">Mercado</Label>
+                      <Label className="text-muted-foreground">{t('bets.market')}</Label>
                       <p className="font-medium">{selectedBet.market}</p>
                     </div>
                   )}
                   <div>
-                    <Label className="text-muted-foreground">Tipo de Aposta</Label>
+                    <Label className="text-muted-foreground">{t('bets.betType')}</Label>
                     <Badge variant="outline" className="font-medium">
-                      {selectedBet.betType === 'simple' ? 'Simples' : 
-                       selectedBet.betType === 'multiple' ? 'Múltipla' : 
-                       selectedBet.betType === 'live' ? 'Ao Vivo' : 
-                       selectedBet.betType === 'system' ? 'Sistema' : selectedBet.betType}
+                      {selectedBet.betType === 'simple' ? t('addBet.simple') :
+                       selectedBet.betType === 'multiple' ? t('addBet.multiple') :
+                       selectedBet.betType === 'live' ? t('addBet.live') :
+                       selectedBet.betType === 'system' ? t('addBet.system') : selectedBet.betType}
                     </Badge>
                   </div>
                 </div>
@@ -891,23 +891,23 @@ export default function BetsList() {
 
               {/* Análise Financeira */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Análise Financeira</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.financialAnalysis')}</h4>
                 <div className="grid grid-cols-4 gap-4">
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <Label className="text-xs text-blue-600 font-medium">Valor Apostado</Label>
+                    <Label className="text-xs text-blue-600 font-medium">{t('bets.betAmount')}</Label>
                     <p className="text-xl font-bold text-blue-700">R$ {selectedBet.amount.toFixed(2)}</p>
                   </div>
                   <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                    <Label className="text-xs text-purple-600 font-medium">Odds</Label>
+                    <Label className="text-xs text-purple-600 font-medium">{t('addBet.odds')}</Label>
                     <p className="text-xl font-bold text-purple-700">{selectedBet.odds.toFixed(2)}</p>
                   </div>
                   <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                    <Label className="text-xs text-gray-600 font-medium">Retorno Total</Label>
+                    <Label className="text-xs text-gray-600 font-medium">{t('bets.totalReturn')}</Label>
                     <p className="text-xl font-bold text-gray-700">R$ {selectedBet.return.toFixed(2)}</p>
                   </div>
                   <div className={`p-4 border rounded-lg ${selectedBet.profit >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
                     <Label className={`text-xs font-medium ${selectedBet.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {selectedBet.profit >= 0 ? 'Lucro' : 'Prejuízo'}
+                      {selectedBet.profit >= 0 ? t('dashboard.profit') : t('bets.loss')}
                     </Label>
                     <p className={`text-xl font-bold ${selectedBet.profit >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                       {selectedBet.profit >= 0 ? '+' : ''}R$ {selectedBet.profit.toFixed(2)}
@@ -916,13 +916,13 @@ export default function BetsList() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-muted rounded-lg">
-                    <Label className="text-xs text-muted-foreground">ROI Individual</Label>
+                    <Label className="text-xs text-muted-foreground">{t('bets.individualROI')}</Label>
                     <p className={`text-lg font-semibold ${selectedBet.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {((selectedBet.profit / selectedBet.amount) * 100).toFixed(2)}%
                     </p>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
-                    <Label className="text-xs text-muted-foreground">Probabilidade Implícita</Label>
+                    <Label className="text-xs text-muted-foreground">{t('bets.impliedProbability')}</Label>
                     <p className="text-lg font-semibold">{(100 / selectedBet.odds).toFixed(1)}%</p>
                   </div>
                 </div>
@@ -930,10 +930,10 @@ export default function BetsList() {
 
               {/* Status e Badges */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Status e Características</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.statusAndCharacteristics')}</h4>
                 <div className="flex flex-wrap gap-2">
-                  <Badge 
-                    variant="outline" 
+                  <Badge
+                    variant="outline"
                     className={
                       selectedBet.status === 'won'
                         ? 'bg-[hsl(var(--profit)/0.1)] text-[hsl(var(--profit))] border-[hsl(var(--profit)/0.3)] text-sm px-3 py-1'
@@ -942,89 +942,89 @@ export default function BetsList() {
                           : 'text-sm px-3 py-1'
                     }
                   >
-                    {selectedBet.status === 'won' ? '✅ Ganha' : 
-                     selectedBet.status === 'lost' ? '❌ Perdida' : 
-                     selectedBet.status === 'pending' ? '⏳ Pendente' : 
-                     selectedBet.status === 'void' ? '🚫 Anulada' : selectedBet.status}
+                    {selectedBet.status === 'won' ? `✅ ${t('bets.won')}` :
+                     selectedBet.status === 'lost' ? `❌ ${t('bets.lost')}` :
+                     selectedBet.status === 'pending' ? `⏳ ${t('bets.pending')}` :
+                     selectedBet.status === 'void' ? `🚫 ${t('bets.void')}` : selectedBet.status}
                   </Badge>
-                  {selectedBet.isProtected && <Badge className="bg-orange-500 text-sm px-3 py-1">🛡️ Protegida</Badge>}
-                  {selectedBet.isLive && <Badge variant="secondary" className="text-sm px-3 py-1">📺 Ao Vivo</Badge>}
-                  {isLiveBet(selectedBet) && <Badge className="bg-red-500 animate-pulse text-sm px-3 py-1">🔴 AO VIVO AGORA</Badge>}
+                  {selectedBet.isProtected && <Badge className="bg-orange-500 text-sm px-3 py-1">🛡️ {t('bets.protected')}</Badge>}
+                  {selectedBet.isLive && <Badge variant="secondary" className="text-sm px-3 py-1">📺 {t('addBet.live')}</Badge>}
+                  {isLiveBet(selectedBet) && <Badge className="bg-red-500 animate-pulse text-sm px-3 py-1">🔴 {t('bets.liveNowBadge')}</Badge>}
                 </div>
               </div>
 
               {/* Características Especiais */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Características Especiais</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.specialCharacteristics')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Boost */}
                   {selectedBet.id.includes('1') && (
                     <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800">💰 BOOST</Badge>
+                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800">💰 {t('bets.boost')}</Badge>
                       </div>
                       <div className="text-sm space-y-1">
                         <div className="flex justify-between">
-                          <span className="text-yellow-700">Odds Original:</span>
+                          <span className="text-yellow-700">{t('bets.originalOdds')}:</span>
                           <span className="font-medium">{(selectedBet.odds * 0.95).toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-yellow-700">Odds Final:</span>
+                          <span className="text-yellow-700">{t('bets.finalOdds')}:</span>
                           <span className="font-medium">{selectedBet.odds.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-yellow-700">Aumento:</span>
+                          <span className="text-yellow-700">{t('bets.increase')}:</span>
                           <span className="font-semibold text-yellow-800">+{((selectedBet.odds / (selectedBet.odds * 0.95) - 1) * 100).toFixed(1)}%</span>
                         </div>
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Cashout */}
                   {selectedBet.id.includes('2') && (
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="bg-blue-100 text-blue-800">🏦 CASHOUT</Badge>
+                        <Badge variant="outline" className="bg-blue-100 text-blue-800">🏦 {t('bets.cashout')}</Badge>
                       </div>
                       <div className="text-sm space-y-1">
-                        <div className="text-blue-700 mb-1">Aposta encerrada antecipadamente</div>
+                        <div className="text-blue-700 mb-1">{t('bets.closedEarly')}</div>
                         <div className="flex justify-between">
-                          <span className="text-blue-700">Valor Resgatado:</span>
+                          <span className="text-blue-700">{t('bets.rescuedValue')}:</span>
                           <span className="font-medium">R$ {(selectedBet.amount * 0.85).toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-blue-700">% do Potencial:</span>
+                          <span className="text-blue-700">{t('bets.potentialPercent')}:</span>
                           <span className="font-medium">85%</span>
                         </div>
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Créditos */}
                   {selectedBet.id.includes('3') && (
                     <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="bg-purple-100 text-purple-800">💳 CRÉDITOS</Badge>
+                        <Badge variant="outline" className="bg-purple-100 text-purple-800">💳 {t('bets.creditsUppercase')}</Badge>
                       </div>
                       <div className="text-sm space-y-1">
-                        <div className="text-purple-700 mb-1">Aposta feita com créditos promocionais</div>
+                        <div className="text-purple-700 mb-1">{t('bets.betWithPromotionalCredits')}</div>
                         <div className="flex justify-between">
-                          <span className="text-purple-700">Origem:</span>
-                          <span className="font-medium">Bônus de Depósito</span>
+                          <span className="text-purple-700">{t('bets.origin')}:</span>
+                          <span className="font-medium">{t('bets.depositBonus')}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-purple-700">Rollover:</span>
+                          <span className="text-purple-700">{t('bets.rollover')}:</span>
                           <span className="font-medium">3x</span>
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
-                
+
                 {/* Caso não tenha características especiais */}
                 {!selectedBet.id.includes('1') && !selectedBet.id.includes('2') && !selectedBet.id.includes('3') && (
                   <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
-                    <span className="text-gray-500 text-sm">Nenhuma característica especial aplicada nesta aposta</span>
+                    <span className="text-gray-500 text-sm">{t('bets.noSpecialCharacteristics')}</span>
                   </div>
                 )}
               </div>
@@ -1032,7 +1032,7 @@ export default function BetsList() {
               {/* Estratégias e Proteções */}
               {selectedBet.strategies && selectedBet.strategies.length > 0 && (
                 <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Estratégias e Proteções</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.strategiesAndProtections')}</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedBet.strategies.map((s, i) => (
                       <Badge key={i} variant="secondary" className="text-sm px-3 py-1">{s}</Badge>
@@ -1044,7 +1044,7 @@ export default function BetsList() {
               {/* Descrição Detalhada */}
               {selectedBet.description && (
                 <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Descrição Completa</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.completeDescription')}</h4>
                   <div className="p-4 bg-muted rounded-lg">
                     <p className="text-sm leading-relaxed">{selectedBet.description}</p>
                   </div>
@@ -1054,7 +1054,7 @@ export default function BetsList() {
               {/* Método de Stake */}
               {selectedBet.stakeLogic && (
                 <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Método de Stake</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.stakeMethod')}</h4>
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-800">{selectedBet.stakeLogic}</p>
                   </div>
@@ -1063,14 +1063,14 @@ export default function BetsList() {
 
               {/* Simulação de dados da planilha */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Informações Adicionais</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.additionalInfo')}</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-muted-foreground">Placar Final</Label>
+                    <Label className="text-muted-foreground">{t('bets.finalScore')}</Label>
                     <p className="font-medium">2x1 (simulado)</p>
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">Tempo do Gol</Label>
+                    <Label className="text-muted-foreground">{t('bets.goalTime')}</Label>
                     <p className="font-medium">23', 67' e 89'</p>
                   </div>
                 </div>
@@ -1084,17 +1084,17 @@ export default function BetsList() {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Editar Aposta</DialogTitle>
-            <DialogDescription>Atualizar informações da aposta</DialogDescription>
+            <DialogTitle>{t('bets.editBet')}</DialogTitle>
+            <DialogDescription>{t('bets.updateBetInfo')}</DialogDescription>
           </DialogHeader>
           {editForm && (
             <div className="space-y-6">
               {/* Informações Básicas */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Informações Básicas</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.basicInfo')}</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="edit-stake">Valor (R$)</Label>
+                    <Label htmlFor="edit-stake">{t('bets.value')}</Label>
                     <Input
                       id="edit-stake"
                       type="number"
@@ -1104,7 +1104,7 @@ export default function BetsList() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edit-odds">Odds</Label>
+                    <Label htmlFor="edit-odds">{t('addBet.odds')}</Label>
                     <Input
                       id="edit-odds"
                       type="number"
@@ -1114,30 +1114,30 @@ export default function BetsList() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edit-status">Status</Label>
+                    <Label htmlFor="edit-status">{t('addBet.status')}</Label>
                     <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v as BetStatus })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pending">Pendente</SelectItem>
-                        <SelectItem value="won">Ganha</SelectItem>
-                        <SelectItem value="lost">Perdida</SelectItem>
-                        <SelectItem value="void">Anulada</SelectItem>
+                        <SelectItem value="pending">{t('bets.pending')}</SelectItem>
+                        <SelectItem value="won">{t('bets.won')}</SelectItem>
+                        <SelectItem value="lost">{t('bets.lost')}</SelectItem>
+                        <SelectItem value="void">{t('bets.void')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="edit-type">Tipo de Aposta</Label>
+                    <Label htmlFor="edit-type">{t('bets.betType')}</Label>
                     <Select value={editForm.betType} onValueChange={(v) => setEditForm({ ...editForm, betType: v as BetType })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="simple">Simples</SelectItem>
-                        <SelectItem value="multiple">Múltipla</SelectItem>
-                        <SelectItem value="live">Ao Vivo</SelectItem>
-                        <SelectItem value="system">Sistema</SelectItem>
+                        <SelectItem value="simple">{t('addBet.simple')}</SelectItem>
+                        <SelectItem value="multiple">{t('addBet.multiple')}</SelectItem>
+                        <SelectItem value="live">{t('addBet.live')}</SelectItem>
+                        <SelectItem value="system">{t('addBet.system')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1146,10 +1146,10 @@ export default function BetsList() {
 
               {/* Informações do Jogo */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Informações do Jogo</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.gameInfo')}</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="edit-league">Liga/Competição</Label>
+                    <Label htmlFor="edit-league">{t('bets.leagueCompetition')}</Label>
                     <Input
                       id="edit-league"
                       value={editForm.league || ''}
@@ -1158,7 +1158,7 @@ export default function BetsList() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edit-market">Mercado</Label>
+                    <Label htmlFor="edit-market">{t('bets.market')}</Label>
                     <Input
                       id="edit-market"
                       value={editForm.market || ''}
@@ -1171,51 +1171,51 @@ export default function BetsList() {
 
               {/* Descrição e Lógica */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Detalhes</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.detailsSection')}</h4>
                 <div>
-                  <Label htmlFor="edit-description">Descrição da Aposta</Label>
+                  <Label htmlFor="edit-description">{t('bets.betDescription')}</Label>
                   <Textarea
                     id="edit-description"
                     value={editForm.description}
                     onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     rows={3}
-                    placeholder="Descreva os detalhes da aposta, seleções, etc."
+                    placeholder={t('bets.descriptionPlaceholder')}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="edit-logic">Lógica do Stake</Label>
+                  <Label htmlFor="edit-logic">{t('bets.stakeLogic')}</Label>
                   <Textarea
                     id="edit-logic"
                     value={editForm.stakeLogic || ''}
                     onChange={(e) => setEditForm({ ...editForm, stakeLogic: e.target.value })}
                     rows={2}
-                    placeholder="Ex: 2% da banca, Flat R$50, Kelly Criterion"
+                    placeholder={t('bets.stakeLogicPlaceholder')}
                   />
                 </div>
               </div>
 
               {/* Informações Calculadas */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Resultados</h4>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('bets.results')}</h4>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="p-3 bg-muted rounded-lg">
-                    <Label className="text-xs text-muted-foreground">Retorno Potencial</Label>
+                    <Label className="text-xs text-muted-foreground">{t('bets.potentialReturn')}</Label>
                     <p className="text-lg font-semibold">R$ {(editForm.amount * editForm.odds).toFixed(2)}</p>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
-                    <Label className="text-xs text-muted-foreground">Lucro Potencial</Label>
+                    <Label className="text-xs text-muted-foreground">{t('bets.potentialProfit')}</Label>
                     <p className="text-lg font-semibold text-green-600">+R$ {((editForm.amount * editForm.odds) - editForm.amount).toFixed(2)}</p>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
-                    <Label className="text-xs text-muted-foreground">ROI Potencial</Label>
+                    <Label className="text-xs text-muted-foreground">{t('bets.potentialROI')}</Label>
                     <p className="text-lg font-semibold">{(((editForm.odds - 1) * 100)).toFixed(1)}%</p>
                   </div>
                 </div>
               </div>
 
               <DialogFooter>
-                <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancelar</Button>
-                <Button onClick={handleSaveEdit}>Salvar Alterações</Button>
+                <Button variant="outline" onClick={() => setEditDialogOpen(false)}>{t('common.cancel')}</Button>
+                <Button onClick={handleSaveEdit}>{t('bets.saveChanges')}</Button>
               </DialogFooter>
             </div>
           )}
@@ -1226,15 +1226,15 @@ export default function BetsList() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogTitle>{t('bets.confirmDeletion')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir esta aposta? Esta ação não pode ser desfeita.
+              {t('bets.deletionWarning')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete}>
-              Excluir
+              {t('bets.deleteBet')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

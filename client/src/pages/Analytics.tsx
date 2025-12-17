@@ -31,6 +31,10 @@ export default function Analytics() {
   const bets = useBettingStore(state => state.bets);
   const bankroll = useBettingStore(state => state.bankroll);
 
+  // Bet type translations
+  const BET_TYPE_LIVE = t('analytics.betTypeFilters.live');
+  const BET_TYPE_PREMATCH = t('analytics.betTypeFilters.prematch');
+
   // Filtros da analytics filter store
   const {
     period,

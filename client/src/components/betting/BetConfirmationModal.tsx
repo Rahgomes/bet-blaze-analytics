@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import type { BetFormData } from '@/lib/schemas/betFormSchema';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface BetConfirmationModalProps {
   open: boolean;
@@ -36,6 +37,8 @@ export const BetConfirmationModal: React.FC<BetConfirmationModalProps> = ({
   aggregatedBadges,
   onConfirm,
 }) => {
+  const { tm } = useTranslation();
+
   const getBadgeVariant = (badge: string) => {
     if (badge.includes('BOOST')) return 'secondary';
     if (badge === 'CRÉDITOS') return 'outline';
@@ -174,7 +177,7 @@ export const BetConfirmationModal: React.FC<BetConfirmationModalProps> = ({
                           {leg.homeTeam} vs {leg.awayTeam}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {leg.sport} • {leg.market}
+                          {leg.sport} • {tm(leg.market)}
                           {leg.league && ` • ${leg.league}`}
                         </p>
                       </div>

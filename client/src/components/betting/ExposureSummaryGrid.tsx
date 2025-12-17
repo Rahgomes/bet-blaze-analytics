@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/useTranslation';
 import { ExposureMetrics } from '@/utils/exposureCalculations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -8,6 +9,8 @@ interface ExposureSummaryGridProps {
 }
 
 export default function ExposureSummaryGrid({ metrics, currentBankroll }: ExposureSummaryGridProps) {
+  const { t } = useTranslation();
+
   const exposurePercentage = currentBankroll > 0
     ? (metrics.totalActiveStake / currentBankroll) * 100
     : 0;
@@ -26,15 +29,15 @@ export default function ExposureSummaryGrid({ metrics, currentBankroll }: Exposu
               R$ {metrics.totalActiveStake.toFixed(2)}
             </div>
             <div className="text-sm text-muted-foreground mt-1">
-              Stake Total em Risco
+              {t('watchlist.components.exposureSummary.totalStake')}
             </div>
             <Progress value={exposurePercentage} className="mt-3" />
             <div className="text-xs text-muted-foreground mt-1">
-              {exposurePercentage.toFixed(1)}% da banca
+              {exposurePercentage.toFixed(1)}% {t('watchlist.components.exposureSummary.ofBankroll')}
             </div>
             {exposurePercentage > 30 && (
               <div className="text-xs text-red-600 mt-1 font-medium">
-                ⚠️ Exposição alta
+                {t('watchlist.components.exposureSummary.highExposure')}
               </div>
             )}
           </div>
@@ -47,7 +50,7 @@ export default function ExposureSummaryGrid({ metrics, currentBankroll }: Exposu
           <div className="text-2xl font-bold text-green-600">
             {metrics.potentialProfit >= 0 ? '+' : ''}R$ {metrics.potentialProfit.toFixed(2)}
           </div>
-          <div className="text-sm text-muted-foreground">Lucro Potencial</div>
+          <div className="text-sm text-muted-foreground">{t('watchlist.components.exposureSummary.potentialProfit')}</div>
           <div className="text-xs text-green-600 mt-1">
             +{roiPercentage.toFixed(1)}% ROI
           </div>
@@ -65,10 +68,10 @@ export default function ExposureSummaryGrid({ metrics, currentBankroll }: Exposu
               {metrics.liveGamesCount}
             </div>
           </div>
-          <div className="text-sm text-muted-foreground">Jogos ao Vivo</div>
+          <div className="text-sm text-muted-foreground">{t('watchlist.components.exposureSummary.liveGames')}</div>
           {metrics.liveGamesCount > 0 && (
             <div className="text-xs text-orange-600 mt-1">
-              🔴 Em andamento
+              {t('watchlist.components.exposureSummary.inProgress')}
             </div>
           )}
         </CardContent>
@@ -80,10 +83,10 @@ export default function ExposureSummaryGrid({ metrics, currentBankroll }: Exposu
           <div className="text-2xl font-bold text-purple-600">
             {metrics.pendingGamesTodayCount}
           </div>
-          <div className="text-sm text-muted-foreground">Pendentes Hoje</div>
+          <div className="text-sm text-muted-foreground">{t('watchlist.components.exposureSummary.pendingToday')}</div>
           {metrics.gamesInNextHour > 0 && (
             <div className="text-xs text-yellow-600 mt-1 font-medium">
-              ⏰ {metrics.gamesInNextHour} na próxima hora
+              {t('watchlist.components.exposureSummary.nextHour', { count: metrics.gamesInNextHour })}
             </div>
           )}
         </CardContent>
@@ -95,10 +98,10 @@ export default function ExposureSummaryGrid({ metrics, currentBankroll }: Exposu
           <div className="text-2xl font-bold text-gray-700">
             {metrics.teamsWithBets}
           </div>
-          <div className="text-sm text-muted-foreground">Times com Apostas</div>
+          <div className="text-sm text-muted-foreground">{t('watchlist.components.exposureSummary.teamsWithBets')}</div>
           {metrics.teamConcentration[0] && (
             <div className="text-xs text-muted-foreground mt-1 truncate">
-              Maior: {metrics.teamConcentration[0].team}
+              {t('watchlist.components.exposureSummary.largest', { team: metrics.teamConcentration[0].team })}
             </div>
           )}
         </CardContent>
@@ -110,9 +113,9 @@ export default function ExposureSummaryGrid({ metrics, currentBankroll }: Exposu
           <div className="text-2xl font-bold text-indigo-600">
             R$ {metrics.maxSingleGameExposure.toFixed(2)}
           </div>
-          <div className="text-sm text-muted-foreground">Máx. por Jogo</div>
+          <div className="text-sm text-muted-foreground">{t('watchlist.components.exposureSummary.maxPerGame')}</div>
           <div className="text-xs text-muted-foreground mt-1">
-            {currentBankroll > 0 ? ((metrics.maxSingleGameExposure / currentBankroll) * 100).toFixed(1) : 0}% da banca
+            {currentBankroll > 0 ? ((metrics.maxSingleGameExposure / currentBankroll) * 100).toFixed(1) : 0}% {t('watchlist.components.exposureSummary.ofBankroll')}
           </div>
         </CardContent>
       </Card>

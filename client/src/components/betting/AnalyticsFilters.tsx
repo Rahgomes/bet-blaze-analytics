@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { ChevronDown, ChevronUp, X, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface AnalyticsFiltersProps {
   period: string;
@@ -39,16 +40,7 @@ interface AnalyticsFiltersProps {
   onClearFilters: () => void;
 }
 
-const BET_TYPES = ['Pré-jogo', 'Ao vivo'];
 const BET_STATUSES = ['pending', 'won', 'lost', 'void', 'cashout'];
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Pendente',
-  won: 'Ganhas',
-  lost: 'Perdidas',
-  void: 'Anuladas',
-  cashout: 'Cashout',
-};
 
 export function AnalyticsFilters({
   period,
@@ -73,7 +65,23 @@ export function AnalyticsFilters({
   availableTeams,
   onClearFilters,
 }: AnalyticsFiltersProps) {
+  const { t } = useTranslation();
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  // Bet types with translations
+  const BET_TYPES = [
+    { value: 'Pré-jogo', label: t('analytics.betTypeFilters.prematch') },
+    { value: 'Ao vivo', label: t('analytics.betTypeFilters.live') },
+  ];
+
+  // Status labels with translations
+  const STATUS_LABELS: Record<string, string> = {
+    pending: t('analytics.status.pending'),
+    won: t('analytics.status.won'),
+    lost: t('analytics.status.lost'),
+    void: t('analytics.status.void'),
+    cashout: t('analytics.status.cashout'),
+  };
 
   // Contar filtros ativos (excluindo o período)
   const activeFiltersCount =
@@ -107,16 +115,16 @@ export function AnalyticsFilters({
         <div className="flex-1 min-w-[200px]">
           <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger>
-              <SelectValue placeholder="Selecione o período" />
+              <SelectValue placeholder={t('analytics.filters.periodPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="today">Hoje</SelectItem>
-              <SelectItem value="week">Esta Semana</SelectItem>
-              <SelectItem value="month">Este Mês</SelectItem>
-              <SelectItem value="30days">Últimos 30 Dias</SelectItem>
-              <SelectItem value="90days">Últimos 90 Dias</SelectItem>
-              <SelectItem value="year">Este Ano</SelectItem>
-              <SelectItem value="all">Todo o Período</SelectItem>
+              <SelectItem value="today">{t('analytics.filters.today')}</SelectItem>
+              <SelectItem value="week">{t('analytics.filters.week')}</SelectItem>
+              <SelectItem value="month">{t('analytics.filters.month')}</SelectItem>
+              <SelectItem value="30days">{t('analytics.filters.30days')}</SelectItem>
+              <SelectItem value="90days">{t('analytics.filters.90days')}</SelectItem>
+              <SelectItem value="year">{t('analytics.filters.year')}</SelectItem>
+              <SelectItem value="all">{t('analytics.filters.all')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -127,7 +135,7 @@ export function AnalyticsFilters({
           className="gap-2"
         >
           <Filter className="h-4 w-4" />
-          Filtros Avançados
+          {t('analytics.filters.advancedFilters')}
           {activeFiltersCount > 0 && (
             <Badge variant="default" className="ml-1">
               {activeFiltersCount}
@@ -143,7 +151,7 @@ export function AnalyticsFilters({
         {hasActiveFilters && (
           <Button variant="ghost" onClick={onClearFilters} className="gap-2">
             <X className="h-4 w-4" />
-            Limpar Tudo
+            {t('analytics.filters.clearAll')}
           </Button>
         )}
       </div>
@@ -152,13 +160,13 @@ export function AnalyticsFilters({
       {showAdvancedFilters && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Filtros Avançados</CardTitle>
+            <CardTitle className="text-base">{t('analytics.filters.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Casas de Apostas */}
             {availableBookmakers.length > 0 && (
               <div className="space-y-3">
-                <Label className="text-sm font-semibold">Casas de Apostas</Label>
+                <Label className="text-sm font-semibold">{t('analytics.filters.bookmakers')}</Label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {availableBookmakers.map((bookmaker) => (
                     <div key={bookmaker} className="flex items-center space-x-2">
@@ -184,7 +192,7 @@ export function AnalyticsFilters({
             {/* Ligas/Competições */}
             {availableLeagues.length > 0 && (
               <div className="space-y-3">
-                <Label className="text-sm font-semibold">Ligas/Competições</Label>
+                <Label className="text-sm font-semibold">{t('analytics.filters.leagues')}</Label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto">
                   {availableLeagues.map((league) => (
                     <div key={league} className="flex items-center space-x-2">
@@ -209,19 +217,19 @@ export function AnalyticsFilters({
 
             {/* Tipo de Aposta */}
             <div className="space-y-3">
-              <Label className="text-sm font-semibold">Tipo de Aposta</Label>
+              <Label className="text-sm font-semibold">{t('bets.betType')}</Label>
               <div className="grid grid-cols-2 gap-3">
                 {BET_TYPES.map((type) => (
-                  <div key={type} className="flex items-center space-x-2">
+                  <div key={type.value} className="flex items-center space-x-2">
                     <Checkbox
-                      id={`type-${type}`}
-                      checked={selectedBetTypes.includes(type)}
+                      id={`type-${type.value}`}
+                      checked={selectedBetTypes.includes(type.value)}
                       onCheckedChange={() =>
-                        handleToggleItem(type, selectedBetTypes, setSelectedBetTypes)
+                        handleToggleItem(type.value, selectedBetTypes, setSelectedBetTypes)
                       }
                     />
-                    <label htmlFor={`type-${type}`} className="text-sm cursor-pointer">
-                      {type}
+                    <label htmlFor={`type-${type.value}`} className="text-sm cursor-pointer">
+                      {type.label}
                     </label>
                   </div>
                 ))}
@@ -231,7 +239,7 @@ export function AnalyticsFilters({
             {/* Mercados */}
             {availableMarkets.length > 0 && (
               <div className="space-y-3">
-                <Label className="text-sm font-semibold">Mercados</Label>
+                <Label className="text-sm font-semibold">{t('analytics.filters.markets')}</Label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto">
                   {availableMarkets.map((market) => (
                     <div key={market} className="flex items-center space-x-2">
@@ -257,14 +265,14 @@ export function AnalyticsFilters({
             {/* Faixa de Odds */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-semibold">Faixa de Odds</Label>
+                <Label className="text-sm font-semibold">{t('analytics.filters.oddsRange')}</Label>
                 <span className="text-sm text-muted-foreground">
                   {oddsRange.min.toFixed(2)} - {oddsRange.max.toFixed(2)}
                 </span>
               </div>
               <div className="space-y-4">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Mínima</Label>
+                  <Label className="text-xs text-muted-foreground">{t('analytics.filters.minimum')}</Label>
                   <Slider
                     value={[oddsRange.min]}
                     onValueChange={(value) =>
@@ -277,7 +285,7 @@ export function AnalyticsFilters({
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Máxima</Label>
+                  <Label className="text-xs text-muted-foreground">{t('analytics.filters.maximum')}</Label>
                   <Slider
                     value={[oddsRange.max]}
                     onValueChange={(value) =>
@@ -294,7 +302,7 @@ export function AnalyticsFilters({
 
             {/* Status */}
             <div className="space-y-3">
-              <Label className="text-sm font-semibold">Status</Label>
+              <Label className="text-sm font-semibold">{t('analytics.filters.status')}</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {BET_STATUSES.map((status) => (
                   <div key={status} className="flex items-center space-x-2">
@@ -319,7 +327,7 @@ export function AnalyticsFilters({
             {/* Times (se houver muitos, mostrar apenas como info) */}
             {selectedTeams.length > 0 && (
               <div className="space-y-3">
-                <Label className="text-sm font-semibold">Times Selecionados</Label>
+                <Label className="text-sm font-semibold">{t('analytics.filters.selectedTeams')}</Label>
                 <div className="flex flex-wrap gap-2">
                   {selectedTeams.map((team) => (
                     <Badge

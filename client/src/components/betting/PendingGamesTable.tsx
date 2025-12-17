@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/useTranslation';
 import { Bet } from '@/types/betting';
 import { PendingGame } from '@/utils/exposureCalculations';
 import {
@@ -25,10 +26,12 @@ interface PendingGamesTableProps {
 }
 
 export default function PendingGamesTable({ games, onViewBet }: PendingGamesTableProps) {
+  const { t } = useTranslation();
+
   if (games.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-8">
-        Nenhuma aposta pendente para hoje
+        {t('watchlist.components.pendingGamesTable.noPending')}
       </div>
     );
   }
@@ -40,13 +43,13 @@ export default function PendingGamesTable({ games, onViewBet }: PendingGamesTabl
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Jogo</TableHead>
-              <TableHead>Horário</TableHead>
-              <TableHead className="text-center">Apostas</TableHead>
-              <TableHead className="text-right">Stake</TableHead>
-              <TableHead className="text-right">Retorno Potencial</TableHead>
-              <TableHead className="text-right">Lucro Potencial</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+              <TableHead>{t('watchlist.components.pendingGamesTable.game')}</TableHead>
+              <TableHead>{t('watchlist.components.pendingGamesTable.time')}</TableHead>
+              <TableHead className="text-center">{t('watchlist.components.pendingGamesTable.bets')}</TableHead>
+              <TableHead className="text-right">{t('watchlist.components.pendingGamesTable.stake')}</TableHead>
+              <TableHead className="text-right">{t('watchlist.components.pendingGamesTable.potentialReturn')}</TableHead>
+              <TableHead className="text-right">{t('watchlist.components.pendingGamesTable.potentialProfit')}</TableHead>
+              <TableHead className="text-right">{t('watchlist.components.pendingGamesTable.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -101,12 +104,12 @@ export default function PendingGamesTable({ games, onViewBet }: PendingGamesTabl
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => onViewBet(game.bets[0])}>
                         <Eye className="h-3 w-3 mr-2" />
-                        Ver primeira aposta
+                        {t('watchlist.components.pendingGamesTable.viewFirstBet')}
                       </DropdownMenuItem>
                       {game.totalBets > 1 && (
                         <DropdownMenuItem onClick={() => onViewBet(game.bets[0])}>
                           <List className="h-3 w-3 mr-2" />
-                          Ver todas ({game.totalBets})
+                          {t('watchlist.components.pendingGamesTable.viewAll', { count: game.totalBets })}
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -145,15 +148,15 @@ export default function PendingGamesTable({ games, onViewBet }: PendingGamesTabl
             <CardContent>
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="text-center p-2 bg-muted rounded">
-                  <div className="text-xs text-muted-foreground">Apostas</div>
+                  <div className="text-xs text-muted-foreground">{t('watchlist.components.pendingGamesTable.bets')}</div>
                   <div className="text-sm font-bold">{game.totalBets}</div>
                 </div>
                 <div className="text-center p-2 bg-muted rounded">
-                  <div className="text-xs text-muted-foreground">Stake</div>
+                  <div className="text-xs text-muted-foreground">{t('watchlist.components.pendingGamesTable.stake')}</div>
                   <div className="text-sm font-bold">R$ {game.totalStake.toFixed(0)}</div>
                 </div>
                 <div className="text-center p-2 bg-green-50 rounded">
-                  <div className="text-xs text-green-700">Lucro</div>
+                  <div className="text-xs text-green-700">{t('watchlist.components.pendingGamesTable.profit')}</div>
                   <div className="text-sm font-bold text-green-600">
                     +R$ {game.potentialProfit.toFixed(0)}
                   </div>
@@ -166,7 +169,7 @@ export default function PendingGamesTable({ games, onViewBet }: PendingGamesTabl
                 onClick={() => onViewBet(game.bets[0])}
               >
                 <Eye className="h-3 w-3 mr-1" />
-                Ver Detalhes
+                {t('watchlist.components.pendingGamesTable.viewDetails')}
               </Button>
             </CardContent>
           </Card>

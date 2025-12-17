@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/useTranslation';
 import { MarketDistribution } from '@/utils/exposureCalculations';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -8,21 +9,23 @@ interface MarketDistributionChartProps {
 }
 
 export default function MarketDistributionChart({ distribution }: MarketDistributionChartProps) {
+  const { t, tm } = useTranslation();
+
   if (distribution.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            Distribuição por Mercado
+            {t('watchlist.components.marketDistribution.title')}
           </CardTitle>
           <CardDescription>
-            Nenhuma aposta ativa no momento
+            {t('watchlist.components.marketDistribution.noBets')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center text-muted-foreground py-8">
-            Sem dados para exibir
+            {t('watchlist.components.marketDistribution.noData')}
           </div>
         </CardContent>
       </Card>
@@ -34,10 +37,10 @@ export default function MarketDistributionChart({ distribution }: MarketDistribu
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BarChart3 className="h-5 w-5" />
-          Distribuição por Mercado
+          {t('watchlist.components.marketDistribution.title')}
         </CardTitle>
         <CardDescription>
-          Como seu stake está distribuído entre mercados
+          {t('watchlist.components.marketDistribution.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -45,10 +48,10 @@ export default function MarketDistributionChart({ distribution }: MarketDistribu
           {distribution.map((market, i) => (
             <div key={i}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">{market.market}</span>
+                <span className="text-sm font-medium">{tm(market.market)}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">
-                    {market.betCount} aposta{market.betCount > 1 ? 's' : ''}
+                    {market.betCount} {market.betCount > 1 ? t('watchlist.components.marketDistribution.bets') : t('watchlist.components.marketDistribution.bet')}
                   </span>
                   <span className="text-sm font-semibold">
                     {market.percentage.toFixed(1)}%
@@ -69,10 +72,13 @@ export default function MarketDistributionChart({ distribution }: MarketDistribu
         {distribution.length > 0 && (
           <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="text-xs text-blue-800">
-              <strong>📊 Insight:</strong>
+              <strong>{t('watchlist.components.marketDistribution.insightLabel')}</strong>
               {distribution[0].percentage > 50
-                ? ` ${distribution[0].percentage.toFixed(0)}% do seu stake está concentrado em ${distribution[0].market}. Considere diversificar.`
-                : ` Sua distribuição está equilibrada entre ${distribution.length} mercados diferentes.`}
+                ? t('watchlist.components.marketDistribution.concentrated', {
+                    percent: distribution[0].percentage.toFixed(0),
+                    market: tm(distribution[0].market)
+                  })
+                : t('watchlist.components.marketDistribution.balanced', { count: distribution.length })}
             </div>
           </div>
         )}

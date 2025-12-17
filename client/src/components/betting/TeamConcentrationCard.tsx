@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/useTranslation';
 import { TeamExposure } from '@/utils/exposureCalculations';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,21 +10,23 @@ interface TeamConcentrationCardProps {
 }
 
 export default function TeamConcentrationCard({ teamExposure }: TeamConcentrationCardProps) {
+  const { t } = useTranslation();
+
   if (teamExposure.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-gray-400" />
-            Risco de Concentração por Time
+            {t('watchlist.components.teamConcentration.title')}
           </CardTitle>
           <CardDescription>
-            Nenhum time com apostas ativas no momento
+            {t('watchlist.components.teamConcentration.noTeams')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center text-muted-foreground py-8">
-            Sem dados para exibir
+            {t('watchlist.components.teamConcentration.noData')}
           </div>
         </CardContent>
       </Card>
@@ -32,15 +35,21 @@ export default function TeamConcentrationCard({ teamExposure }: TeamConcentratio
 
   const maxStake = teamExposure[0]?.totalStake || 1;
 
+  const getRiskLabel = (riskLevel: string) => {
+    if (riskLevel === 'high') return t('watchlist.components.teamConcentration.riskHigh');
+    if (riskLevel === 'medium') return t('watchlist.components.teamConcentration.riskMedium');
+    return t('watchlist.components.teamConcentration.riskLow');
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-yellow-600" />
-          Risco de Concentração por Time
+          {t('watchlist.components.teamConcentration.title')}
         </CardTitle>
         <CardDescription>
-          Times com maior exposição de stake - monitorar para evitar over-exposure
+          {t('watchlist.components.teamConcentration.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -61,9 +70,7 @@ export default function TeamConcentrationCard({ teamExposure }: TeamConcentratio
                           : 'border-green-500 text-green-700 bg-green-50'
                       }
                     >
-                      {team.riskLevel === 'high' ? '🔴 Alto' :
-                       team.riskLevel === 'medium' ? '🟡 Médio' :
-                       '🟢 Baixo'}
+                      {getRiskLabel(team.riskLevel)}
                     </Badge>
                     <span className="text-sm font-semibold">
                       R$ {team.totalStake.toFixed(2)}
@@ -71,9 +78,9 @@ export default function TeamConcentrationCard({ teamExposure }: TeamConcentratio
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                  <span>{team.betCount} apostas</span>
+                  <span>{team.betCount} {t('watchlist.components.teamConcentration.bets')}</span>
                   <span>•</span>
-                  <span>{team.gameCount} jogos</span>
+                  <span>{team.gameCount} {t('watchlist.components.teamConcentration.games')}</span>
                 </div>
                 <Progress
                   value={(team.totalStake / maxStake) * 100}
@@ -86,7 +93,7 @@ export default function TeamConcentrationCard({ teamExposure }: TeamConcentratio
 
         {teamExposure.length > 5 && (
           <div className="mt-4 text-center text-xs text-muted-foreground">
-            + {teamExposure.length - 5} outros times
+            {t('watchlist.components.teamConcentration.otherTeams', { count: teamExposure.length - 5 })}
           </div>
         )}
       </CardContent>

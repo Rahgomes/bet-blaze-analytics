@@ -8,7 +8,8 @@ type TranslationKeys = typeof en;
 interface TranslationContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  tm: (marketName: string) => string; // Translate market
 }
 
 const translations: Record<Language, TranslationKeys> = {
@@ -32,19 +33,46 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     setLanguageState(lang);
   };
 
-  const t = (key: string): string => {
+  const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
     let value: any = translations[language];
-    
+
     for (const k of keys) {
       value = value?.[k];
     }
-    
-    return value || key;
+
+    let result = value || key;
+
+    // Replace placeholders with params
+    if (params && typeof result === 'string') {
+      Object.entries(params).forEach(([paramKey, paramValue]) => {
+        result = result.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(paramValue));
+      });
+    }
+
+    return result;
+  };
+
+  // Translate market names
+  const tm = (marketName: string): string => {
+    // Convert market name to camelCase key for lookup
+    const normalizeToKey = (name: string): string => {
+      return name
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .replace(/\s+/g, '') // Remove spaces
+        .replace(/[^\w]/g, ''); // Remove special chars
+    };
+
+    const key = normalizeToKey(marketName);
+    const marketTranslation = translations[language]?.markets?.[key as keyof typeof translations.en.markets];
+
+    return marketTranslation || marketName; // Return original if no translation found
   };
 
   return (
-    <TranslationContext.Provider value={{ language, setLanguage, t }}>
+    <TranslationContext.Provider value={{ language, setLanguage, t, tm }}>
       {children}
     </TranslationContext.Provider>
   );

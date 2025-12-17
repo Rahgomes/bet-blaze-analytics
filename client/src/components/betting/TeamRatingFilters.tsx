@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/useTranslation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,13 +29,14 @@ export default function TeamRatingFilters({
   setFilterWinRate,
   onClearFilters,
 }: TeamRatingFiltersProps) {
+  const { t } = useTranslation();
   const hasActiveFilters = searchTerm !== '' || filterRank !== 'all' || filterWinRate !== 'all';
 
   return (
     <div className="grid gap-4 md:grid-cols-4">
       {/* Input de busca por nome */}
       <Input
-        placeholder="Buscar por nome do time..."
+        placeholder={t('watchlist.components.teamFilters.searchPlaceholder')}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="w-full"
@@ -43,10 +45,10 @@ export default function TeamRatingFilters({
       {/* Select de Rank */}
       <Select value={filterRank} onValueChange={setFilterRank}>
         <SelectTrigger>
-          <SelectValue placeholder="Filtrar por Rank" />
+          <SelectValue placeholder={t('watchlist.components.teamFilters.filterByRank')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos os Ranks</SelectItem>
+          <SelectItem value="all">{t('watchlist.components.teamFilters.allRanks')}</SelectItem>
           <SelectItem value="A++">A++</SelectItem>
           <SelectItem value="A+">A+</SelectItem>
           <SelectItem value="A">A</SelectItem>
@@ -58,10 +60,10 @@ export default function TeamRatingFilters({
       {/* Select de Taxa de Acerto */}
       <Select value={filterWinRate} onValueChange={setFilterWinRate}>
         <SelectTrigger>
-          <SelectValue placeholder="Taxa de Acerto" />
+          <SelectValue placeholder={t('watchlist.components.teamFilters.winRate')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todas as taxas</SelectItem>
+          <SelectItem value="all">{t('watchlist.components.teamFilters.allRates')}</SelectItem>
           <SelectItem value="0-25">0% - 25%</SelectItem>
           <SelectItem value="25-50">25% - 50%</SelectItem>
           <SelectItem value="50-75">50% - 75%</SelectItem>
@@ -77,7 +79,7 @@ export default function TeamRatingFilters({
         className="w-full"
       >
         <X className="h-4 w-4 mr-2" />
-        Limpar Filtros
+        {t('watchlist.components.teamFilters.clearFilters')}
       </Button>
     </div>
   );
