@@ -2,8 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { generateCSVTemplate, generateExcelTemplate } from '@/utils/importTemplateGenerator';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function ImportTemplateDownload() {
+  const { t } = useTranslation();
+
   const handleDownloadCSV = () => {
     try {
       generateCSVTemplate();
@@ -25,17 +28,16 @@ export function ImportTemplateDownload() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Download className="h-5 w-5" />
-          Download de Template
+          {t('import.template.title')}
         </CardTitle>
         <CardDescription>
-          Baixe um modelo pronto para preencher com suas apostas
+          {t('import.template.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            O template já vem com exemplos de apostas simples e múltiplas para facilitar o preenchimento.
-            Preencha os dados e faça upload do arquivo para importar suas apostas em massa.
+            {t('import.template.introText')}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -46,9 +48,9 @@ export function ImportTemplateDownload() {
             >
               <FileText className="h-8 w-8 text-green-600" />
               <div className="text-center">
-                <div className="font-semibold">Baixar CSV</div>
+                <div className="font-semibold">{t('import.template.csvButton')}</div>
                 <div className="text-xs text-muted-foreground">
-                  Formato universal, editável em qualquer programa
+                  {t('import.template.csvDescription')}
                 </div>
               </div>
             </Button>
@@ -60,22 +62,22 @@ export function ImportTemplateDownload() {
             >
               <FileSpreadsheet className="h-8 w-8 text-blue-600" />
               <div className="text-center">
-                <div className="font-semibold">Baixar Excel</div>
+                <div className="font-semibold">{t('import.template.excelButton')}</div>
                 <div className="text-xs text-muted-foreground">
-                  Formato Excel (.xlsx) com formatação
+                  {t('import.template.excelDescription')}
                 </div>
               </div>
             </Button>
           </div>
 
           <div className="bg-muted p-3 rounded-lg text-sm space-y-1">
-            <p className="font-medium">Dicas para preenchimento:</p>
+            <p className="font-medium">{t('import.template.tipsTitle')}</p>
             <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-              <li>Campos marcados com * são obrigatórios</li>
-              <li>Para apostas múltiplas, use uma linha por leg com o mesmo operationNumber</li>
-              <li>Use o formato YYYY-MM-DD para datas (ex: 2024-12-01)</li>
-              <li>Separe tags com | (pipe), ex: "Value Bet|Linha Segura"</li>
-              <li>Use true/false para campos booleanos</li>
+              <li>{t('import.template.tip1')}</li>
+              <li>{t('import.template.tip2')}</li>
+              <li>{t('import.template.tip3')}</li>
+              <li>{t('import.template.tip4')}</li>
+              <li>{t('import.template.tip5')}</li>
             </ul>
           </div>
         </div>

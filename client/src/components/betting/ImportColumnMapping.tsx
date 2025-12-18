@@ -4,8 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getColumnMapping } from '@/utils/importTemplateGenerator';
 import { FileQuestion } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function ImportColumnMapping() {
+  const { t } = useTranslation();
   const { required, optional } = getColumnMapping();
 
   return (
@@ -13,19 +15,19 @@ export function ImportColumnMapping() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileQuestion className="h-5 w-5" />
-          Mapeamento de Colunas
+          {t('import.columnMapping.title')}
         </CardTitle>
         <CardDescription>
-          Entenda o que cada coluna significa no arquivo de importação
+          {t('import.columnMapping.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Required Fields */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm">Campos Obrigatórios</h3>
+            <h3 className="font-semibold text-sm">{t('import.columnMapping.requiredFields')}</h3>
             <Badge variant="destructive" className="text-xs">
-              Obrigatórios
+              {t('import.columnMapping.requiredBadge')}
             </Badge>
           </div>
 
@@ -33,8 +35,8 @@ export function ImportColumnMapping() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-[200px] font-semibold">Coluna</TableHead>
-                  <TableHead className="font-semibold">Descrição</TableHead>
+                  <TableHead className="w-[200px] font-semibold">{t('import.columnMapping.columnHeader')}</TableHead>
+                  <TableHead className="font-semibold">{t('import.columnMapping.descriptionHeader')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -44,7 +46,7 @@ export function ImportColumnMapping() {
                       {col.name}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {col.description}
+                      {t(`import.columns.${col.key}`)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -58,9 +60,9 @@ export function ImportColumnMapping() {
         {/* Optional Fields */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm">Campos Opcionais</h3>
+            <h3 className="font-semibold text-sm">{t('import.columnMapping.optionalFields')}</h3>
             <Badge variant="secondary" className="text-xs">
-              Opcionais
+              {t('import.columnMapping.optionalBadge')}
             </Badge>
           </div>
 
@@ -68,8 +70,8 @@ export function ImportColumnMapping() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-[200px] font-semibold">Coluna</TableHead>
-                  <TableHead className="font-semibold">Descrição</TableHead>
+                  <TableHead className="w-[200px] font-semibold">{t('import.columnMapping.columnHeader')}</TableHead>
+                  <TableHead className="font-semibold">{t('import.columnMapping.descriptionHeader')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -79,7 +81,7 @@ export function ImportColumnMapping() {
                       {col.name}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {col.description}
+                      {t(`import.columns.${col.key}`)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -91,17 +93,17 @@ export function ImportColumnMapping() {
         {/* Help text */}
         <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg text-sm space-y-1">
           <p className="font-medium text-blue-900 dark:text-blue-100">
-            Importante:
+            {t('import.columnMapping.importantTitle')}
           </p>
           <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-200">
             <li>
-              <strong>Apostas Simples:</strong> Use apenas 1 linha com legNumber=1
+              <strong>{t('import.columnMapping.simpleBetTip').split(':')[0]}:</strong> {t('import.columnMapping.simpleBetTip').split(':')[1]}
             </li>
             <li>
-              <strong>Apostas Múltiplas:</strong> Use uma linha por leg, todas com o mesmo operationNumber ou description
+              <strong>{t('import.columnMapping.multipleBetTip').split(':')[0]}:</strong> {t('import.columnMapping.multipleBetTip').split(':')[1]}
             </li>
             <li>
-              Campos condicionais (como originalOdds) só são obrigatórios se o campo relacionado (hasBoost) for true
+              {t('import.columnMapping.conditionalFieldsTip')}
             </li>
           </ul>
         </div>
